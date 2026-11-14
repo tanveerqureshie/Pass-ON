@@ -53,18 +53,6 @@ Built with an authentic **Modern Brutalist UI** (bold typography, high-contrast 
 
 ---
 
-## Environment Configuration
-
-Create a `.env.local` file in the root directory:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://yvziylhrauitjqxkqqdn.supabase.co
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_0PF0MOzdJdjqrdDwGzYMZA_1jzKSKTX
-NEXT_PUBLIC_APP_NAME="Pass ON"
-NEXT_PUBLIC_APP_TAGLINE="Pass It On. Save More."
-```
-
----
 
 ## Database Migration & Seed
 
