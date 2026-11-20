@@ -32,17 +32,17 @@ export function SectionHeader({
   return (
     <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
       <div className="max-w-2xl">
-        {eyebrow && <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.18em] text-brand-600">{eyebrow}</p>}
-        <h2 className="font-display text-2xl font-extrabold tracking-tight text-ink-950 sm:text-3xl">{title}</h2>
-        {description && <p className="mt-2 text-sm leading-relaxed text-ink-500 sm:text-base">{description}</p>}
+        {eyebrow && <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.18em] text-brand-600 dark:text-teal-400">{eyebrow}</p>}
+        <h2 className="font-display text-2xl font-extrabold tracking-tight text-ink-950 dark:text-white sm:text-3xl">{title}</h2>
+        {description && <p className="mt-2 text-sm leading-relaxed text-ink-500 dark:text-slate-400 sm:text-base">{description}</p>}
       </div>
       {actionHref && actionLabel && (
         <Link
           href={actionHref}
-          className="group inline-flex h-10 shrink-0 items-center gap-2 rounded-full border border-ink-300 bg-white px-5 text-sm font-bold text-ink-900 shadow-chip transition hover:border-ink-400 hover:bg-ink-50"
+          className="group inline-flex h-10 shrink-0 items-center gap-2 rounded-full border border-ink-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-5 text-sm font-bold text-ink-900 dark:text-slate-100 shadow-chip transition hover:border-ink-400 dark:hover:border-slate-600 hover:bg-ink-50 dark:hover:bg-slate-700"
         >
           {actionLabel}
-          <ArrowRight className="h-4 w-4 text-brand-600 transition-transform group-hover:translate-x-0.5" />
+          <ArrowRight className="h-4 w-4 text-brand-600 dark:text-teal-400 transition-transform group-hover:translate-x-0.5" />
         </Link>
       )}
     </div>

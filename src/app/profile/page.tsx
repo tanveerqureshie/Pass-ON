@@ -122,6 +122,17 @@ export default function ProfilePage() {
                   ? `Your application was declined: ${currentUser?.rejectionReason || 'Details could not be matched against university records.'}`
                   : 'Your application is awaiting manual verification by campus administrators. Browsing is unlocked.'}
             </p>
+            {currentUser?.idCardUrl && (
+              <div className="pt-2 flex items-center gap-3 border-t border-black/5 mt-2">
+                <div className="h-12 w-20 overflow-hidden rounded-lg border border-teal-500/60 bg-slate-900 shrink-0">
+                  <img src={currentUser.idCardUrl} alt="Uploaded College ID Card" className="h-full w-full object-cover" />
+                </div>
+                <div>
+                  <span className="block text-xs font-bold text-ink-900">Submitted College ID Card</span>
+                  <span className="block text-[11px] text-ink-500">Verified by campus administration</span>
+                </div>
+              </div>
+            )}
           </div>
 
           <Input

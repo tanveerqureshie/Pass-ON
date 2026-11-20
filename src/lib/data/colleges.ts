@@ -13,6 +13,13 @@ export const INITIAL_COLLEGES: College[] = [
     description: 'Premier GGSIPU engineering college situated in PSP Area, Plot No. 1, Sector 22, Rohini.',
     establishedYear: 1999,
     featured: true,
+    image: '/colleges/MAIT.jpeg',
+    connectivity: 'Rithala Metro Station (Red Line) — 10 mins e-rickshaw',
+    placements: {
+      highest: '₹55 LPA',
+      average: '₹9.2 LPA',
+      topRecruiters: ['Amazon', 'Google', 'Microsoft', 'Atlassian', 'Infosys'],
+    },
   },
   {
     id: 'msit',
@@ -26,6 +33,13 @@ export const INITIAL_COLLEGES: College[] = [
     description: 'Renowned engineering college located in C-4 Janakpuri, New Delhi.',
     establishedYear: 1999,
     featured: true,
+    image: '/colleges/MSIT.jpeg',
+    connectivity: 'Janakpuri East / West Metro (Blue Line) — 5 mins walk',
+    placements: {
+      highest: '₹48 LPA',
+      average: '₹8.8 LPA',
+      topRecruiters: ['Adobe', 'Amazon', 'Cisco', 'ZS Associates'],
+    },
   },
   {
     id: 'bvcoe',
@@ -39,6 +53,13 @@ export const INITIAL_COLLEGES: College[] = [
     description: 'A-4 Paschim Vihar, Rohtak Road campus known for engineering and technical excellence.',
     establishedYear: 1999,
     featured: true,
+    image: '/colleges/BVCOE.jpeg',
+    connectivity: 'Paschim Vihar East Metro (Green Line) — 2 mins walk',
+    placements: {
+      highest: '₹42 LPA',
+      average: '₹8.1 LPA',
+      topRecruiters: ['Samsung', 'Amazon', 'TCS Ninja', 'Wipro'],
+    },
   },
   {
     id: 'bpit',
@@ -52,6 +73,13 @@ export const INITIAL_COLLEGES: College[] = [
     description: 'Located in Sector 17, Rohini, Delhi, providing comprehensive undergraduate engineering education.',
     establishedYear: 2005,
     featured: false,
+    image: '/colleges/BPIT.jpeg',
+    connectivity: 'Samaypur Badli / Rohini Sector 18 Metro (Yellow Line) — 8 mins',
+    placements: {
+      highest: '₹36 LPA',
+      average: '₹7.5 LPA',
+      topRecruiters: ['Amazon', 'Cognizant', 'HCL', 'Accenture'],
+    },
   },
   {
     id: 'gtbit',
@@ -65,6 +93,13 @@ export const INITIAL_COLLEGES: College[] = [
     description: 'Sikh minority institution located at G-8 Area, Rajouri Garden, New Delhi.',
     establishedYear: 1999,
     featured: true,
+    image: '/colleges/GTBIT.jpeg',
+    connectivity: 'Subhash Nagar / Rajouri Garden Metro (Blue & Pink Lines) — 5 mins',
+    placements: {
+      highest: '₹44 LPA',
+      average: '₹8.0 LPA',
+      topRecruiters: ['Paytm', 'Infosys', 'GrapeCity', 'Capgemini'],
+    },
   },
   {
     id: 'adgitm',
@@ -78,6 +113,13 @@ export const INITIAL_COLLEGES: College[] = [
     description: 'FC-26, Pandav Nagar Road, Shastri Park, offering modern diverse B.Tech specializations.',
     establishedYear: 2003,
     featured: false,
+    image: '/colleges/ADGITM.jpeg',
+    connectivity: 'Shastri Park Metro (Red Line) — 5 mins transit',
+    placements: {
+      highest: '₹38 LPA',
+      average: '₹7.2 LPA',
+      topRecruiters: ['Amazon', 'Tech Mahindra', 'TCS', 'L&T Infotech'],
+    },
   },
   {
     id: 'vips-tc',
@@ -91,6 +133,13 @@ export const INITIAL_COLLEGES: College[] = [
     description: 'AU Block, Outer Ring Road, Pitampura, focused on cutting-edge computer sciences & emerging technologies.',
     establishedYear: 2000,
     featured: true,
+    image: '/colleges/VIPS.jpeg',
+    connectivity: 'Pitampura / Netaji Subhash Place (Red & Pink Lines) — 5 mins',
+    placements: {
+      highest: '₹40 LPA',
+      average: '₹8.4 LPA',
+      topRecruiters: ['Microsoft', 'Deloitte', 'Nagarro', 'Wipro'],
+    },
   },
   {
     id: 'hmr',
@@ -104,6 +153,13 @@ export const INITIAL_COLLEGES: College[] = [
     description: 'Established in Hameedpur, Delhi, offering undergraduate courses in core engineering fields.',
     establishedYear: 2002,
     featured: false,
+    image: '/colleges/HMR.jpeg',
+    connectivity: 'Samaypur Badli (Yellow Line) — direct campus feeder buses',
+    placements: {
+      highest: '₹30 LPA',
+      average: '₹6.8 LPA',
+      topRecruiters: ['TCS', 'HCL', 'Wipro', 'Genpact'],
+    },
   },
   {
     id: 'gtb4cec',
@@ -117,6 +173,13 @@ export const INITIAL_COLLEGES: College[] = [
     description: 'Affiliated technical college in New Delhi fostering engineering innovation.',
     establishedYear: 2006,
     featured: false,
+    image: '/colleges/GTBIT.jpeg',
+    connectivity: 'Rajouri Garden Metro (Blue & Pink Lines) — 10 mins',
+    placements: {
+      highest: '₹32 LPA',
+      average: '₹6.5 LPA',
+      topRecruiters: ['Cognizant', 'Infosys', 'Capgemini'],
+    },
   },
   {
     id: 'usar',
@@ -130,6 +193,13 @@ export const INITIAL_COLLEGES: College[] = [
     description: 'GGSIPU East Campus school focused on automation, robotics and AI-driven engineering education.',
     establishedYear: 2021,
     featured: false,
+    image: '/colleges/USAR.jpeg',
+    connectivity: 'Karkardooma / Anand Vihar Metro (Blue & Pink Lines) — 5 mins',
+    placements: {
+      highest: '₹45 LPA',
+      average: '₹10.2 LPA',
+      topRecruiters: ['Texas Instruments', 'Amazon', 'Siemens', 'ABB'],
+    },
   },
   {
     id: 'usict',
@@ -140,9 +210,16 @@ export const INITIAL_COLLEGES: College[] = [
     category: 'Engineering',
     isActive: true,
     branches: ['CSE', 'IT', 'ECE'],
-    description: 'GGSIPU Dwarka school for information & communication technology, computing and electronics.',
-    establishedYear: 2017,
-    featured: false,
+    description: 'GGSIPU Dwarka main university campus for computing, electronics and information technology.',
+    establishedYear: 1999,
+    featured: true,
+    image: '/colleges/USICT.jpeg',
+    connectivity: 'Dwarka Sector 14 Metro (Blue Line) — 2 mins walk (Gate 1)',
+    placements: {
+      highest: '₹52 LPA',
+      average: '₹11.5 LPA',
+      topRecruiters: ['Google', 'Adobe', 'Microsoft', 'Goldman Sachs', 'Amazon'],
+    },
   },
 ];
 

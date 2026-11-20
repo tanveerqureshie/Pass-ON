@@ -1,23 +1,60 @@
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
+  darkMode: 'class',
   content: ['./src/**/*.{ts,tsx}'],
   theme: {
     extend: {
       colors: {
-        /* Primary — deep collegiate red */
+        /* Primary — Teal #0F766E */
         brand: {
-          50: '#FDF2F3',
-          100: '#FBE5E8',
-          200: '#F5C9CF',
-          300: '#EDA7B0',
-          400: '#E27485',
-          500: '#D63E55',
-          600: '#C8102E',
-          700: '#A80D27',
-          800: '#861222',
-          900: '#72141F',
-          950: '#3F0A10',
+          50: '#F0FDFA',
+          100: '#CCFBF1',
+          200: '#99F6E4',
+          300: '#5EEAD4',
+          400: '#2DD4BF',
+          500: '#14B8A6',
+          600: '#0F766E', // Primary Teal
+          700: '#0D645D',
+          800: '#115E59',
+          900: '#134E4A',
+          950: '#042F2C',
+        },
+        teal: {
+          DEFAULT: '#0F766E',
+          50: '#F0FDFA',
+          100: '#CCFBF1',
+          200: '#99F6E4',
+          300: '#5EEAD4',
+          400: '#2DD4BF',
+          500: '#14B8A6',
+          600: '#0F766E',
+          700: '#0D645D',
+          800: '#115E59',
+          900: '#134E4A',
+        },
+        /* Accent — Emerald #10B981 */
+        emerald: {
+          DEFAULT: '#10B981',
+          50: '#ECFDF5',
+          100: '#D1FAE5',
+          200: '#A7F3D0',
+          300: '#6EE7B7',
+          400: '#34D399',
+          500: '#10B981',
+          600: '#059669',
+          700: '#047857',
+          800: '#065F46',
+          900: '#064E3B',
+        },
+        /* Base Background — Cream #FFF8F0 */
+        cream: {
+          DEFAULT: '#FFF8F0',
+          50: '#FFFCF7',
+          100: '#FFF8F0',
+          200: '#F7EFE5',
+          300: '#EDE0D0',
+          400: '#DFCDB8',
         },
         /* Secondary — rich black / neutral greys */
         ink: {

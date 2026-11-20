@@ -22,13 +22,15 @@ export const ADMIN_PASSWORD = 'MrVeer9906';
 
 /* All administrator credential sets accepted by the sign-in portal.
    NOTE: keep this server-side in a real deployment. */
-export const ADMIN_CREDENTIALS: ReadonlyArray<{ email: string; password: string }> = [
-  { email: 'mrtanveerqureshi@gmail.com', password: 'MrVeer9906' },
-  { email: 'passon@gmail.com', password: 'passon@321' },
+export const ADMIN_CREDENTIALS: ReadonlyArray<{ email: string; password: string; name?: string }> = [
+  { email: 'mrtanveerqureshi@gmail.com', password: 'MrVeer9906', name: 'Tanveer Qureshi (Founder)' },
+  { email: 'admin321@gmail.com', password: 'admin321', name: 'Campus Admin Partner' },
+  { email: 'passon@gmail.com', password: 'passon@321', name: 'Pass ON Team' },
 ];
 
 const ADMIN_EMAILS: ReadonlyArray<string> = [
   ADMIN_EMAIL,
+  'admin321@gmail.com',
   'admin@passon.in',
   'passon@gmail.com',
 ];
@@ -106,6 +108,10 @@ interface AppContextType {
   auditLogs: AuditLog[];
   logAdminAction: (action: string, targetType: AuditLog['targetType'], targetId: string, details: string) => void;
 
+  // Theme Toggle Mode
+  theme: 'light' | 'dark';
+  toggleTheme: () => void;
+
   // Notification Toast
   toastMessage: string | null;
   showToast: (msg: string) => void;
@@ -149,6 +155,40 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   ]);
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  // Sync theme with HTML class
+  useEffect(() => {
+    try {
+      const savedTheme = localStorage.getItem('passon_theme') as 'light' | 'dark' | null;
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        setTheme('dark');
+        document.documentElement.classList.add('dark');
+      } else {
+        setTheme('light');
+        document.documentElement.classList.remove('dark');
+      }
+    } catch {
+      // fallback to light
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    setTheme((prev) => {
+      const next = prev === 'light' ? 'dark' : 'light';
+      try {
+        localStorage.setItem('passon_theme', next);
+      } catch {
+        // storage disabled
+      }
+      if (next === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      return next;
+    });
+  };
 
   useEffect(() => {
     try {
@@ -251,10 +291,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       if (password && cred && password !== cred.password) {
         return null;
       }
-      setCurrentUser(DEFAULT_ADMIN_PROFILE);
-      localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(DEFAULT_ADMIN_PROFILE));
-      showToast('Logged in as Administrator (Tanveer Qureshi)');
-      return DEFAULT_ADMIN_PROFILE;
+      const adminProfile: UserProfile = {
+        ...DEFAULT_ADMIN_PROFILE,
+        id: `admin-${trimmed.replace(/[^a-z0-9]/g, '-')}`,
+        email: trimmed,
+        fullName: cred?.name || 'Campus Administrator',
+      };
+      setCurrentUser(adminProfile);
+      localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(adminProfile));
+      showToast(`Logged in as Administrator (${adminProfile.fullName})`);
+      return adminProfile;
     }
 
     const found = registeredStudents.find((s) => s.email.toLowerCase() === trimmed);
@@ -582,6 +628,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         dismissReport,
         auditLogs,
         logAdminAction,
+        theme,
+        toggleTheme,
         toastMessage,
         showToast,
       }}

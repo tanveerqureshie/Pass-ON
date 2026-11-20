@@ -7,16 +7,16 @@ import { ShieldCheck, MessageCircle, Heart, Landmark, Mail, Github, Instagram } 
 export const Footer: React.FC = () => {
   return (
     <footer className="mt-20 bg-ink-950 text-ink-300">
-      <div className="h-1 w-full bg-brand-600" />
+      <div className="h-1.5 w-full bg-gradient-to-r from-teal-600 via-teal-700 to-emerald-500" />
       <div className="container-x grid grid-cols-1 gap-10 py-14 md:grid-cols-2 lg:grid-cols-4">
         {/* Brand */}
         <div>
           <Link href="/" className="flex items-center gap-2.5">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-600 text-white">
+            <span className="grid h-9 w-9 place-items-center rounded-xl bg-teal-600 text-white">
               <Landmark className="h-4.5 w-4.5" strokeWidth={2.2} />
             </span>
             <span className="font-display text-lg font-extrabold tracking-tight text-white">
-              Pass <span className="text-brand-500">ON</span>
+              Pass <span className="text-teal-400">ON</span>
             </span>
           </Link>
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-ink-400">
@@ -35,7 +35,7 @@ export const Footer: React.FC = () => {
                 aria-label={label}
                 target="_blank"
                 rel="noreferrer"
-                className="grid h-9 w-9 place-items-center rounded-full border border-ink-800 text-ink-400 transition hover:border-brand-600 hover:bg-brand-600 hover:text-white"
+                className="grid h-9 w-9 place-items-center rounded-full border border-ink-800 text-ink-400 transition hover:border-teal-500 hover:bg-teal-600 hover:text-white"
               >
                 <Icon className="h-4 w-4" />
               </a>
@@ -66,7 +66,7 @@ export const Footer: React.FC = () => {
             <li><Link href="/cart" className="text-ink-400 transition hover:text-white">Cart & Checkout</Link></li>
             <li><Link href="/college/mait" className="text-ink-400 transition hover:text-white">MAIT — Rohini</Link></li>
             <li><Link href="/college/msit" className="text-ink-400 transition hover:text-white">MSIT — Janakpuri</Link></li>
-            <li><Link href="/colleges" className="text-ink-400 transition hover:text-white">All 9 Delhi Colleges →</Link></li>
+            <li><Link href="/colleges" className="text-ink-400 transition hover:text-white">All 11 Delhi Colleges →</Link></li>
           </ul>
         </div>
 
@@ -75,21 +75,21 @@ export const Footer: React.FC = () => {
           <h4 className="text-xs font-bold uppercase tracking-widest text-white">Trust & Safety</h4>
           <ul className="mt-4 space-y-3.5 text-sm text-ink-400">
             <li className="flex items-start gap-2.5">
-              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />
+              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-teal-400" />
               <span>Every seller is manually verified against college enrollment records.</span>
             </li>
             <li className="flex items-start gap-2.5">
-              <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />
+              <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
               <span>Direct WhatsApp handovers — contacts stay private, zero commission.</span>
             </li>
             <li className="flex items-start gap-2.5">
-              <Heart className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />
+              <Heart className="mt-0.5 h-4 w-4 shrink-0 text-teal-400" />
               <span>Meet-ups in safe, well-lit campus spots. Free giveaways supported.</span>
             </li>
           </ul>
           <Link
             href="/team"
-            className="mt-5 inline-flex items-center gap-2 rounded-full border border-ink-800 px-4 py-2 text-xs font-bold text-white transition hover:border-brand-600 hover:bg-brand-600"
+            className="mt-5 inline-flex items-center gap-2 rounded-full border border-ink-800 px-4 py-2 text-xs font-bold text-white transition hover:border-teal-500 hover:bg-teal-600"
           >
             Meet the Team
           </Link>

@@ -76,9 +76,9 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
   };
 
   return (
-    <article className="card-3d glass-card group flex flex-col overflow-hidden rounded-2xl border border-ink-200/60 bg-white/70 backdrop-blur-xl hover:border-brand-200">
+    <article className="card-3d glass-card group flex flex-col overflow-hidden rounded-2xl border border-ink-200/60 dark:border-slate-800 bg-white/70 dark:bg-slate-900/85 backdrop-blur-xl hover:border-brand-200 dark:hover:border-teal-700 transition-colors">
       {/* Cover */}
-      <div className="relative overflow-hidden bg-ink-100">
+      <div className="relative overflow-hidden bg-ink-100 dark:bg-slate-800">
         <Link href={`/item/${listing.id}`} aria-label={listing.title}>
           {listing.images && listing.images.length > 0 ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -143,15 +143,15 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
         </div>
 
         <Link href={`/item/${listing.id}`} className="mt-2 block">
-          <h3 className="font-display text-[15px] font-extrabold leading-snug text-ink-950 transition-colors line-clamp-2 hover:text-brand-700">
+          <h3 className="font-display text-[15px] font-extrabold leading-snug text-ink-950 dark:text-slate-100 transition-colors line-clamp-2 hover:text-brand-700 dark:hover:text-teal-400">
             {listing.title}
           </h3>
         </Link>
 
-        <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-ink-500">{listing.description}</p>
+        <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-ink-500 dark:text-slate-400">{listing.description}</p>
 
-        <p className="mt-3 flex items-center gap-1.5 border-t border-ink-100 pt-3 text-[11px] text-ink-500">
-          <span className="font-bold text-ink-700">Pickup:</span>
+        <p className="mt-3 flex items-center gap-1.5 border-t border-ink-100 dark:border-slate-800 pt-3 text-[11px] text-ink-500 dark:text-slate-400">
+          <span className="font-bold text-ink-700 dark:text-slate-300">Pickup:</span>
           <span className="truncate">{listing.preferredPickupLocation}</span>
         </p>
       </div>
@@ -160,7 +160,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
       <div className="grid grid-cols-2 gap-2 px-4 pb-4 sm:px-5 sm:pb-5">
         <Link
           href={`/item/${listing.id}`}
-          className="inline-flex h-9.5 items-center justify-center gap-1 rounded-xl border border-ink-300 bg-white text-xs font-bold text-ink-800 transition hover:border-ink-400 hover:bg-ink-50"
+          className="inline-flex h-9.5 items-center justify-center gap-1 rounded-xl border border-ink-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-ink-800 dark:text-slate-200 transition hover:border-ink-400 dark:hover:border-slate-600 hover:bg-ink-50 dark:hover:bg-slate-700"
         >
           Details
           <ArrowRight className="h-3.5 w-3.5" />

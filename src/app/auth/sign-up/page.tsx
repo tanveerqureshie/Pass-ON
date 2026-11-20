@@ -7,7 +7,7 @@ import { useApp } from '@/context/AppContext';
 import { createClient } from '@/lib/supabase/client';
 import { Input, Select } from '@/components/ui/Form';
 import { Button } from '@/components/ui/Button';
-import { UserPlus, ArrowLeft, ArrowRight, Check, GraduationCap } from 'lucide-react';
+import { UserPlus, ArrowLeft, ArrowRight, Check, GraduationCap, UploadCloud, Camera, Image as ImageIcon, X, Trash2 } from 'lucide-react';
 import { UserProfile } from '@/lib/types';
 import clsx from 'clsx';
 
@@ -25,11 +25,35 @@ export default function SignUpPage() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [instagramHandle, setInstagramHandle] = useState('');
   const [branch, setBranch] = useState('CSE');
-  const [enrollmentNumber, setEnrollmentNumber] = useState('');
   const [academicYear, setAcademicYear] = useState('2nd Year');
+  const [idCardImage, setIdCardImage] = useState<string>('');
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const handleIdCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setError('Please upload an image file (PNG, JPG, WEBP).');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError('ID card photo must be less than 5MB.');
+      return;
+    }
+
+    setError('');
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (event.target?.result) {
+        setIdCardImage(event.target.result as string);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   const selectedColObj = colleges.find((c) => c.id === collegeId);
 
@@ -46,8 +70,8 @@ export default function SignUpPage() {
     e.preventDefault();
     setError('');
 
-    if (!enrollmentNumber.trim()) {
-      setError('Enrollment number is required for campus verification.');
+    if (!idCardImage) {
+      setError('Please upload your College ID Card photo for campus verification.');
       return;
     }
 
@@ -67,7 +91,7 @@ export default function SignUpPage() {
         collegeName: selectedCol?.name || 'Delhi College',
         collegeShortName: selectedCol?.short_name || 'DELHI',
         branch,
-        enrollmentNumber: enrollmentNumber.trim(),
+        idCardUrl: idCardImage,
         academicYear,
         password,
         role: 'student',
@@ -89,7 +113,7 @@ export default function SignUpPage() {
               college_name: selectedCol?.name,
               college_short_name: selectedCol?.short_name,
               branch,
-              enrollment_number: enrollmentNumber.trim(),
+              id_card_url: idCardImage,
               phone_number: phoneNumber.trim(),
               instagram_handle: instagramHandle.trim().replace(/^@/, ''),
               academic_year: academicYear,
@@ -200,15 +224,67 @@ export default function SignUpPage() {
           ) : (
             /* ── Step 2 · Campus & contact ── */
             <form onSubmit={handleSignUp} className="space-y-4">
-              <Input
-                label="Enrollment / Roll Number"
-                name="enrollmentNumber"
-                placeholder="e.g. 04114802721"
-                value={enrollmentNumber}
-                onChange={(e) => setEnrollmentNumber(e.target.value)}
-                helper="Only admins see this — used to verify you're a real student."
-                required
-              />
+              {/* College ID Card Upload Dropzone */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-ink-900 dark:text-slate-200">
+                  College Student ID Card Photo <span className="text-teal-600 dark:text-teal-400">*</span>
+                </label>
+
+                {idCardImage ? (
+                  <div className="relative overflow-hidden rounded-2xl border-2 border-teal-500/80 bg-teal-50/40 dark:bg-teal-950/40 p-2.5">
+                    <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-slate-900">
+                      <img
+                        src={idCardImage}
+                        alt="Uploaded College ID Card"
+                        className="h-full w-full object-contain"
+                      />
+                      <div className="absolute top-2 right-2 flex items-center gap-1.5">
+                        <label className="cursor-pointer rounded-lg bg-black/75 hover:bg-black px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur shadow-sm transition">
+                          Change Photo
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleIdCardChange}
+                          />
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setIdCardImage('')}
+                          className="grid h-7 w-7 place-items-center rounded-lg bg-red-600/85 hover:bg-red-600 text-white shadow-sm transition"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                    <p className="mt-2 text-center text-[11px] font-semibold text-teal-800 dark:text-teal-300">
+                      ✓ ID Card photo attached for admin verification
+                    </p>
+                  </div>
+                ) : (
+                  <label className="group flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-teal-300 dark:border-teal-700 hover:border-teal-500 bg-white/70 dark:bg-slate-900/60 p-5 text-center transition hover:bg-teal-50/40 dark:hover:bg-teal-950/30">
+                    <div className="grid h-12 w-12 place-items-center rounded-2xl bg-teal-50 dark:bg-teal-900/40 text-teal-600 dark:text-teal-400 mb-2.5 shadow-sm group-hover:scale-110 transition-transform">
+                      <UploadCloud className="h-6 w-6" />
+                    </div>
+                    <span className="text-xs font-bold text-ink-900 dark:text-slate-100">
+                      Click to upload your Student ID Card Photo
+                    </span>
+                    <span className="mt-1 text-[11px] text-ink-400 dark:text-slate-400">
+                      PNG, JPG, or WEBP up to 5MB (physical card photo or digital ID)
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      className="hidden"
+                      onChange={handleIdCardChange}
+                    />
+                  </label>
+                )}
+                <p className="text-[11px] text-ink-400 dark:text-slate-400">
+                  Only college admins inspect this photo — it is never shown publicly.
+                </p>
+              </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <Select
@@ -255,10 +331,10 @@ export default function SignUpPage() {
                 />
               </div>
 
-              <div className="flex items-start gap-2.5 rounded-2xl border border-ink-200 bg-ink-50 p-3 text-[11px] leading-relaxed text-ink-500">
-                <GraduationCap className="mt-0.5 h-4 w-4 shrink-0 text-brand-600" />
-                After signing up, admins verify your enrollment number. You can browse right away — posting unlocks
-                once verified.
+              <div className="flex items-start gap-2.5 rounded-2xl border border-teal-200/80 dark:border-teal-900/60 bg-teal-50/50 dark:bg-teal-950/30 p-3 text-[11px] leading-relaxed text-ink-600 dark:text-slate-300">
+                <GraduationCap className="mt-0.5 h-4 w-4 shrink-0 text-teal-600 dark:text-teal-400" />
+                After signing up, campus admins verify your uploaded Student ID card photo. You can browse right away — posting unlocks
+                once approved.
               </div>
 
               <div className="flex gap-2">

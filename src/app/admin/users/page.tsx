@@ -19,6 +19,8 @@ import {
   Check,
   AlertTriangle,
   CheckCircle,
+  Eye,
+  FileText,
 } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -35,6 +37,7 @@ export default function AdminUsersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [rejectionModalUser, setRejectionModalUser] = useState<UserProfile | null>(null);
   const [rejectionReason, setRejectionReason] = useState('');
+  const [inspectingIdUser, setInspectingIdUser] = useState<UserProfile | null>(null);
 
   // Count pending
   const pendingCount = registeredStudents.filter((s) => s.verificationStatus === 'pending').length;
@@ -240,14 +243,54 @@ export default function AdminUsersPage() {
                         <span>Phone: {u.phoneNumber}</span>
                       </div>
 
-                      {/* High-visibility Enrollment Number for Verification */}
-                      <div className="flex items-center gap-2 pt-1">
-                        <span className="text-[10px] font-extrabold uppercase tracking-widest text-ink-400">
-                          Enrollment / Roll No:
-                        </span>
-                        <Badge tone={isApproved ? 'green' : isPending ? 'amber' : 'gray'} size="sm">
-                          <span className="font-mono">{u.enrollmentNumber || 'Not submitted'}</span>
-                        </Badge>
+                      {/* College ID Card Photo Preview Thumbnail */}
+                      <div className="flex flex-wrap items-center gap-3 pt-1.5">
+                        {u.idCardUrl ? (
+                          <button
+                            type="button"
+                            onClick={() => setInspectingIdUser(u)}
+                            className="group relative flex items-center gap-2.5 rounded-xl border-2 border-teal-500/80 bg-teal-50/70 dark:bg-teal-950/40 p-1.5 transition hover:scale-[1.02] hover:shadow-md cursor-pointer text-left"
+                          >
+                            <div className="relative h-12 w-20 overflow-hidden rounded-lg bg-slate-900 border border-teal-600/40">
+                              <img
+                                src={u.idCardUrl}
+                                alt={`ID Card of ${u.fullName}`}
+                                className="h-full w-full object-cover"
+                              />
+                              <div className="absolute inset-0 grid place-items-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Eye className="h-4 w-4 text-white" />
+                              </div>
+                            </div>
+                            <div className="pr-2">
+                              <span className="block text-[11px] font-extrabold text-teal-800 dark:text-teal-300">
+                                Inspect College ID Card
+                              </span>
+                              <span className="block text-[10px] text-ink-500 dark:text-slate-400">
+                                Click to verify full photo
+                              </span>
+                            </div>
+                          </button>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-extrabold uppercase tracking-widest text-ink-400">
+                              ID Card:
+                            </span>
+                            <Badge tone="gray" size="sm">
+                              No photo attached
+                            </Badge>
+                          </div>
+                        )}
+
+                        {u.enrollmentNumber && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-extrabold uppercase tracking-widest text-ink-400">
+                              Enrollment #:
+                            </span>
+                            <Badge tone={isApproved ? 'green' : isPending ? 'amber' : 'gray'} size="sm">
+                              <span className="font-mono">{u.enrollmentNumber}</span>
+                            </Badge>
+                          </div>
+                        )}
                       </div>
 
                       {/* Rejection note if any */}
@@ -325,6 +368,89 @@ export default function AdminUsersPage() {
             </Button>
           </div>
         </form>
+      </Modal>
+
+      {/* ID Card Full Size Inspection Modal */}
+      <Modal
+        open={inspectingIdUser !== null}
+        onClose={() => setInspectingIdUser(null)}
+        title="Student College ID Card Inspection"
+        description={
+          inspectingIdUser
+            ? `Reviewing submitted college ID card for ${inspectingIdUser.fullName} (${inspectingIdUser.collegeName}).`
+            : undefined
+        }
+        size="lg"
+      >
+        {inspectingIdUser && (
+          <div className="space-y-5">
+            {/* High-res Image Preview */}
+            <div className="relative aspect-[16/10] max-h-[440px] w-full overflow-hidden rounded-2xl border-2 border-teal-500/40 bg-slate-950 flex items-center justify-center p-2 shadow-inner">
+              {inspectingIdUser.idCardUrl ? (
+                <img
+                  src={inspectingIdUser.idCardUrl}
+                  alt={`Student ID of ${inspectingIdUser.fullName}`}
+                  className="h-full w-full object-contain"
+                />
+              ) : (
+                <p className="text-sm text-slate-400">No ID card photo attached</p>
+              )}
+            </div>
+
+            {/* Student Details Grid */}
+            <div className="grid grid-cols-2 gap-3 rounded-2xl bg-cream-100/70 dark:bg-slate-800/60 p-4 text-xs border border-cream-200 dark:border-slate-700">
+              <div>
+                <span className="block text-[10px] font-bold uppercase tracking-wider text-ink-400">Student Name</span>
+                <span className="font-bold text-ink-950 dark:text-white text-sm">{inspectingIdUser.fullName}</span>
+              </div>
+              <div>
+                <span className="block text-[10px] font-bold uppercase tracking-wider text-ink-400">Campus Institution</span>
+                <span className="font-bold text-teal-800 dark:text-teal-300 text-sm">{inspectingIdUser.collegeName}</span>
+              </div>
+              <div>
+                <span className="block text-[10px] font-bold uppercase tracking-wider text-ink-400">Branch & Academic Year</span>
+                <span className="font-semibold text-ink-800 dark:text-slate-200">{inspectingIdUser.branch || 'CSE'} • {inspectingIdUser.academicYear || '1st Year'}</span>
+              </div>
+              <div>
+                <span className="block text-[10px] font-bold uppercase tracking-wider text-ink-400">Student Email & Phone</span>
+                <span className="font-semibold text-ink-800 dark:text-slate-200">{inspectingIdUser.email} • {inspectingIdUser.phoneNumber || 'N/A'}</span>
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex items-center justify-between gap-3 pt-2">
+              <Button variant="outline" onClick={() => setInspectingIdUser(null)}>
+                Close
+              </Button>
+              <div className="flex items-center gap-2">
+                {inspectingIdUser.verificationStatus !== 'rejected' && (
+                  <Button
+                    variant="danger"
+                    onClick={() => {
+                      const u = inspectingIdUser;
+                      setInspectingIdUser(null);
+                      setRejectionModalUser(u);
+                    }}
+                  >
+                    <XCircle className="h-4 w-4" /> Reject ID
+                  </Button>
+                )}
+                {inspectingIdUser.verificationStatus !== 'approved' && (
+                  <Button
+                    variant="dark"
+                    onClick={() => {
+                      approveStudent(inspectingIdUser.id);
+                      setInspectingIdUser(null);
+                      showToast(`Approved ${inspectingIdUser.fullName} against College ID!`);
+                    }}
+                  >
+                    <Check className="h-4 w-4" /> Approve Student ID
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   );

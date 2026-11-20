@@ -15,6 +15,13 @@ export interface College {
   description?: string;
   establishedYear?: number;
   featured?: boolean;
+  image?: string;
+  connectivity?: string;
+  placements?: {
+    highest?: string;
+    average?: string;
+    topRecruiters?: string[];
+  };
 }
 
 export interface Category {
@@ -39,6 +46,7 @@ export interface UserProfile {
   phoneNumber?: string;
   instagramHandle?: string;
   contactPreference?: 'whatsapp' | 'instagram' | 'both';
+  idCardUrl?: string; // Base64 or URL of uploaded college ID photo for admin verification
   enrollmentNumber?: string; // e.g. '04114802721' - Kept secure, never exposed publicly
   collegeId: string;
   collegeName?: string;
