@@ -15,6 +15,10 @@ export const metadata: Metadata = {
   },
   description:
     'Pass ON connects verified college seniors and juniors to buy, sell, borrow, donate and exchange textbooks, calculators, lab coats and essentials across Delhi engineering colleges — plus the official Pass ON store for student favourites.',
+  icons: {
+    icon: '/logo-icon.png',
+    apple: '/logo-icon.png',
+  },
 };
 
 export default function RootLayout({

@@ -151,11 +151,11 @@ export default function CheckoutPage() {
               </h2>
               {!currentUser && (
                 <p className="mt-2 rounded-xl bg-ink-50 px-3.5 py-2 text-xs text-ink-600">
-                  Checking out as a guest.{' '}
+                  Have an account?{' '}
                   <Link href="/auth/sign-in" className="font-bold text-brand-700 hover:underline">
                     Sign in
                   </Link>{' '}
-                  for pre-filled details.
+                  for faster checkout.
                 </p>
               )}
               <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">

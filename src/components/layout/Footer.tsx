@@ -1,7 +1,6 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ShieldCheck, MessageCircle, Heart, Landmark, Mail, Github, Instagram } from 'lucide-react';
 
 export const Footer: React.FC = () => {
@@ -11,13 +10,14 @@ export const Footer: React.FC = () => {
       <div className="container-x grid grid-cols-1 gap-10 py-14 md:grid-cols-2 lg:grid-cols-4">
         {/* Brand */}
         <div>
-          <Link href="/" className="flex items-center gap-2.5">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-blue-600 text-white">
-              <Landmark className="h-4.5 w-4.5" strokeWidth={2.2} />
-            </span>
-            <span className="font-display text-lg font-extrabold tracking-tight text-white">
-              Pass <span className="text-blue-400">ON</span>
-            </span>
+          <Link href="/" className="inline-block" aria-label="Pass ON home">
+            <Image
+              src="/logo-dark-mode.png"
+              alt="Pass ON"
+              width={150}
+              height={42}
+              className="h-9 w-auto object-contain"
+            />
           </Link>
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-slate-400">
             Pass It On. Save More. The verified campus marketplace connecting seniors and juniors across Delhi
@@ -96,8 +96,8 @@ export const Footer: React.FC = () => {
         </div>
       </div>
 
-      <div className="border-t border-ink-800">
-        <div className="container-x flex flex-col items-center justify-between gap-3 py-6 text-xs text-ink-500 sm:flex-row">
+      <div className="border-t border-slate-800">
+        <div className="container-x flex flex-col items-center justify-between gap-3 py-6 text-xs text-slate-400 sm:flex-row">
           <p>© {new Date().getFullYear()} Pass ON — Made for Delhi-NCR college students.</p>
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
             <Link href="/explore" className="transition hover:text-white">Marketplace</Link>

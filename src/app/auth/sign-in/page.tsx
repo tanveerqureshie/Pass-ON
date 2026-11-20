@@ -2,12 +2,13 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useApp, DEFAULT_ADMIN_PROFILE, ADMIN_CREDENTIALS } from '@/context/AppContext';
+import { useApp, ADMIN_CREDENTIALS } from '@/context/AppContext';
 import { createClient } from '@/lib/supabase/client';
 import { Input } from '@/components/ui/Form';
 import { Button } from '@/components/ui/Button';
-import { LogIn, Shield, ArrowRight } from 'lucide-react';
+import { LogIn, ArrowRight } from 'lucide-react';
 
 export default function SignInPage() {
   const router = useRouter();
@@ -26,9 +27,12 @@ export default function SignInPage() {
     const trimmedEmail = email.trim().toLowerCase();
 
     // Administrator credential sets
-    const admin = ADMIN_CREDENTIALS.find((c) => c.email === trimmedEmail);
-    if (admin) {
-      if (password !== admin.password) {
+    const matchingAdmins = ADMIN_CREDENTIALS.filter((c) => c.email.toLowerCase() === trimmedEmail);
+    if (matchingAdmins.length > 0) {
+      const match = matchingAdmins.some(
+        (c) => c.password === password.trim() || c.password.toLowerCase() === password.trim().toLowerCase()
+      );
+      if (!match) {
         setError('Incorrect password for this administrator account.');
         setLoading(false);
         return;
@@ -81,23 +85,30 @@ export default function SignInPage() {
     }
   };
 
-  /* Quick admin login — credentials are intentionally NOT displayed here. */
-  const handleQuickAdminLogin = () => {
-    setCurrentUser(DEFAULT_ADMIN_PROFILE);
-    localStorage.setItem('passon_user_v3', JSON.stringify(DEFAULT_ADMIN_PROFILE));
-    showToast('Logged in as Administrator (Tanveer Qureshi)');
-    router.push('/admin');
-  };
-
   return (
     <div className="container-x flex min-h-[80vh] items-center justify-center py-12">
       <div className="w-full max-w-sm">
         {/* Brand mark */}
         <div className="mb-7 text-center">
-          <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-brand-600 text-white shadow-lift">
-            <LogIn className="h-6 w-6" />
-          </span>
-          <h1 className="mt-4 font-display text-2xl font-extrabold tracking-tight text-ink-950 sm:text-3xl">
+          <Link href="/" className="inline-block mb-3">
+            <Image
+              src="/logo.png"
+              alt="Pass ON"
+              width={160}
+              height={48}
+              priority
+              className="h-11 sm:h-12 w-auto object-contain mx-auto dark:hidden"
+            />
+            <Image
+              src="/logo-dark-mode.png"
+              alt="Pass ON"
+              width={160}
+              height={48}
+              priority
+              className="h-11 sm:h-12 w-auto object-contain mx-auto hidden dark:block"
+            />
+          </Link>
+          <h1 className="mt-2 font-display text-2xl font-extrabold tracking-tight text-ink-950 dark:text-white sm:text-3xl">
             Welcome back
           </h1>
           <p className="mt-1 text-sm text-ink-500">Sign in to your Pass ON account.</p>
@@ -144,14 +155,6 @@ export default function SignInPage() {
               Create an account
             </Link>
           </p>
-        </div>
-
-        {/* Quick admin */}
-        <div className="mt-5">
-          <Button type="button" variant="dark" block onClick={handleQuickAdminLogin}>
-            <Shield className="h-4 w-4" />
-            One-Click Admin Sign In
-          </Button>
         </div>
       </div>
     </div>

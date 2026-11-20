@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
 import { createClient } from '@/lib/supabase/client';
@@ -140,10 +141,25 @@ export default function SignUpPage() {
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="mb-6 text-center">
-          <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-brand-600 text-white shadow-lift">
-            <UserPlus className="h-6 w-6" />
-          </span>
-          <h1 className="mt-4 font-display text-2xl font-extrabold tracking-tight text-ink-950 sm:text-3xl">
+          <Link href="/" className="inline-block mb-3">
+            <Image
+              src="/logo.png"
+              alt="Pass ON"
+              width={160}
+              height={48}
+              priority
+              className="h-11 sm:h-12 w-auto object-contain mx-auto dark:hidden"
+            />
+            <Image
+              src="/logo-dark-mode.png"
+              alt="Pass ON"
+              width={160}
+              height={48}
+              priority
+              className="h-11 sm:h-12 w-auto object-contain mx-auto hidden dark:block"
+            />
+          </Link>
+          <h1 className="mt-2 font-display text-2xl font-extrabold tracking-tight text-ink-950 dark:text-white sm:text-3xl">
             Create your account
           </h1>
           <p className="mt-1 text-sm text-ink-500">

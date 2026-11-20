@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import Image from 'next/image';
+import { usePathname, useRouter } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
 import { useCart } from '@/context/CartContext';
 import {
@@ -26,11 +27,13 @@ import {
   Settings,
   Sun,
   Moon,
+  Sparkles,
 } from 'lucide-react';
 import clsx from 'clsx';
 
 export const Navbar: React.FC = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const { currentUser, selectedCollege, colleges, setSelectedCollegeId, logout, savedListingIds, theme, toggleTheme } = useApp();
   const { count, setDrawerOpen } = useCart();
 
@@ -63,13 +66,23 @@ export const Navbar: React.FC = () => {
       <div className="container-x h-16 flex items-center justify-between gap-3">
         {/* Brand + college switcher */}
         <div className="flex items-center gap-3 shrink-0">
-          <Link href="/" className="flex items-center gap-2.5 group" aria-label="Pass ON home">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-blue-600 text-white shadow-sm transition group-hover:bg-blue-700">
-              <Landmark className="h-4.5 w-4.5" strokeWidth={2.2} />
-            </span>
-            <span className="font-display text-lg font-extrabold tracking-tight text-ink-950 dark:text-white">
-              Pass <span className="text-blue-600">ON</span>
-            </span>
+          <Link href="/" className="flex items-center gap-2 group py-1" aria-label="Pass ON home">
+            <Image
+              src="/logo.png"
+              alt="Pass ON"
+              width={140}
+              height={40}
+              priority
+              className="h-8 sm:h-9 w-auto object-contain dark:hidden"
+            />
+            <Image
+              src="/logo-dark-mode.png"
+              alt="Pass ON"
+              width={140}
+              height={40}
+              priority
+              className="h-8 sm:h-9 w-auto object-contain hidden dark:block"
+            />
           </Link>
 
           {/* College switcher */}
@@ -194,66 +207,66 @@ export const Navbar: React.FC = () => {
             Sell an Item
           </Link>
 
-          {/* User menu */}
-          <div className="relative">
-            <button
-              onClick={() => {
-                setUserMenuOpen((v) => !v);
-                setCollegeDropdownOpen(false);
-              }}
-              className="flex items-center gap-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 py-1 pl-1 pr-2.5 transition hover:border-blue-400 shadow-xs"
-            >
-              <span
-                className={clsx(
-                  'grid h-7 w-7 place-items-center rounded-full text-[11px] font-extrabold text-white',
-                  currentUser?.role === 'admin' ? 'bg-indigo-700' : 'bg-blue-600'
-                )}
+          {/* User menu or Sign In / Sign Up */}
+          {currentUser ? (
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setUserMenuOpen((v) => !v);
+                  setCollegeDropdownOpen(false);
+                }}
+                className="flex items-center gap-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 py-1 pl-1 pr-2.5 transition hover:border-blue-400 shadow-xs"
               >
-                {displayInitial}
-              </span>
-              <span className="max-w-[72px] truncate text-xs font-bold text-slate-800 dark:text-slate-200">{displayName}</span>
-              <ChevronDown className={clsx('h-3.5 w-3.5 text-slate-400 transition', userMenuOpen && 'rotate-180')} />
-            </button>
+                <span
+                  className={clsx(
+                    'grid h-7 w-7 place-items-center rounded-full text-[11px] font-extrabold text-white',
+                    currentUser.role === 'admin' ? 'bg-indigo-700' : 'bg-blue-600'
+                  )}
+                >
+                  {displayInitial}
+                </span>
+                <span className="max-w-[72px] truncate text-xs font-bold text-slate-800 dark:text-slate-200">{displayName}</span>
+                <ChevronDown className={clsx('h-3.5 w-3.5 text-slate-400 transition', userMenuOpen && 'rotate-180')} />
+              </button>
 
-            {userMenuOpen && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
-                <div className="absolute right-0 top-full z-50 mt-2 w-64 animate-pop-in overflow-hidden rounded-2xl border border-ink-200 bg-white shadow-lift">
-                  <div className="border-b border-ink-100 bg-ink-50/60 px-4 py-3">
-                    <p className="truncate text-sm font-bold text-ink-950">
-                      {currentUser ? currentUser.fullName : 'Pass ON Guest'}
-                    </p>
-                    <p className="truncate text-[11px] text-ink-500">{currentUser ? currentUser.email : 'Sign in to get started'}</p>
-                    <div className="mt-2 flex items-center gap-1.5">
-                      {currentUser?.role === 'admin' || !currentUser ? (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-ink-800 bg-ink-950 px-2 py-0.5 text-[10px] font-bold text-white">
-                          <Shield className="h-3 w-3" /> Campus Admin
-                        </span>
-                      ) : currentUser.verificationStatus === 'approved' ? (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
-                          <ShieldCheck className="h-3 w-3" /> Verified Student
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700">
-                          <Clock className="h-3 w-3" /> Pending Approval
-                        </span>
-                      )}
+              {userMenuOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
+                  <div className="absolute right-0 top-full z-50 mt-2 w-64 animate-pop-in overflow-hidden rounded-2xl border border-ink-200 bg-white shadow-lift">
+                    <div className="border-b border-ink-100 bg-ink-50/60 px-4 py-3">
+                      <p className="truncate text-sm font-bold text-ink-950">
+                        {currentUser.fullName}
+                      </p>
+                      <p className="truncate text-[11px] text-ink-500">{currentUser.email}</p>
+                      <div className="mt-2 flex items-center gap-1.5">
+                        {currentUser.role === 'admin' ? (
+                          <span className="inline-flex items-center gap-1 rounded-full border border-ink-800 bg-ink-950 px-2 py-0.5 text-[10px] font-bold text-white">
+                            <Shield className="h-3 w-3" /> Campus Admin
+                          </span>
+                        ) : currentUser.verificationStatus === 'approved' ? (
+                          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+                            <ShieldCheck className="h-3 w-3" /> Verified Student
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700">
+                            <Clock className="h-3 w-3" /> Pending Approval
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="p-2 text-sm">
-                    <MenuLink href="/dashboard" icon={LayoutGrid} label="Dashboard" onClick={() => setUserMenuOpen(false)} />
-                    <MenuLink href="/dashboard/listings" icon={PlusCircle} label="My Listings" onClick={() => setUserMenuOpen(false)} />
-                    <MenuLink href="/dashboard/saved" icon={Heart} label="Saved Items" onClick={() => setUserMenuOpen(false)} />
-                    <MenuLink href="/cart" icon={ShoppingBag} label="Cart & Orders" onClick={() => setUserMenuOpen(false)} />
-                    {currentUser?.role === 'admin' && (
-                      <MenuLink href="/admin" icon={Settings} label="Admin Portal" onClick={() => setUserMenuOpen(false)} />
-                    )}
-                    <MenuLink href="/profile" icon={User} label="Profile & Verification" onClick={() => setUserMenuOpen(false)} />
-                  </div>
+                    <div className="p-2 text-sm">
+                      <MenuLink href="/dashboard" icon={LayoutGrid} label="Dashboard" onClick={() => setUserMenuOpen(false)} />
+                      <MenuLink href="/dashboard/listings" icon={PlusCircle} label="My Listings" onClick={() => setUserMenuOpen(false)} />
+                      <MenuLink href="/dashboard/saved" icon={Heart} label="Saved Items" onClick={() => setUserMenuOpen(false)} />
+                      <MenuLink href="/cart" icon={ShoppingBag} label="Cart & Orders" onClick={() => setUserMenuOpen(false)} />
+                      {currentUser.role === 'admin' && (
+                        <MenuLink href="/admin" icon={Settings} label="Admin Portal" onClick={() => setUserMenuOpen(false)} />
+                      )}
+                      <MenuLink href="/profile" icon={User} label="Profile & Verification" onClick={() => setUserMenuOpen(false)} />
+                    </div>
 
-                  <div className="border-t border-ink-100 p-2">
-                    {currentUser ? (
+                    <div className="border-t border-ink-100 p-2">
                       <button
                         onClick={() => {
                           logout();
@@ -263,20 +276,27 @@ export const Navbar: React.FC = () => {
                       >
                         <LogOut className="h-4 w-4" /> Sign Out
                       </button>
-                    ) : (
-                      <Link
-                        href="/auth/sign-in"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-brand-700 transition hover:bg-brand-50"
-                      >
-                        <User className="h-4 w-4" /> Sign In
-                      </Link>
-                    )}
+                    </div>
                   </div>
-                </div>
-              </>
-            )}
-          </div>
+                </>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Link
+                href="/auth/sign-in"
+                className="inline-flex h-9 items-center rounded-full px-3.5 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/auth/sign-up"
+                className="inline-flex h-9 items-center rounded-full bg-blue-600 hover:bg-blue-700 text-white px-4 text-xs font-bold shadow-sm shadow-blue-500/20 transition active:scale-95"
+              >
+                Sign Up
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Mobile controls */}
@@ -332,7 +352,7 @@ export const Navbar: React.FC = () => {
             <Link
               href="/sell"
               onClick={() => setMobileMenuOpen(false)}
-              className="col-span-2 flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-3 py-3 text-sm font-bold text-white"
+              className="col-span-2 flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-3 py-3 text-sm font-bold text-white shadow-sm"
             >
               <PlusCircle className="h-4 w-4" /> Sell an Item
             </Link>

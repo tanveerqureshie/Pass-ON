@@ -32,25 +32,6 @@ export default function AdminOverviewPage() {
 
   return (
     <div className="container-x py-8 sm:py-10">
-      {/* RBAC Notice if not in admin role */}
-      {!isAdmin && (
-        <div className="mb-8 flex flex-col items-start justify-between gap-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 sm:flex-row sm:items-center">
-          <div className="flex items-center gap-3">
-            <Shield className="h-5 w-5 shrink-0 text-amber-600" />
-            <div>
-              <span className="block text-sm font-bold text-amber-900">Administrator Access Restricted</span>
-              <span className="text-xs leading-relaxed text-amber-800">
-                You are currently viewing in student mode. Log in as an administrator to approve students or moderate content.
-              </span>
-            </div>
-          </div>
-          <Link href="/auth/sign-in">
-            <Button variant="dark" size="sm">
-              Administrator Login
-            </Button>
-          </Link>
-        </div>
-      )}
 
       {/* Admin Header — dark chrome */}
       <div className="relative overflow-hidden rounded-3xl bg-ink-950 p-6 text-white sm:p-8">

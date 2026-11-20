@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import {
   BookOpen,
@@ -80,27 +81,35 @@ export default function HomePage() {
   };
 
   return (
-    <div className="bg-[#f8fafc] dark:bg-[#020617] bg-notebook-grid min-h-screen text-ink-950 dark:text-slate-100 transition-colors duration-300">
-      {/* ───────────────────────────── Hero: Elevated & Framed Showcase Stage ───────────────────────────── */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-blue-50 via-slate-50 to-[#f8fafc] dark:from-slate-900/90 dark:via-slate-950 dark:to-[#020617] pt-16 pb-16 sm:pt-24 sm:pb-24 border-b border-slate-200/80 dark:border-slate-800 shadow-[0_12px_30px_-15px_rgba(37,99,235,0.12)] transition-colors">
+    <div className="bg-white dark:bg-[#020617] bg-notebook-grid min-h-screen text-ink-950 dark:text-slate-100 transition-colors duration-300">
+      {/* ───────────────────────────── Hero: Centered Stage with Background Illustration ───────────────────────────── */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-blue-50/70 via-white to-white dark:from-slate-900/90 dark:via-slate-950 dark:to-[#020617] pt-20 pb-24 sm:pt-28 sm:pb-32 lg:pt-36 lg:pb-40 min-h-[580px] lg:min-h-[660px] flex items-center border-b border-slate-200/80 dark:border-slate-800 transition-colors">
         {/* Subtle notebook grid inside hero for texture */}
-        <div className="pointer-events-none absolute inset-0 bg-notebook-grid opacity-60" />
+        <div className="pointer-events-none absolute inset-0 bg-notebook-grid opacity-50" />
 
-        {/* Ambient mesh lighting */}
-        <div className="pointer-events-none absolute -left-20 -top-20 h-96 w-96 rounded-full bg-blue-300/30 dark:bg-blue-600/15 blur-3xl animate-hero-mesh" />
-        <div className="pointer-events-none absolute -right-20 top-12 h-96 w-96 rounded-full bg-indigo-300/25 dark:bg-indigo-600/15 blur-3xl animate-hero-mesh-reverse" />
-        <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[520px] w-[520px] rounded-full bg-white/40 dark:bg-blue-900/10 blur-3xl" />
+        {/* Ambient mesh lighting blobs */}
+        <div className="pointer-events-none absolute -left-20 -top-20 h-96 w-96 rounded-full bg-blue-300/20 dark:bg-blue-600/15 blur-3xl animate-hero-mesh" />
+        <div className="pointer-events-none absolute right-0 top-12 h-96 w-96 rounded-full bg-indigo-300/20 dark:bg-indigo-600/15 blur-3xl animate-hero-mesh-reverse" />
 
+        {/* Full-width Background Illustration (100% Edge-to-edge, zero space left and right) */}
+        <div className="pointer-events-none absolute inset-0 w-full h-full overflow-hidden z-0">
+          <Image
+            src="/hero-exchange.png"
+            alt="Campus exchange background"
+            fill
+            priority
+            sizes="100vw"
+            className="w-full h-full object-cover object-center opacity-30 dark:opacity-15 select-none"
+          />
+          {/* Subtle gradient wash over background image to keep typography ultra-crisp */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white/70 via-white/50 to-white/90 dark:from-[#020617]/85 dark:via-[#020617]/70 dark:to-[#020617]" />
+        </div>
+
+        {/* Centered Hero Content */}
         <div className="container-x relative z-10">
-          <div className="mx-auto max-w-4xl text-center">
-            {/* Campus Network Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 dark:bg-blue-950/70 dark:border-blue-800 dark:text-blue-300 text-xs font-bold uppercase tracking-wider mb-6 shadow-sm">
-              <span className="h-1.5 w-1.5 rounded-full bg-blue-600 animate-pulse" />
-              <span>Delhi Campus Network • 11 Colleges</span>
-            </div>
-
+          <div className="max-w-4xl mx-auto text-center space-y-6 sm:space-y-7">
             {/* Headline */}
-            <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-ink-950 dark:text-white leading-[1.08]">
+            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-ink-950 dark:text-white leading-[1.08]">
               Pass It On.{' '}
               <span className="text-blue-600 dark:text-blue-400">
                 Save More.
@@ -108,91 +117,72 @@ export default function HomePage() {
             </h1>
 
             {/* Subtitle */}
-            <p className="mt-5 text-base sm:text-lg text-ink-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed font-medium">
+            <p className="text-base sm:text-lg lg:text-xl text-slate-600 dark:text-slate-300 leading-relaxed font-medium max-w-2xl mx-auto">
               Seniors&apos; textbooks, gadgets and hostel essentials find their next owner — verified, free to use and zero commission.
             </p>
 
-            {/* Floating Hero Search Bar with Deep Visible Drop Shadow */}
+            {/* Search Bar (Centered) */}
             <form
               onSubmit={handleSearchSubmit}
-              className="mt-8 mx-auto max-w-2xl relative flex items-center rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-2 shadow-[0_12px_32px_-6px_rgba(15,23,42,0.14),0_4px_12px_-2px_rgba(15,23,42,0.06)] hover:border-blue-400 transition-all group"
+              className="relative flex items-center rounded-2xl bg-white/95 dark:bg-slate-900/95 border border-slate-200/90 dark:border-slate-700 p-2 shadow-[0_12px_32px_-4px_rgba(15,23,42,0.12),0_2px_6px_rgba(15,23,42,0.06)] hover:border-blue-400 transition-all group max-w-2xl mx-auto backdrop-blur-sm"
             >
               <Search className="h-5 w-5 text-slate-400 dark:text-slate-500 ml-3 shrink-0" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search textbooks, notes, lab gear, drafters, PYQs, calculators on any campus..."
+                placeholder="Search textbooks, notes, lab gear, calculators..."
                 className="w-full bg-transparent px-3 py-2 text-sm text-ink-950 dark:text-white placeholder:text-slate-400 focus:outline-none"
               />
               <button
                 type="submit"
-                className="shrink-0 rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 text-xs font-bold shadow-md shadow-blue-500/25 transition-all hover:shadow-lg active:scale-95"
+                className="shrink-0 rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-5 sm:px-6 py-2.5 text-xs sm:text-sm font-bold shadow-md shadow-blue-500/25 transition-all hover:shadow-lg active:scale-95"
               >
                 Search Items
               </button>
             </form>
 
-            {/* 3 CTAs */}
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3.5">
+            {/* 3 Action CTAs (Centered) */}
+            <div className="flex flex-wrap items-center justify-center gap-3 pt-1">
               <Link
                 href="/explore"
-                className="group inline-flex h-12 items-center gap-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white px-7 text-sm font-bold shadow-md shadow-blue-500/25 transition-all hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
+                className="group inline-flex h-11 sm:h-12 items-center gap-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 text-xs sm:text-sm font-bold shadow-md shadow-blue-500/25 transition-all hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
               >
                 Explore Campus Items
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
               <Link
                 href="/sell"
-                className="inline-flex h-12 items-center gap-2 rounded-full bg-white hover:bg-slate-50 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-100 border border-slate-200 dark:border-slate-700 px-7 text-sm font-bold shadow-sm transition hover:shadow-md hover:-translate-y-0.5"
+                className="inline-flex h-11 sm:h-12 items-center gap-2 rounded-full bg-white/95 hover:bg-slate-50 text-slate-800 dark:bg-slate-800/95 dark:hover:bg-slate-700 dark:text-slate-100 border border-slate-200 dark:border-slate-700 px-6 sm:px-7 text-xs sm:text-sm font-bold shadow-sm transition hover:shadow-md hover:-translate-y-0.5 backdrop-blur-sm"
               >
                 Pass On an Item
               </Link>
               <Link
                 href="/store"
-                className="inline-flex h-12 items-center gap-2 rounded-full bg-white hover:bg-slate-50 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-100 border border-slate-200 dark:border-slate-700 px-7 text-sm font-bold shadow-sm transition hover:shadow-md hover:-translate-y-0.5"
+                className="inline-flex h-11 sm:h-12 items-center gap-2 rounded-full bg-white/95 hover:bg-slate-50 text-slate-800 dark:bg-slate-800/95 dark:hover:bg-slate-700 dark:text-slate-100 border border-slate-200 dark:border-slate-700 px-6 sm:px-7 text-xs sm:text-sm font-bold shadow-sm transition hover:shadow-md hover:-translate-y-0.5 backdrop-blur-sm"
               >
                 Shop Our Store
               </Link>
             </div>
 
-            {/* 3 Perks */}
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-3.5 text-xs sm:text-sm font-bold text-ink-700 dark:text-slate-300">
-              <span className="inline-flex items-center gap-2 bg-white dark:bg-slate-900/90 px-3.5 py-1.5 rounded-full border border-slate-200 dark:border-slate-800 shadow-sm">
-                <ShieldCheck className="h-4.5 w-4.5 text-blue-600 dark:text-blue-400" />
+            {/* 3 Perks (Centered) */}
+            <div className="flex flex-wrap items-center justify-center gap-3 pt-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+              <span className="inline-flex items-center gap-1.5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm px-3.5 py-1.5 rounded-full border border-slate-200 dark:border-slate-800 shadow-sm">
+                <ShieldCheck className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                 Verified enrollment IDs
               </span>
-              <span className="inline-flex items-center gap-2 bg-white dark:bg-slate-900/90 px-3.5 py-1.5 rounded-full border border-slate-200 dark:border-slate-800 shadow-sm">
-                <Tag className="h-4.5 w-4.5 text-blue-600 dark:text-blue-400" />
+              <span className="inline-flex items-center gap-1.5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm px-3.5 py-1.5 rounded-full border border-slate-200 dark:border-slate-800 shadow-sm">
+                <Tag className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                 Zero fees, zero commission
               </span>
-              <span className="inline-flex items-center gap-2 bg-white dark:bg-slate-900/90 px-3.5 py-1.5 rounded-full border border-slate-200 dark:border-slate-800 shadow-sm">
-                <MessageCircle className="h-4.5 w-4.5 text-blue-600 dark:text-blue-400" />
+              <span className="inline-flex items-center gap-1.5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm px-3.5 py-1.5 rounded-full border border-slate-200 dark:border-slate-800 shadow-sm">
+                <MessageCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                 WhatsApp handovers
               </span>
             </div>
           </div>
         </div>
       </section>
-
-      {/* ─────────────── College name marquee (all campuses) ───────────── */}
-      <Reveal>
-        <section aria-label="Colleges on the Pass ON network" className="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 py-3.5 backdrop-blur-sm transition-colors shadow-xs">
-          <div className="marquee-mask overflow-hidden">
-            <div className="animate-marquee flex w-max items-center gap-10 whitespace-nowrap">
-              {marqueeNames.map((c, i) => (
-                <span key={`${c.short}-${i}`} className="flex items-center gap-10">
-                  <span className="flex items-baseline gap-2">
-                    <span className="font-display text-xs font-black tracking-wider text-blue-700 dark:text-blue-400">{c.short}</span>
-                    <span className="hidden text-[11px] font-medium text-ink-400 dark:text-slate-400 md:inline">{c.name}</span>
-                  </span>
-                  <span className="h-1.5 w-1.5 rounded-full bg-blue-500" aria-hidden />
-                </span>
-              ))}
-            </div>
-          </div>
-        </section>
-      </Reveal>
 
       {/* ─────────────── 3D College Cards Slider (Smooth Drag) ───────────── */}
       <Reveal>

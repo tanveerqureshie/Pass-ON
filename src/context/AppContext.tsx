@@ -24,6 +24,7 @@ export const ADMIN_PASSWORD = 'MrVeer9906';
    NOTE: keep this server-side in a real deployment. */
 export const ADMIN_CREDENTIALS: ReadonlyArray<{ email: string; password: string; name?: string }> = [
   { email: 'mrtanveerqureshi@gmail.com', password: 'MrVeer9906', name: 'Tanveer Qureshi (Founder)' },
+  { email: 'admin321@gmail.com', password: 'Admin321', name: 'Campus Admin Partner' },
   { email: 'admin321@gmail.com', password: 'admin321', name: 'Campus Admin Partner' },
   { email: 'passon@gmail.com', password: 'passon@321', name: 'Pass ON Team' },
 ];
@@ -131,9 +132,9 @@ const STORAGE_KEY_REPORTS = 'passon_reports_v3';
 const STORAGE_KEY_LOGS = 'passon_logs_v3';
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  // Initial state: starts with Admin logged in by default or null
-  const [currentUser, setCurrentUser] = useState<UserProfile | null>(DEFAULT_ADMIN_PROFILE);
-  const [registeredStudents, setRegisteredStudents] = useState<UserProfile[]>([DEFAULT_ADMIN_PROFILE]);
+  // Initial state: starts completely fresh with null user and clean student list
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
+  const [registeredStudents, setRegisteredStudents] = useState<UserProfile[]>([]);
   const [colleges, setColleges] = useState<College[]>(INITIAL_COLLEGES);
   const [selectedCollegeId, setSelectedCollegeId] = useState<string>('mait');
   const [categories, setCategories] = useState<Category[]>(INITIAL_CATEGORIES);
@@ -157,11 +158,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
-  // Sync theme with HTML class
+  // Sync theme with HTML class — always default to clean light/white mode unless explicitly set to 'dark'
   useEffect(() => {
     try {
       const savedTheme = localStorage.getItem('passon_theme') as 'light' | 'dark' | null;
-      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      if (savedTheme === 'dark') {
         setTheme('dark');
         document.documentElement.classList.add('dark');
       } else {
@@ -169,7 +170,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         document.documentElement.classList.remove('dark');
       }
     } catch {
-      // fallback to light
+      setTheme('light');
+      document.documentElement.classList.remove('dark');
     }
   }, []);
 
@@ -209,33 +211,28 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       if (storedUser) {
         try {
           const parsed = JSON.parse(storedUser);
-          if (parsed.role === 'admin' || isAdminEmail(parsed.email)) {
-            setCurrentUser(DEFAULT_ADMIN_PROFILE);
-            localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(DEFAULT_ADMIN_PROFILE));
-          } else {
+          if (parsed && parsed.email) {
             setCurrentUser(parsed);
+          } else {
+            setCurrentUser(null);
           }
         } catch {
-          setCurrentUser(DEFAULT_ADMIN_PROFILE);
+          setCurrentUser(null);
         }
+      } else {
+        setCurrentUser(null);
       }
 
       const storedStudents = localStorage.getItem(STORAGE_KEY_STUDENTS);
       if (storedStudents) {
         try {
           const parsed = JSON.parse(storedStudents) as UserProfile[];
-          const updated = parsed.map((s) =>
-            s.role === 'admin' || isAdminEmail(s.email)
-              ? DEFAULT_ADMIN_PROFILE
-              : s
-          );
-          if (!updated.some((s) => s.email === ADMIN_EMAIL)) {
-            updated.unshift(DEFAULT_ADMIN_PROFILE);
-          }
-          setRegisteredStudents(updated);
+          setRegisteredStudents(Array.isArray(parsed) ? parsed.filter((s) => s.id !== 'admin-tanveer-01') : []);
         } catch {
-          setRegisteredStudents([DEFAULT_ADMIN_PROFILE]);
+          setRegisteredStudents([]);
         }
+      } else {
+        setRegisteredStudents([]);
       }
 
       const storedCollegeId = localStorage.getItem(STORAGE_KEY_COLLEGE_ID);
@@ -283,22 +280,33 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
-  // Login with personal email & optional admin password check
+  // Login with personal email & admin password authentication
   const loginWithEmail = (email: string, password?: string): UserProfile | null => {
     const trimmed = email.trim().toLowerCase();
     if (isAdminEmail(trimmed)) {
-      const cred = ADMIN_CREDENTIALS.find((c) => c.email.toLowerCase() === trimmed);
-      if (password && cred && password !== cred.password) {
+      const matchingCreds = ADMIN_CREDENTIALS.filter((c) => c.email.toLowerCase() === trimmed);
+      if (!password || password.trim() === '') {
         return null;
       }
+      const matches = matchingCreds.some(
+        (c) => c.password === password.trim() || c.password.toLowerCase() === password.trim().toLowerCase()
+      );
+      if (!matches) {
+        return null;
+      }
+      const cred = matchingCreds[0];
       const adminProfile: UserProfile = {
         ...DEFAULT_ADMIN_PROFILE,
         id: `admin-${trimmed.replace(/[^a-z0-9]/g, '-')}`,
         email: trimmed,
         fullName: cred?.name || 'Campus Administrator',
+        role: 'admin',
+        verificationStatus: 'approved',
       };
       setCurrentUser(adminProfile);
-      localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(adminProfile));
+      try {
+        localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(adminProfile));
+      } catch {}
       showToast(`Logged in as Administrator (${adminProfile.fullName})`);
       return adminProfile;
     }
@@ -306,7 +314,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const found = registeredStudents.find((s) => s.email.toLowerCase() === trimmed);
     if (found) {
       setCurrentUser(found);
-      localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(found));
+      try {
+        localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(found));
+      } catch {}
       showToast(`Welcome back, ${found.fullName}!`);
       return found;
     }

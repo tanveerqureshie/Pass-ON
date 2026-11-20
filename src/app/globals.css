@@ -31,7 +31,7 @@
   --emerald: #10B981;
   --ink: #0f172a;
   --paper: #ffffff;
-  --page: #f8fafc;
+  --page: #ffffff;
   --line: #e2e8f0;
   color-scheme: light;
 }
@@ -326,6 +326,69 @@ img {
   .animate-hero-mesh-reverse {
     animation: hero-mesh-float 15s ease-in-out infinite reverse;
     will-change: transform;
+  }
+
+  /* Hero illustration natural blend & floating animations */
+  @keyframes hero-natural-float {
+    0%, 100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-10px) rotate(0.35deg);
+    }
+  }
+
+  @keyframes hero-badge-float-1 {
+    0%, 100% {
+      transform: translateY(0px) translateX(0px);
+    }
+    50% {
+      transform: translateY(-8px) translateX(3px);
+    }
+  }
+
+  @keyframes hero-badge-float-2 {
+    0%, 100% {
+      transform: translateY(0px) translateX(0px);
+    }
+    50% {
+      transform: translateY(-10px) translateX(-3px);
+    }
+  }
+
+  @keyframes hero-badge-float-3 {
+    0%, 100% {
+      transform: translateY(0px) translateX(0px);
+    }
+    50% {
+      transform: translateY(-7px) translateX(3px);
+    }
+  }
+
+  .animate-hero-float {
+    animation: hero-natural-float 6s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .animate-hero-badge-1 {
+    animation: hero-badge-float-1 5s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .animate-hero-badge-2 {
+    animation: hero-badge-float-2 6.5s ease-in-out infinite 0.6s;
+    will-change: transform;
+  }
+
+  .animate-hero-badge-3 {
+    animation: hero-badge-float-3 5.5s ease-in-out infinite 1.2s;
+    will-change: transform;
+  }
+
+  .hero-img-blend {
+    /* Natural mask feathering: softly fades the outer perimeter so the illustration blends naturally into the hero canvas without any borders or harsh box cutoffs */
+    -webkit-mask-image: radial-gradient(ellipse 94% 90% at 50% 50%, #000 70%, transparent 100%);
+    mask-image: radial-gradient(ellipse 94% 90% at 50% 50%, #000 70%, transparent 100%);
   }
 
   /* ─── Award-tier ambient & reveal animations ─── */
