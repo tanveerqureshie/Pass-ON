@@ -105,7 +105,7 @@ export const HeroSlider: React.FC<{ slides: HeroSlide[] }> = ({ slides }) => {
             </h1>
 
             <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/70 sm:text-base">
-              Seniors' textbooks, gadgets and hostel essentials find their next owner — verified, free to use and
+              Seniors&apos; textbooks, gadgets and hostel essentials find their next owner — verified, free to use and
               zero commission.
             </p>
 

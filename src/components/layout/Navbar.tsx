@@ -58,17 +58,17 @@ export const Navbar: React.FC = () => {
   return (
     <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/90 backdrop-blur supports-[backdrop-filter]:bg-white/80 dark:supports-[backdrop-filter]:bg-slate-950/80 border-b border-ink-200/70 dark:border-slate-800 shadow-header transition-colors">
       {/* Brand strip */}
-      <div className="h-1.5 w-full bg-gradient-to-r from-teal-600 via-teal-700 to-emerald-500" />
+      <div className="h-1.5 w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500" />
 
       <div className="container-x h-16 flex items-center justify-between gap-3">
         {/* Brand + college switcher */}
         <div className="flex items-center gap-3 shrink-0">
           <Link href="/" className="flex items-center gap-2.5 group" aria-label="Pass ON home">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-teal-600 text-white shadow-chip transition group-hover:bg-teal-700">
+            <span className="grid h-9 w-9 place-items-center rounded-xl bg-blue-600 text-white shadow-sm transition group-hover:bg-blue-700">
               <Landmark className="h-4.5 w-4.5" strokeWidth={2.2} />
             </span>
-            <span className="font-display text-lg font-extrabold tracking-tight text-ink-950">
-              Pass <span className="text-teal-600">ON</span>
+            <span className="font-display text-lg font-extrabold tracking-tight text-ink-950 dark:text-white">
+              Pass <span className="text-blue-600">ON</span>
             </span>
           </Link>
 
@@ -79,18 +79,18 @@ export const Navbar: React.FC = () => {
                 setCollegeDropdownOpen((v) => !v);
                 setUserMenuOpen(false);
               }}
-              className="flex items-center gap-2 rounded-full border border-ink-200 bg-ink-50 py-1.5 pl-3 pr-2.5 text-xs font-bold text-ink-800 transition hover:border-ink-300 hover:bg-white"
+              className="flex items-center gap-2 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 py-1.5 pl-3 pr-2.5 text-xs font-bold text-slate-800 dark:text-slate-200 transition hover:border-slate-300 hover:bg-white dark:hover:bg-slate-800 shadow-xs"
             >
-              <Building2 className="h-3.5 w-3.5 text-brand-600" />
+              <Building2 className="h-3.5 w-3.5 text-blue-600" />
               <span className="max-w-[80px] truncate">{activeCollegeName}</span>
-              <ChevronDown className={clsx('h-3.5 w-3.5 text-ink-500 transition', collegeDropdownOpen && 'rotate-180')} />
+              <ChevronDown className={clsx('h-3.5 w-3.5 text-slate-400 transition', collegeDropdownOpen && 'rotate-180')} />
             </button>
 
             {collegeDropdownOpen && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setCollegeDropdownOpen(false)} />
-                <div className="absolute left-0 top-full z-50 mt-2 w-72 animate-pop-in overflow-hidden rounded-2xl border border-ink-200 bg-white shadow-lift">
-                  <p className="px-4 pt-3 pb-2 text-[10px] font-bold uppercase tracking-widest text-ink-400">
+                <div className="absolute left-0 top-full z-50 mt-2 w-72 animate-pop-in overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl">
+                  <p className="px-4 pt-3 pb-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
                     My Campus
                   </p>
                   <div className="max-h-72 overflow-y-auto px-2 pb-2">
@@ -104,19 +104,19 @@ export const Navbar: React.FC = () => {
                         className={clsx(
                           'flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-xs transition',
                           col.id === selectedCollege?.id
-                            ? 'bg-teal-50 font-bold text-teal-800'
-                            : 'font-medium text-ink-700 hover:bg-cream-100'
+                            ? 'bg-blue-50 dark:bg-blue-950/70 font-bold text-blue-700 dark:text-blue-300'
+                            : 'font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
                         )}
                       >
                         <span className="font-bold">{col.short_name}</span>
-                        <span className="text-[11px] text-ink-400">{col.location.split(',')[0]}</span>
+                        <span className="text-[11px] text-slate-400">{col.location.split(',')[0]}</span>
                       </button>
                     ))}
                   </div>
                   <Link
                     href="/colleges"
                     onClick={() => setCollegeDropdownOpen(false)}
-                    className="block border-t border-ink-100 py-2.5 text-center text-xs font-bold text-teal-700 transition hover:bg-teal-50"
+                    className="block border-t border-slate-100 dark:border-slate-800 py-2.5 text-center text-xs font-bold text-blue-600 dark:text-blue-400 transition hover:bg-blue-50 dark:hover:bg-blue-950/50"
                   >
                     All Colleges Directory →
                   </Link>
@@ -134,7 +134,7 @@ export const Navbar: React.FC = () => {
               href={href}
               className={clsx(
                 'relative rounded-full px-3.5 py-2 text-[13px] font-semibold transition',
-                isActive(href) ? 'bg-teal-50 text-teal-800 font-bold' : 'text-ink-600 hover:bg-cream-100 hover:text-ink-950'
+                isActive(href) ? 'bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 font-bold' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-950 dark:hover:text-white'
               )}
             >
               {label}
@@ -148,11 +148,11 @@ export const Navbar: React.FC = () => {
           <Link
             href="/dashboard/saved"
             aria-label="Saved items"
-            className="relative grid h-10 w-10 place-items-center rounded-full border border-cream-300 bg-white text-ink-600 transition hover:border-teal-500 hover:text-teal-600"
+            className="relative grid h-10 w-10 place-items-center rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 transition hover:border-blue-400 hover:text-blue-600 shadow-xs"
           >
             <Heart className="h-[18px] w-[18px]" />
             {savedListingIds.length > 0 && (
-              <span className="absolute -right-1 -top-1 grid h-4.5 min-w-[18px] place-items-center rounded-full bg-teal-600 px-1 text-[10px] font-bold text-white shadow-sm">
+              <span className="absolute -right-1 -top-1 grid h-4.5 min-w-[18px] place-items-center rounded-full bg-blue-600 px-1 text-[10px] font-bold text-white shadow-sm">
                 {savedListingIds.length}
               </span>
             )}
@@ -162,11 +162,11 @@ export const Navbar: React.FC = () => {
           <button
             onClick={() => setDrawerOpen(true)}
             aria-label={`Cart, ${count} items`}
-            className="relative grid h-10 w-10 place-items-center rounded-full border border-cream-300 bg-white text-ink-600 transition hover:border-teal-500 hover:text-teal-600"
+            className="relative grid h-10 w-10 place-items-center rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 transition hover:border-blue-400 hover:text-blue-600 shadow-xs"
           >
             <ShoppingBag className="h-[18px] w-[18px]" />
             {count > 0 && (
-              <span className="absolute -right-1 -top-1 grid h-4.5 min-w-[18px] place-items-center rounded-full bg-teal-600 px-1 text-[10px] font-bold text-white shadow-sm">
+              <span className="absolute -right-1 -top-1 grid h-4.5 min-w-[18px] place-items-center rounded-full bg-blue-600 px-1 text-[10px] font-bold text-white shadow-sm">
                 {count > 99 ? '99+' : count}
               </span>
             )}
@@ -176,19 +176,19 @@ export const Navbar: React.FC = () => {
           <button
             onClick={toggleTheme}
             aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-            className="grid h-10 w-10 place-items-center rounded-full border border-cream-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-ink-600 dark:text-slate-200 transition hover:border-teal-500 hover:text-teal-600 dark:hover:text-teal-400 shadow-sm"
+            className="grid h-10 w-10 place-items-center rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 transition hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 shadow-xs"
           >
             {theme === 'dark' ? (
               <Sun className="h-[18px] w-[18px] text-amber-400 transition-transform hover:rotate-45" />
             ) : (
-              <Moon className="h-[18px] w-[18px] text-teal-700 transition-transform hover:-rotate-12" />
+              <Moon className="h-[18px] w-[18px] text-blue-700 transition-transform hover:-rotate-12" />
             )}
           </button>
 
           {/* Sell CTA */}
           <Link
             href="/sell"
-            className="inline-flex h-10 items-center gap-2 rounded-full bg-teal-600 px-4 text-[13px] font-bold text-white shadow-chip transition hover:bg-teal-700 active:scale-[0.98]"
+            className="inline-flex h-10 items-center gap-2 rounded-full bg-blue-600 hover:bg-blue-700 px-4 text-[13px] font-bold text-white shadow-md shadow-blue-500/25 transition active:scale-[0.98]"
           >
             <PlusCircle className="h-4 w-4" />
             Sell an Item
@@ -201,18 +201,18 @@ export const Navbar: React.FC = () => {
                 setUserMenuOpen((v) => !v);
                 setCollegeDropdownOpen(false);
               }}
-              className="flex items-center gap-2 rounded-full border border-cream-300 bg-white py-1 pl-1 pr-2.5 transition hover:border-teal-400"
+              className="flex items-center gap-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 py-1 pl-1 pr-2.5 transition hover:border-blue-400 shadow-xs"
             >
               <span
                 className={clsx(
                   'grid h-7 w-7 place-items-center rounded-full text-[11px] font-extrabold text-white',
-                  currentUser?.role === 'admin' ? 'bg-teal-800' : 'bg-teal-600'
+                  currentUser?.role === 'admin' ? 'bg-indigo-700' : 'bg-blue-600'
                 )}
               >
                 {displayInitial}
               </span>
-              <span className="max-w-[72px] truncate text-xs font-bold text-ink-900">{displayName}</span>
-              <ChevronDown className={clsx('h-3.5 w-3.5 text-ink-400 transition', userMenuOpen && 'rotate-180')} />
+              <span className="max-w-[72px] truncate text-xs font-bold text-slate-800 dark:text-slate-200">{displayName}</span>
+              <ChevronDown className={clsx('h-3.5 w-3.5 text-slate-400 transition', userMenuOpen && 'rotate-180')} />
             </button>
 
             {userMenuOpen && (
@@ -285,18 +285,18 @@ export const Navbar: React.FC = () => {
             <button
               onClick={toggleTheme}
               aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-              className="grid h-10 w-10 place-items-center rounded-full border border-ink-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-ink-700 dark:text-slate-200"
+              className="grid h-10 w-10 place-items-center rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
             >
-              {theme === 'dark' ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-teal-700" />}
+              {theme === 'dark' ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-blue-700" />}
             </button>
             <button
               onClick={() => setDrawerOpen(true)}
               aria-label="Open cart"
-              className="relative grid h-10 w-10 place-items-center rounded-full border border-ink-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-ink-700 dark:text-slate-200"
+              className="relative grid h-10 w-10 place-items-center rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
             >
               <ShoppingBag className="h-[18px] w-[18px]" />
               {count > 0 && (
-                <span className="absolute -right-1 -top-1 grid h-4.5 min-w-[18px] place-items-center rounded-full bg-teal-600 px-1 text-[10px] font-bold text-white">
+                <span className="absolute -right-1 -top-1 grid h-4.5 min-w-[18px] place-items-center rounded-full bg-blue-600 px-1 text-[10px] font-bold text-white">
                   {count}
                 </span>
               )}

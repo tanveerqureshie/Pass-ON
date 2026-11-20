@@ -6,32 +6,33 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        /* Primary — Teal #0F766E */
+        /* Primary — Royal Blue #2563EB */
         brand: {
-          50: '#F0FDFA',
-          100: '#CCFBF1',
-          200: '#99F6E4',
-          300: '#5EEAD4',
-          400: '#2DD4BF',
-          500: '#14B8A6',
-          600: '#0F766E', // Primary Teal
-          700: '#0D645D',
-          800: '#115E59',
-          900: '#134E4A',
-          950: '#042F2C',
+          50: '#EFF6FF',
+          100: '#DBEAFE',
+          200: '#BFDBFE',
+          300: '#93C5FD',
+          400: '#60A5FA',
+          500: '#3B82F6',
+          600: '#2563EB', // Primary Royal Blue
+          700: '#1D4ED8',
+          800: '#1E40AF',
+          900: '#1E3A8A',
+          950: '#172554',
         },
-        teal: {
-          DEFAULT: '#0F766E',
-          50: '#F0FDFA',
-          100: '#CCFBF1',
-          200: '#99F6E4',
-          300: '#5EEAD4',
-          400: '#2DD4BF',
-          500: '#14B8A6',
-          600: '#0F766E',
-          700: '#0D645D',
-          800: '#115E59',
-          900: '#134E4A',
+        blue: {
+          DEFAULT: '#2563EB',
+          50: '#EFF6FF',
+          100: '#DBEAFE',
+          200: '#BFDBFE',
+          300: '#93C5FD',
+          400: '#60A5FA',
+          500: '#3B82F6',
+          600: '#2563EB',
+          700: '#1D4ED8',
+          800: '#1E40AF',
+          900: '#1E3A8A',
+          950: '#172554',
         },
         /* Accent — Emerald #10B981 */
         emerald: {
@@ -46,15 +47,6 @@ const config: Config = {
           700: '#047857',
           800: '#065F46',
           900: '#064E3B',
-        },
-        /* Base Background — Cream #FFF8F0 */
-        cream: {
-          DEFAULT: '#FFF8F0',
-          50: '#FFFCF7',
-          100: '#FFF8F0',
-          200: '#F7EFE5',
-          300: '#EDE0D0',
-          400: '#DFCDB8',
         },
         /* Secondary — rich black / neutral greys */
         ink: {
@@ -76,10 +68,11 @@ const config: Config = {
         display: ['Manrope', 'Inter', '-apple-system', 'Segoe UI', 'sans-serif'],
       },
       boxShadow: {
-        card: '0 1px 2px rgba(17,17,20,0.05), 0 12px 32px -16px rgba(17,17,20,0.14)',
-        lift: '0 2px 4px rgba(17,17,20,0.06), 0 24px 48px -20px rgba(17,17,20,0.25)',
-        chip: '0 1px 2px rgba(17,17,20,0.06)',
-        header: '0 1px 0 rgba(17,17,20,0.06), 0 8px 24px -18px rgba(17,17,20,0.20)',
+        card: '0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 10px 24px -4px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(15, 23, 42, 0.05)',
+        'card-hover': '0 12px 28px -4px rgba(37, 99, 235, 0.16), 0 18px 36px -6px rgba(15, 23, 42, 0.14), 0 0 0 1px rgba(37, 99, 235, 0.15)',
+        lift: '0 8px 20px -4px rgba(15, 23, 42, 0.12), 0 20px 32px -8px rgba(15, 23, 42, 0.16)',
+        chip: '0 2px 4px rgba(15, 23, 42, 0.08)',
+        header: '0 1px 0 rgba(15, 23, 42, 0.06), 0 8px 24px -16px rgba(15, 23, 42, 0.12)',
       },
       borderRadius: {
         '4xl': '2rem',
