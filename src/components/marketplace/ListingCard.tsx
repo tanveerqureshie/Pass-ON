@@ -76,7 +76,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
   };
 
   return (
-    <article className="card-3d group flex flex-col overflow-hidden rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-[0_6px_18px_-4px_rgba(15,23,42,0.1),0_2px_6px_rgba(15,23,42,0.06)] hover:shadow-[0_16px_32px_-6px_rgba(37,99,235,0.18),0_6px_14px_rgba(15,23,42,0.08)] hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300">
+    <article className="card-3d glass-oily border-oily group flex flex-col overflow-hidden rounded-2xl shadow-[0_6px_20px_-4px_rgba(15,23,42,0.1),0_2px_6px_rgba(15,23,42,0.06)] hover:shadow-[0_20px_40px_-6px_rgba(37,99,235,0.25),0_0_24px_rgba(59,130,246,0.2)] hover:border-blue-400/90 transition-all duration-300">
       {/* Cover */}
       <div className="relative overflow-hidden bg-slate-100 dark:bg-slate-800">
         <Link href={`/item/${listing.id}`} aria-label={listing.title}>
