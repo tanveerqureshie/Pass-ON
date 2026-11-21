@@ -194,11 +194,15 @@ export async function deleteListing(id: string): Promise<boolean> {
 
   try {
     const supabase = getSupabase();
+    // Also remove any inquiries and reports attached to this listing
+    await supabase.from('inquiries').delete().eq('listing_id', id);
+    await supabase.from('reports').delete().eq('listing_id', id);
     const { error } = await supabase.from('listings').delete().eq('id', id);
     if (error) {
       console.error('Supabase deleteListing error:', error);
+      return false;
     }
-    return !error;
+    return true;
   } catch (err) {
     console.error('Supabase deleteListing failed:', err);
     return false;
@@ -315,7 +319,9 @@ export async function updateStudentStatus(
   reason?: string,
   verifiedBy?: string
 ): Promise<UserProfile | null> {
-  const existing = memoryDb.students.find((s) => s.id === userId);
+  const existing = memoryDb.students.find(
+    (s) => s.id === userId || s.email.toLowerCase() === userId.toLowerCase()
+  );
   if (existing) {
     existing.verificationStatus = status;
     existing.rejectionReason = status === 'rejected' ? reason : undefined;
@@ -339,12 +345,25 @@ export async function updateStudentStatus(
       updates.verified_by = verifiedBy || null;
     }
 
-    const { data, error } = await supabase
+    // Try matching by id first
+    let { data, error } = await supabase
       .from('profiles')
       .update(updates)
       .eq('id', userId)
       .select()
-      .single();
+      .maybeSingle();
+
+    // If not found by id, try matching by email
+    if (!data) {
+      const byEmail = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('email', userId.toLowerCase())
+        .select()
+        .maybeSingle();
+      data = byEmail.data;
+      error = byEmail.error;
+    }
 
     if (!error && data) {
       return fromDbProfile(data);

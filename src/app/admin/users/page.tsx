@@ -60,10 +60,9 @@ export default function AdminUsersPage() {
   const handleConfirmReject = (e: React.FormEvent) => {
     e.preventDefault();
     if (!rejectionModalUser) return;
-    rejectStudent(
-      rejectionModalUser.id,
-      rejectionReason || 'Enrollment number could not be verified against college database.'
-    );
+    const targetId = rejectionModalUser.id;
+    const reason = rejectionReason.trim() || 'Enrollment number could not be verified against college database.';
+    rejectStudent(targetId, reason);
     setRejectionModalUser(null);
     setRejectionReason('');
   };

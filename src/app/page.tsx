@@ -190,21 +190,21 @@ export default function HomePage() {
       </Reveal>
 
       {/* ─────────────── Explore Categories (Deep Visible Drop Shadows) ──────────── */}
-      <section className="section py-12 sm:py-16">
+      <section className="section py-14 sm:py-20">
         <div className="container-x">
           <Reveal>
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-10">
               <div>
-                <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-ink-950 dark:text-white tracking-tight">
+                <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-ink-950 dark:text-white tracking-tight">
                   Explore Categories
                 </h2>
-                <p className="mt-1 text-sm text-ink-500 dark:text-slate-400">
+                <p className="mt-2 text-sm sm:text-base lg:text-lg text-ink-500 dark:text-slate-400 max-w-2xl leading-relaxed">
                   Select a category to browse textbooks, practical instruments, engineering drafters, and hostel gear.
                 </p>
               </div>
               <Link
                 href="/categories"
-                className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition underline underline-offset-4"
+                className="text-xs sm:text-sm font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition underline underline-offset-4"
               >
                 All Categories →
               </Link>
@@ -212,22 +212,22 @@ export default function HomePage() {
           </Reveal>
 
           <Reveal delay={80}>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5 lg:gap-6">
               {CATEGORY_ITEMS.map((cat) => {
                 const Icon = cat.icon;
                 return (
                   <Link
                     key={cat.id}
                     href={`/explore?category=${cat.id}`}
-                    className="group flex flex-col items-center text-center p-4 rounded-2xl glass-neu transition-all duration-300 hover:-translate-y-1.5"
+                    className="group flex flex-col items-center text-center p-5 sm:p-6 rounded-3xl glass-neu transition-all duration-300 hover:-translate-y-2 hover:shadow-lg"
                   >
-                    <span className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-200 mb-3 shadow-sm">
-                      <Icon className="h-5 w-5" />
+                    <span className="grid h-14 w-14 sm:h-16 sm:w-16 place-items-center rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-200 mb-3.5 shadow-sm">
+                      <Icon className="h-6 w-6 sm:h-7 sm:w-7" />
                     </span>
-                    <span className="text-xs font-bold text-ink-950 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
+                    <span className="text-sm sm:text-base font-extrabold text-ink-950 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
                       {cat.name}
                     </span>
-                    <span className="mt-1 text-[10px] text-ink-400 dark:text-slate-400 line-clamp-1">
+                    <span className="mt-1.5 text-xs text-ink-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
                       {cat.desc}
                     </span>
                   </Link>
@@ -253,14 +253,14 @@ export default function HomePage() {
 
           {/* Filter Tabs Row */}
           <Reveal delay={40}>
-            <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 no-scrollbar">
+            <div className="flex items-center gap-2.5 overflow-x-auto pb-4 mb-8 no-scrollbar">
               {FILTER_TABS.map((tab) => {
                 const isActive = activeFilter === tab.id;
                 return (
                   <button
                     key={tab.id}
                     onClick={() => setActiveFilter(tab.id)}
-                    className={`shrink-0 rounded-full px-4 py-1.5 text-xs font-bold transition-all ${
+                    className={`shrink-0 rounded-full px-5 py-2 text-xs sm:text-sm font-bold transition-all ${
                       isActive
                         ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25'
                         : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-blue-300 shadow-sm'
@@ -274,22 +274,22 @@ export default function HomePage() {
           </Reveal>
 
           {studentListings.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-7">
               {studentListings.map((listing) => (
                 <ListingCard key={listing.id} listing={listing} />
               ))}
             </div>
           ) : (
             <div className="rounded-3xl glass-neu p-12 text-center">
-              <p className="text-sm font-semibold text-ink-500 dark:text-slate-400">
+              <p className="text-sm sm:text-base font-semibold text-ink-500 dark:text-slate-400">
                 No items found for this category right now. Be the first to list one!
               </p>
               <Link
                 href="/sell"
-                className="mt-4 inline-flex items-center gap-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 text-xs font-bold shadow-md shadow-blue-500/20 transition"
+                className="mt-5 inline-flex items-center gap-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 text-xs sm:text-sm font-bold shadow-md shadow-blue-500/20 transition"
               >
                 Pass On an Item
-                <ArrowRight className="h-3.5 w-3.5" />
+                <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           )}
@@ -297,31 +297,31 @@ export default function HomePage() {
       </section>
 
       {/* ───────────────────────────── Final CTA Banner ─────────────────────────── */}
-      <section className="section py-14">
+      <section className="section py-16 sm:py-24">
         <div className="container-x">
           <Reveal>
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 px-6 py-14 text-center text-white shadow-2xl sm:px-14 border border-blue-400/30">
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 px-8 py-16 text-center text-white shadow-2xl sm:px-16 border border-blue-400/30">
               {/* Ambient floating blobs */}
-              <div className="pointer-events-none absolute -left-16 -top-16 h-56 w-56 animate-hero-mesh rounded-full bg-blue-400/25 blur-2xl" />
-              <div className="pointer-events-none absolute -bottom-20 -right-10 h-64 w-64 animate-hero-mesh-reverse rounded-full bg-indigo-300/20 blur-3xl" />
-              <div className="relative">
-                <h2 className="mx-auto max-w-2xl font-display text-3xl font-extrabold tracking-tight sm:text-4xl text-white">
+              <div className="pointer-events-none absolute -left-16 -top-16 h-64 w-64 animate-hero-mesh rounded-full bg-blue-400/25 blur-2xl" />
+              <div className="pointer-events-none absolute -bottom-20 -right-10 h-72 w-72 animate-hero-mesh-reverse rounded-full bg-indigo-300/20 blur-3xl" />
+              <div className="relative max-w-3xl mx-auto space-y-4">
+                <h2 className="font-display text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl text-white leading-tight">
                   Something on your shelf someone on this campus needs?
                 </h2>
-                <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-blue-100 sm:text-base">
+                <p className="mt-3.5 max-w-2xl mx-auto text-base sm:text-lg lg:text-xl leading-relaxed text-blue-100">
                   List it in under two minutes and let it pass on. Textbooks, calculators, cycles, lab gear — if it
                   helped you pass, pass it on to a junior.
                 </p>
-                <div className="mt-8 flex flex-wrap items-center justify-center gap-3.5">
+                <div className="pt-6 flex flex-wrap items-center justify-center gap-4">
                   <Link
                     href="/sell"
-                    className="inline-flex h-12 items-center gap-2 rounded-full bg-white text-blue-700 hover:bg-blue-50 px-7 text-sm font-bold shadow-lg transition-all hover:-translate-y-0.5 active:translate-y-0"
+                    className="inline-flex h-13 sm:h-14 items-center gap-2.5 rounded-full bg-white text-blue-700 hover:bg-blue-50 px-8 text-sm sm:text-base font-extrabold shadow-xl transition-all hover:-translate-y-0.5 active:translate-y-0"
                   >
                     Pass On an Item <ArrowRight className="h-4 w-4" />
                   </Link>
                   <Link
                     href="/explore"
-                    className="inline-flex h-12 items-center gap-2 rounded-full border border-white/40 bg-white/10 backdrop-blur-sm px-7 text-sm font-bold text-white transition hover:border-white/80 hover:bg-white/20"
+                    className="inline-flex h-13 sm:h-14 items-center gap-2.5 rounded-full border border-white/40 bg-white/10 backdrop-blur-sm px-8 text-sm sm:text-base font-bold text-white transition hover:border-white/80 hover:bg-white/20"
                   >
                     Browse the Marketplace
                   </Link>

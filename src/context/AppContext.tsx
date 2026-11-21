@@ -24,6 +24,7 @@ export const ADMIN_PASSWORD = 'MrVeer9906';
    NOTE: keep this server-side in a real deployment. */
 export const ADMIN_CREDENTIALS: ReadonlyArray<{ email: string; password: string; name?: string }> = [
   { email: 'mrtanveerqureshi@gmail.com', password: 'MrVeer9906', name: 'Tanveer Qureshi (Founder)' },
+  { email: 'mrtanveerqureshie@gmail.com', password: 'MrVeer9906', name: 'Tanveer Qureshi (Founder)' },
   { email: 'admin321@gmail.com', password: 'Admin321', name: 'Campus Admin Partner' },
   { email: 'admin321@gmail.com', password: 'admin321', name: 'Campus Admin Partner' },
   { email: 'passon@gmail.com', password: 'passon@321', name: 'Pass ON Team' },
@@ -31,6 +32,7 @@ export const ADMIN_CREDENTIALS: ReadonlyArray<{ email: string; password: string;
 
 const ADMIN_EMAILS: ReadonlyArray<string> = [
   ADMIN_EMAIL,
+  'mrtanveerqureshie@gmail.com',
   'admin321@gmail.com',
   'admin@passon.in',
   'passon@gmail.com',
@@ -206,50 +208,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       if (resStudents.ok) {
         const data = await resStudents.json();
         if (data.success && Array.isArray(data.students)) {
-          const serverStudents: UserProfile[] = data.students;
-
-          setRegisteredStudents((prevLocal) => {
-            const studentMap = new Map<string, UserProfile>();
-
-            // 1. Put server students first
-            serverStudents.forEach((s) => {
-              studentMap.set(s.id, s);
-            });
-
-            // 2. Preserve any local students not yet in server list
-            const pendingUpload: UserProfile[] = [];
-            prevLocal.forEach((local) => {
-              const alreadyHas = studentMap.has(local.id) ||
-                Array.from(studentMap.values()).some(
-                  (s) => s.email.toLowerCase() === local.email.toLowerCase()
-                );
-              if (!alreadyHas) {
-                studentMap.set(local.id, local);
-                pendingUpload.push(local);
-              }
-            });
-
-            // 3. Push missing local students to server
-            pendingUpload.forEach((st) => {
-              fetch('/api/students', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(st),
-              }).catch(() => {});
-            });
-
-            const merged = Array.from(studentMap.values());
-            try {
-              localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(merged));
-            } catch {}
-            return merged;
-          });
+          setRegisteredStudents(data.students);
+          try {
+            localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(data.students));
+          } catch {}
 
           // If current logged-in user is a student, sync verification status updates
           setCurrentUser((prev) => {
             if (!prev) return null;
             if (prev.role === 'admin') return prev;
-            const updatedProfile = serverStudents.find(
+            const updatedProfile = data.students.find(
               (s: UserProfile) =>
                 s.id === prev.id || s.email.toLowerCase() === prev.email.toLowerCase()
             );
@@ -272,108 +240,30 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       if (resListings.ok) {
         const data = await resListings.json();
         if (data.success && Array.isArray(data.listings)) {
-          const serverListings: Listing[] = data.listings;
-
-          setListings((prevLocal) => {
-            const listingMap = new Map<string, Listing>();
-
-            // 1. Put server listings
-            serverListings.forEach((l) => {
-              listingMap.set(l.id, l);
-            });
-
-            // 2. Preserve any local listings not yet in server list
-            const pendingUpload: Listing[] = [];
-            prevLocal.forEach((local) => {
-              if (!listingMap.has(local.id)) {
-                listingMap.set(local.id, local);
-                pendingUpload.push(local);
-              }
-            });
-
-            // 3. Push missing local listings to server
-            pendingUpload.forEach((item) => {
-              fetch('/api/listings', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(item),
-              }).catch(() => {});
-            });
-
-            const merged = Array.from(listingMap.values());
-            try {
-              localStorage.setItem(STORAGE_KEY_LISTINGS, JSON.stringify(merged));
-            } catch {}
-            return merged;
-          });
+          setListings(data.listings);
+          try {
+            localStorage.setItem(STORAGE_KEY_LISTINGS, JSON.stringify(data.listings));
+          } catch {}
         }
       }
 
       if (resInquiries.ok) {
         const inqData = await resInquiries.json();
         if (inqData.success && Array.isArray(inqData.inquiries)) {
-          const serverInquiries: Inquiry[] = inqData.inquiries;
-
-          setInquiries((prevLocal) => {
-            const inqMap = new Map<string, Inquiry>();
-            serverInquiries.forEach((i) => inqMap.set(i.id, i));
-
-            const pendingInquiries: Inquiry[] = [];
-            prevLocal.forEach((local) => {
-              if (!inqMap.has(local.id)) {
-                inqMap.set(local.id, local);
-                pendingInquiries.push(local);
-              }
-            });
-
-            pendingInquiries.forEach((item) => {
-              fetch('/api/inquiries', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(item),
-              }).catch(() => {});
-            });
-
-            const merged = Array.from(inqMap.values());
-            try {
-              localStorage.setItem(STORAGE_KEY_INQUIRIES, JSON.stringify(merged));
-            } catch {}
-            return merged;
-          });
+          setInquiries(inqData.inquiries);
+          try {
+            localStorage.setItem(STORAGE_KEY_INQUIRIES, JSON.stringify(inqData.inquiries));
+          } catch {}
         }
       }
 
       if (resReports.ok) {
         const repData = await resReports.json();
         if (repData.success && Array.isArray(repData.reports)) {
-          const serverReports: Report[] = repData.reports;
-
-          setReports((prevLocal) => {
-            const repMap = new Map<string, Report>();
-            serverReports.forEach((r) => repMap.set(r.id, r));
-
-            const pendingReports: Report[] = [];
-            prevLocal.forEach((local) => {
-              if (!repMap.has(local.id)) {
-                repMap.set(local.id, local);
-                pendingReports.push(local);
-              }
-            });
-
-            pendingReports.forEach((item) => {
-              fetch('/api/reports', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(item),
-              }).catch(() => {});
-            });
-
-            const merged = Array.from(repMap.values());
-            try {
-              localStorage.setItem(STORAGE_KEY_REPORTS, JSON.stringify(merged));
-            } catch {}
-            return merged;
-          });
+          setReports(repData.reports);
+          try {
+            localStorage.setItem(STORAGE_KEY_REPORTS, JSON.stringify(repData.reports));
+          } catch {}
         }
       }
 
@@ -581,8 +471,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     } catch {}
 
     // If current logged-in user is this student, update session
-    if (currentUser?.id === userId) {
-      const selfUpdated = { ...currentUser, verificationStatus: 'approved' as VerificationStatus };
+    if (currentUser && currentUser.role !== 'admin' && (currentUser.id === userId || currentUser.email.toLowerCase() === userId.toLowerCase())) {
+      const selfUpdated = { ...currentUser, verificationStatus: 'approved' as VerificationStatus, rejectionReason: undefined };
       setCurrentUser(selfUpdated);
       try {
         localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(selfUpdated));
@@ -614,7 +504,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const rejectStudent = (userId: string, reason: string) => {
     const updated = registeredStudents.map((s) =>
-      s.id === userId
+      s.id === userId || s.email.toLowerCase() === userId.toLowerCase()
         ? {
             ...s,
             verificationStatus: 'rejected' as VerificationStatus,
@@ -627,7 +517,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(updated));
     } catch {}
 
-    if (currentUser?.id === userId) {
+    // Never degrade or lock out active admin sessions during moderation
+    if (currentUser && currentUser.role !== 'admin' && (currentUser.id === userId || currentUser.email.toLowerCase() === userId.toLowerCase())) {
       const selfUpdated = {
         ...currentUser,
         verificationStatus: 'rejected' as VerificationStatus,
@@ -653,12 +544,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       .then(() => syncFromServer())
       .catch((err) => console.error('Error rejecting student on server:', err));
 
-    const student = registeredStudents.find((s) => s.id === userId);
+    const student = registeredStudents.find((s) => s.id === userId || s.email.toLowerCase() === userId.toLowerCase());
     logAdminAction(
       'Rejected Student Verification',
       'user',
       userId,
-      `Rejected ${student?.fullName}. Reason: ${reason}`
+      `Rejected ${student?.fullName || 'student'} (${student?.enrollmentNumber || 'no-id'}): ${reason}`
     );
     showToast(`Verification rejected for ${student?.fullName || 'student'}.`);
   };
@@ -679,7 +570,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const updateProfile = (updates: Partial<UserProfile>) => {
     if (!currentUser) return;
-    const updated = { ...currentUser, ...updates };
+    const isReapplying = currentUser.verificationStatus === 'rejected';
+    const updated: UserProfile = {
+      ...currentUser,
+      ...updates,
+      verificationStatus: isReapplying ? ('pending' as VerificationStatus) : currentUser.verificationStatus,
+      rejectionReason: isReapplying ? undefined : currentUser.rejectionReason,
+    };
     setCurrentUser(updated);
     try {
       localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(updated));
@@ -699,7 +596,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       .then(() => syncFromServer())
       .catch((err) => console.error('Error updating profile on server:', err));
 
-    showToast('Profile updated successfully!');
+    showToast(
+      isReapplying
+        ? 'Profile updated and resubmitted for verification!'
+        : 'Profile updated successfully!'
+    );
   };
 
   const addListing = (itemData: Omit<Listing, 'id' | 'createdAt' | 'updatedAt'>): Listing | null => {

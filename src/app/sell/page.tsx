@@ -117,10 +117,15 @@ export default function SellPage() {
             <ShieldAlert className="h-7 w-7" />
           </span>
 
-          <h1 className="font-display text-xl font-extrabold text-ink-950">Student Verification Required</h1>
+          <h1 className="font-display text-xl font-extrabold text-ink-950">
+            {currentUser?.verificationStatus === 'rejected'
+              ? 'Verification Declined'
+              : 'Student Verification Required'}
+          </h1>
           <p className="mx-auto max-w-md text-xs leading-relaxed text-ink-600">
-            Your registration is currently under review by college campus administrators. To maintain student
-            safety and prevent non-student commercial posts, only approved students can post listings.
+            {currentUser?.verificationStatus === 'rejected'
+              ? (currentUser.rejectionReason || 'Your details could not be matched with college records. Please correct your details on your profile to resubmit.')
+              : 'Your registration is currently under review by college campus administrators. To maintain student safety and prevent non-student commercial posts, only approved students can post listings.'}
           </p>
 
           <div className="space-y-2 rounded-2xl border border-ink-200 bg-[#f7f7f8] p-4 text-left text-xs">
@@ -138,24 +143,37 @@ export default function SellPage() {
             </div>
             <div className="flex justify-between">
               <span className="text-ink-500">Verification Status:</span>
-              <span className="font-bold capitalize text-amber-600">
+              <span
+                className={`font-bold capitalize ${
+                  currentUser?.verificationStatus === 'rejected'
+                    ? 'text-red-600'
+                    : 'text-amber-600'
+                }`}
+              >
                 {currentUser?.verificationStatus || 'Pending Approval'}
               </span>
             </div>
+            {currentUser?.verificationStatus === 'rejected' && currentUser.rejectionReason && (
+              <div className="mt-2 rounded-xl bg-red-50 p-2.5 text-xs text-red-700">
+                <strong>Decline Note:</strong> {currentUser.rejectionReason}
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col items-center justify-center gap-2.5 pt-1 sm:flex-row">
+            {currentUser?.verificationStatus === 'rejected' ? (
+              <Link
+                href="/profile"
+                className="inline-flex h-10 items-center rounded-xl bg-blue-600 px-5 text-xs font-bold text-white transition hover:bg-blue-700"
+              >
+                Update Details on Profile →
+              </Link>
+            ) : null}
             <Link
               href="/dashboard"
               className="inline-flex h-10 items-center rounded-xl border border-ink-300 bg-white px-5 text-xs font-bold text-ink-800 transition hover:bg-ink-50"
             >
               Return to Dashboard
-            </Link>
-            <Link
-              href="/auth/sign-in"
-              className="inline-flex h-10 items-center rounded-xl bg-ink-950 px-5 text-xs font-bold text-white transition hover:bg-ink-800"
-            >
-              Administrator Sign In
             </Link>
           </div>
         </div>
