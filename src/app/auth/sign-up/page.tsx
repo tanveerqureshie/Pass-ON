@@ -10,6 +10,7 @@ import { Input, Select } from '@/components/ui/Form';
 import { Button } from '@/components/ui/Button';
 import { UserPlus, ArrowLeft, ArrowRight, Check, GraduationCap, UploadCloud, Camera, Image as ImageIcon, X, Trash2 } from 'lucide-react';
 import { UserProfile } from '@/lib/types';
+import { compressImage } from '@/lib/image-compression';
 import clsx from 'clsx';
 
 export default function SignUpPage() {
@@ -32,7 +33,7 @@ export default function SignUpPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleIdCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleIdCardChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -41,19 +42,24 @@ export default function SignUpPage() {
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      setError('ID card photo must be less than 5MB.');
+    if (file.size > 15 * 1024 * 1024) {
+      setError('ID card photo must be less than 15MB.');
       return;
     }
 
     setError('');
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (event.target?.result) {
-        setIdCardImage(event.target.result as string);
-      }
-    };
-    reader.readAsDataURL(file);
+    try {
+      const compressed = await compressImage(file, 1200, 1200, 0.82);
+      setIdCardImage(compressed);
+    } catch {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setIdCardImage(event.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const selectedColObj = colleges.find((c) => c.id === collegeId);

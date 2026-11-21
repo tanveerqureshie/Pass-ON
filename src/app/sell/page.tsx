@@ -23,6 +23,7 @@ import {
   Instagram,
   Lock,
 } from 'lucide-react';
+import { compressImage } from '@/lib/image-compression';
 import clsx from 'clsx';
 
 const CATEGORY_FALLBACK: Record<string, string> = {
@@ -80,20 +81,30 @@ export default function SellPage() {
   const getDefaultImageForCategory = (catId: string) =>
     CATEGORY_FALLBACK[catId] || FALLBACK_DEFAULT;
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        showToast('Image size should be less than 5MB');
+      if (!file.type.startsWith('image/')) {
+        showToast('Please upload an image file (PNG, JPG, WEBP).');
+        return;
+      }
+      if (file.size > 15 * 1024 * 1024) {
+        showToast('Image size should be less than 15MB');
         return;
       }
       setImageFileName(file.name);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImageUrl(reader.result as string);
-        showToast('Image uploaded successfully!');
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressed = await compressImage(file, 1200, 1200, 0.82);
+        setImageUrl(compressed);
+        showToast('Image processed and ready!');
+      } catch {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImageUrl(reader.result as string);
+          showToast('Image uploaded successfully!');
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 

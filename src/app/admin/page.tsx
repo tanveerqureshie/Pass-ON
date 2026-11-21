@@ -66,7 +66,7 @@ export default function AdminOverviewPage() {
                 className="border border-white/15 bg-white/10 text-white hover:bg-white/15 hover:text-white"
               >
                 <MessageSquare className="h-4 w-4" />
-                <span>Requests ({pendingReportsCount})</span>
+                <span>Requests ({totalRequestsCount})</span>
               </Button>
             </Link>
           </div>

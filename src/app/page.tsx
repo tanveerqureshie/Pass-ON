@@ -296,49 +296,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ───────────────────────────── Safety & Community (Trust Cards) ───────────────────────────── */}
-      <section className="section pt-0">
-        <div className="container-x">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-            <Reveal delay={0}>
-              <div className="rounded-2xl glass-neu p-6">
-                <div className="grid h-10 w-10 place-items-center rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 mb-3 border border-blue-100 dark:border-blue-900 shadow-xs">
-                  <ShieldCheck className="h-5 w-5" />
-                </div>
-                <h3 className="font-display text-base font-extrabold text-ink-950 dark:text-slate-100">Campus-Verified Only</h3>
-                <p className="mt-1 text-xs text-ink-500 dark:text-slate-400 leading-relaxed">
-                  Only students with genuine college enrollment IDs can sign in, post items, or initiate handovers.
-                </p>
-              </div>
-            </Reveal>
-
-            <Reveal delay={100}>
-              <div className="rounded-2xl glass-neu p-6">
-                <div className="grid h-10 w-10 place-items-center rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 mb-3 border border-blue-100 dark:border-blue-900 shadow-xs">
-                  <Tag className="h-5 w-5" />
-                </div>
-                <h3 className="font-display text-base font-extrabold text-ink-950 dark:text-slate-100">Zero Fees, Zero Commission</h3>
-                <p className="mt-1 text-xs text-ink-500 dark:text-slate-400 leading-relaxed">
-                  Every rupee goes straight to the student. Pass ON charges no listing fees, buyer cuts, or middleman fees.
-                </p>
-              </div>
-            </Reveal>
-
-            <Reveal delay={200}>
-              <div className="rounded-2xl glass-neu p-6">
-                <div className="grid h-10 w-10 place-items-center rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 mb-3 border border-blue-100 dark:border-blue-900 shadow-xs">
-                  <MessageCircle className="h-5 w-5" />
-                </div>
-                <h3 className="font-display text-base font-extrabold text-ink-950 dark:text-slate-100">Direct WhatsApp / IG Chat</h3>
-                <p className="mt-1 text-xs text-ink-500 dark:text-slate-400 leading-relaxed">
-                  Connect 1-on-1 with campus peers and decide on your favorite canteen or library handover spot.
-                </p>
-              </div>
-            </Reveal>
-          </div>
-        </div>
-      </section>
-
       {/* ───────────────────────────── Final CTA Banner ─────────────────────────── */}
       <section className="section py-14">
         <div className="container-x">

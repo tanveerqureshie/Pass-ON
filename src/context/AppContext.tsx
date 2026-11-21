@@ -192,6 +192,205 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  // Synchronize state with central Next.js server API endpoints (Bidirectional Smart Merge)
+  const syncFromServer = async () => {
+    try {
+      const [resStudents, resListings, resInquiries, resReports, resLogs] = await Promise.all([
+        fetch('/api/students', { cache: 'no-store' }),
+        fetch('/api/listings', { cache: 'no-store' }),
+        fetch('/api/inquiries', { cache: 'no-store' }),
+        fetch('/api/reports', { cache: 'no-store' }),
+        fetch('/api/logs', { cache: 'no-store' }),
+      ]);
+
+      if (resStudents.ok) {
+        const data = await resStudents.json();
+        if (data.success && Array.isArray(data.students)) {
+          const serverStudents: UserProfile[] = data.students;
+
+          setRegisteredStudents((prevLocal) => {
+            const studentMap = new Map<string, UserProfile>();
+
+            // 1. Put server students first
+            serverStudents.forEach((s) => {
+              studentMap.set(s.id, s);
+            });
+
+            // 2. Preserve any local students not yet in server list
+            const pendingUpload: UserProfile[] = [];
+            prevLocal.forEach((local) => {
+              const alreadyHas = studentMap.has(local.id) ||
+                Array.from(studentMap.values()).some(
+                  (s) => s.email.toLowerCase() === local.email.toLowerCase()
+                );
+              if (!alreadyHas) {
+                studentMap.set(local.id, local);
+                pendingUpload.push(local);
+              }
+            });
+
+            // 3. Push missing local students to server
+            pendingUpload.forEach((st) => {
+              fetch('/api/students', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(st),
+              }).catch(() => {});
+            });
+
+            const merged = Array.from(studentMap.values());
+            try {
+              localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(merged));
+            } catch {}
+            return merged;
+          });
+
+          // If current logged-in user is a student, sync verification status updates
+          setCurrentUser((prev) => {
+            if (!prev) return null;
+            if (prev.role === 'admin') return prev;
+            const updatedProfile = serverStudents.find(
+              (s: UserProfile) =>
+                s.id === prev.id || s.email.toLowerCase() === prev.email.toLowerCase()
+            );
+            if (
+              updatedProfile &&
+              (updatedProfile.verificationStatus !== prev.verificationStatus ||
+                updatedProfile.role !== prev.role)
+            ) {
+              const merged = { ...prev, ...updatedProfile };
+              try {
+                localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(merged));
+              } catch {}
+              return merged;
+            }
+            return prev;
+          });
+        }
+      }
+
+      if (resListings.ok) {
+        const data = await resListings.json();
+        if (data.success && Array.isArray(data.listings)) {
+          const serverListings: Listing[] = data.listings;
+
+          setListings((prevLocal) => {
+            const listingMap = new Map<string, Listing>();
+
+            // 1. Put server listings
+            serverListings.forEach((l) => {
+              listingMap.set(l.id, l);
+            });
+
+            // 2. Preserve any local listings not yet in server list
+            const pendingUpload: Listing[] = [];
+            prevLocal.forEach((local) => {
+              if (!listingMap.has(local.id)) {
+                listingMap.set(local.id, local);
+                pendingUpload.push(local);
+              }
+            });
+
+            // 3. Push missing local listings to server
+            pendingUpload.forEach((item) => {
+              fetch('/api/listings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(item),
+              }).catch(() => {});
+            });
+
+            const merged = Array.from(listingMap.values());
+            try {
+              localStorage.setItem(STORAGE_KEY_LISTINGS, JSON.stringify(merged));
+            } catch {}
+            return merged;
+          });
+        }
+      }
+
+      if (resInquiries.ok) {
+        const inqData = await resInquiries.json();
+        if (inqData.success && Array.isArray(inqData.inquiries)) {
+          const serverInquiries: Inquiry[] = inqData.inquiries;
+
+          setInquiries((prevLocal) => {
+            const inqMap = new Map<string, Inquiry>();
+            serverInquiries.forEach((i) => inqMap.set(i.id, i));
+
+            const pendingInquiries: Inquiry[] = [];
+            prevLocal.forEach((local) => {
+              if (!inqMap.has(local.id)) {
+                inqMap.set(local.id, local);
+                pendingInquiries.push(local);
+              }
+            });
+
+            pendingInquiries.forEach((item) => {
+              fetch('/api/inquiries', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(item),
+              }).catch(() => {});
+            });
+
+            const merged = Array.from(inqMap.values());
+            try {
+              localStorage.setItem(STORAGE_KEY_INQUIRIES, JSON.stringify(merged));
+            } catch {}
+            return merged;
+          });
+        }
+      }
+
+      if (resReports.ok) {
+        const repData = await resReports.json();
+        if (repData.success && Array.isArray(repData.reports)) {
+          const serverReports: Report[] = repData.reports;
+
+          setReports((prevLocal) => {
+            const repMap = new Map<string, Report>();
+            serverReports.forEach((r) => repMap.set(r.id, r));
+
+            const pendingReports: Report[] = [];
+            prevLocal.forEach((local) => {
+              if (!repMap.has(local.id)) {
+                repMap.set(local.id, local);
+                pendingReports.push(local);
+              }
+            });
+
+            pendingReports.forEach((item) => {
+              fetch('/api/reports', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(item),
+              }).catch(() => {});
+            });
+
+            const merged = Array.from(repMap.values());
+            try {
+              localStorage.setItem(STORAGE_KEY_REPORTS, JSON.stringify(merged));
+            } catch {}
+            return merged;
+          });
+        }
+      }
+
+      if (resLogs.ok) {
+        const logsData = await resLogs.json();
+        if (logsData.success && Array.isArray(logsData.logs) && logsData.logs.length > 0) {
+          setAuditLogs(logsData.logs);
+          try {
+            localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(logsData.logs));
+          } catch {}
+        }
+      }
+    } catch {
+      // Offline fallback
+    }
+  };
+
   useEffect(() => {
     try {
       // Drop pre-v3 browser data so old demo users/listings cannot reappear.
@@ -252,6 +451,29 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     } catch {
       // Ignored
     }
+
+    // Immediately sync with central server DB
+    syncFromServer();
+
+    // Auto-poll central database every 4 seconds for cross-device updates
+    const interval = setInterval(syncFromServer, 4000);
+
+    const handleVisibilityChange = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        syncFromServer();
+      }
+    };
+
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+    }
+
+    return () => {
+      clearInterval(interval);
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      }
+    };
   }, []);
 
   const showToast = (msg: string) => {
@@ -267,10 +489,28 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const registerStudent = (student: UserProfile) => {
     const updated = [student, ...registeredStudents.filter((s) => s.id !== student.id && s.email !== student.email)];
     setRegisteredStudents(updated);
-    localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(updated));
+    try {
+      localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(updated));
+    } catch {}
 
     setCurrentUser(student);
-    localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(student));
+    try {
+      localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(student));
+    } catch {}
+
+    // Persist to central server database immediately
+    fetch('/api/students', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(student),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          syncFromServer();
+        }
+      })
+      .catch((err) => console.error('Error saving student to server:', err));
 
     logAdminAction(
       'New Student Registered',
@@ -336,14 +576,31 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         : s
     );
     setRegisteredStudents(updated);
-    localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(updated));
+    try {
+      localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(updated));
+    } catch {}
 
     // If current logged-in user is this student, update session
     if (currentUser?.id === userId) {
       const selfUpdated = { ...currentUser, verificationStatus: 'approved' as VerificationStatus };
       setCurrentUser(selfUpdated);
-      localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(selfUpdated));
+      try {
+        localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(selfUpdated));
+      } catch {}
     }
+
+    // Sync approval to central server database
+    fetch('/api/students', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId,
+        verificationStatus: 'approved',
+        verifiedBy: currentUser?.id,
+      }),
+    })
+      .then(() => syncFromServer())
+      .catch((err) => console.error('Error approving student on server:', err));
 
     const student = registeredStudents.find((s) => s.id === userId);
     logAdminAction(
@@ -366,7 +623,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         : s
     );
     setRegisteredStudents(updated);
-    localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(updated));
+    try {
+      localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(updated));
+    } catch {}
 
     if (currentUser?.id === userId) {
       const selfUpdated = {
@@ -375,8 +634,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         rejectionReason: reason,
       };
       setCurrentUser(selfUpdated);
-      localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(selfUpdated));
+      try {
+        localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(selfUpdated));
+      } catch {}
     }
+
+    // Sync rejection to central server database
+    fetch('/api/students', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId,
+        verificationStatus: 'rejected',
+        rejectionReason: reason,
+        verifiedBy: currentUser?.id,
+      }),
+    })
+      .then(() => syncFromServer())
+      .catch((err) => console.error('Error rejecting student on server:', err));
 
     const student = registeredStudents.find((s) => s.id === userId);
     logAdminAction(
@@ -396,7 +671,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       // Ignored
     }
     setCurrentUser(null);
-    localStorage.removeItem(STORAGE_KEY_USER);
+    try {
+      localStorage.removeItem(STORAGE_KEY_USER);
+    } catch {}
     showToast('Signed out of Pass ON');
   };
 
@@ -404,11 +681,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (!currentUser) return;
     const updated = { ...currentUser, ...updates };
     setCurrentUser(updated);
-    localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(updated));
+    try {
+      localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(updated));
+    } catch {}
 
     const updatedList = registeredStudents.map((s) => (s.id === currentUser.id ? updated : s));
     setRegisteredStudents(updatedList);
-    localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(updatedList));
+    try {
+      localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(updatedList));
+    } catch {}
+
+    fetch('/api/students', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updated),
+    })
+      .then(() => syncFromServer())
+      .catch((err) => console.error('Error updating profile on server:', err));
 
     showToast('Profile updated successfully!');
   };
@@ -430,24 +719,61 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const updated = [newListing, ...listings];
     setListings(updated);
-    localStorage.setItem(STORAGE_KEY_LISTINGS, JSON.stringify(updated));
+    try {
+      localStorage.setItem(STORAGE_KEY_LISTINGS, JSON.stringify(updated));
+    } catch {}
+
+    // Sync listing to central server database
+    fetch('/api/listings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newListing),
+    })
+      .then(() => syncFromServer())
+      .catch((err) => console.error('Error adding listing to server:', err));
+
     showToast(`Listing "${newListing.title}" published successfully!`);
     return newListing;
   };
 
   const updateListing = (id: string, updates: Partial<Listing>) => {
+    const existing = listings.find((l) => l.id === id);
     const updated = listings.map((l) =>
       l.id === id ? { ...l, ...updates, updatedAt: new Date().toISOString() } : l
     );
     setListings(updated);
-    localStorage.setItem(STORAGE_KEY_LISTINGS, JSON.stringify(updated));
+    try {
+      localStorage.setItem(STORAGE_KEY_LISTINGS, JSON.stringify(updated));
+    } catch {}
+
+    if (existing) {
+      const merged = { ...existing, ...updates, updatedAt: new Date().toISOString() };
+      fetch('/api/listings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(merged),
+      })
+        .then(() => syncFromServer())
+        .catch((err) => console.error('Error updating listing on server:', err));
+    }
+
     showToast('Listing updated successfully!');
   };
 
   const deleteListing = (id: string) => {
     const updated = listings.filter((l) => l.id !== id);
     setListings(updated);
-    localStorage.setItem(STORAGE_KEY_LISTINGS, JSON.stringify(updated));
+    try {
+      localStorage.setItem(STORAGE_KEY_LISTINGS, JSON.stringify(updated));
+    } catch {}
+
+    // Sync delete to central server database
+    fetch(`/api/listings?id=${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    })
+      .then(() => syncFromServer())
+      .catch((err) => console.error('Error deleting listing from server:', err));
+
     showToast('Listing removed.');
   };
 
@@ -493,7 +819,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const updated = [newInquiry, ...inquiries];
     setInquiries(updated);
-    localStorage.setItem(STORAGE_KEY_INQUIRIES, JSON.stringify(updated));
+    try {
+      localStorage.setItem(STORAGE_KEY_INQUIRIES, JSON.stringify(updated));
+    } catch {}
+
+    // Persist inquiry to central database immediately
+    fetch('/api/inquiries', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newInquiry),
+    })
+      .then(() => syncFromServer())
+      .catch((err) => console.error('Error saving inquiry:', err));
+
     showToast('Inquiry sent to seller! Check dashboard for responses.');
     return true;
   };
@@ -516,7 +854,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const updatedReports = [newReport, ...reports];
     setReports(updatedReports);
-    localStorage.setItem(STORAGE_KEY_REPORTS, JSON.stringify(updatedReports));
+    try {
+      localStorage.setItem(STORAGE_KEY_REPORTS, JSON.stringify(updatedReports));
+    } catch {}
+
+    // Persist report to central database immediately
+    fetch('/api/reports', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newReport),
+    })
+      .then(() => syncFromServer())
+      .catch((err) => console.error('Error submitting report:', err));
 
     updateListing(listingId, { isReported: true });
 
@@ -534,7 +883,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       r.id === id ? { ...r, status, adminNotes: adminNotes || r.adminNotes } : r
     );
     setReports(updated);
-    localStorage.setItem(STORAGE_KEY_REPORTS, JSON.stringify(updated));
+    try {
+      localStorage.setItem(STORAGE_KEY_REPORTS, JSON.stringify(updated));
+    } catch {}
+
+    // Persist status update to central database immediately
+    fetch('/api/reports', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status, adminNotes }),
+    })
+      .then(() => syncFromServer())
+      .catch((err) => console.error('Error updating report status:', err));
+
     showToast(`Report updated to ${status}.`);
   };
 
@@ -549,7 +910,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const addCollege = (college: College) => {
     const updated = [...colleges, college];
     setColleges(updated);
-    localStorage.setItem(STORAGE_KEY_COLLEGES, JSON.stringify(updated));
+    try {
+      localStorage.setItem(STORAGE_KEY_COLLEGES, JSON.stringify(updated));
+    } catch {}
     logAdminAction('Added College', 'college', college.id, `Added institution: ${college.name}`);
     showToast(`College ${college.name} added!`);
   };
@@ -557,7 +920,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const updateCollege = (id: string, updates: Partial<College>) => {
     const updated = colleges.map((c) => (c.id === id ? { ...c, ...updates } : c));
     setColleges(updated);
-    localStorage.setItem(STORAGE_KEY_COLLEGES, JSON.stringify(updated));
+    try {
+      localStorage.setItem(STORAGE_KEY_COLLEGES, JSON.stringify(updated));
+    } catch {}
     logAdminAction('Updated College', 'college', id, `Updated institution settings for ${id}`);
     showToast('College details updated.');
   };
@@ -594,7 +959,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
     const updated = [newLog, ...auditLogs];
     setAuditLogs(updated);
-    localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(updated));
+    try {
+      localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(updated));
+    } catch {}
+
+    // Persist audit log to central database
+    fetch('/api/logs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newLog),
+    }).catch(() => {});
   };
 
   const selectedCollege = colleges.find((c) => c.id === selectedCollegeId) || colleges[0];

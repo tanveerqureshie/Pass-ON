@@ -15,6 +15,13 @@ export const metadata: Metadata = {
   },
   description:
     'Pass ON connects verified college seniors and juniors to buy, sell, borrow, donate and exchange textbooks, calculators, lab coats and essentials across Delhi engineering colleges — plus the official Pass ON store for student favourites.',
+  metadataBase: new URL('https://pass-on-sage.vercel.app'),
+  openGraph: {
+    title: 'Pass ON — Verified College Marketplace',
+    description: 'Pass It On. Save More.',
+    url: 'https://pass-on-sage.vercel.app/',
+    images: ['/pass-on-preview.png'],
+  },
   icons: {
     icon: '/logo-icon.png',
     apple: '/logo-icon.png',

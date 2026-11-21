@@ -1,6 +1,10 @@
 # Pass ON — Modern College Student Marketplace
 **Pass It On. Save More.**
 
+[![Pass ON live preview](./public/pass-on-preview.png)](https://pass-on-sage.vercel.app/)
+
+**[View the live project →](https://pass-on-sage.vercel.app/)**
+
 Pass ON is a responsive, production-minded web application engineered for college students across Delhi engineering colleges (MAIT, MSIT, BVCOE, BPIT, GTBIT, ADGITM, VIPS-TC, HMR, GTB4CEC) to buy, sell, borrow, donate, or exchange academic materials, lab equipment, electronics, and hostel essentials.
 
 Built with an authentic **Modern Brutalist UI** (bold typography, high-contrast borders, electric lime `#CCFF00`, cyber yellow `#FFE600`, sharp cards, and tactile shadows), it connects seniors and juniors with direct offline campus handovers and click-to-chat WhatsApp actions — completely free of payment gateway fees or commissions.
