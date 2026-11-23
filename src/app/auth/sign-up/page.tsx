@@ -82,9 +82,14 @@ export default function SignUpPage() {
       // Permanently upload student photo to Cloudinary
       let permanentPhotoUrl = idCardImage;
       if (idCardFile) {
-        const uploadedUrl = await uploadToCloudinary(idCardFile, 'pass-on/verification');
-        if (uploadedUrl) {
-          permanentPhotoUrl = uploadedUrl;
+        try {
+          const uploadedUrl = await uploadToCloudinary(idCardFile, 'pass-on/verification');
+          if (uploadedUrl) {
+            permanentPhotoUrl = uploadedUrl;
+          }
+        } catch (uploadErr) {
+          console.warn('Cloudinary upload warning:', uploadErr);
+          // Graceful fallback to local image preview so student is never blocked from creating account!
         }
       }
 

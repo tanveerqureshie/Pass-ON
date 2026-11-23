@@ -71,7 +71,11 @@ export async function POST(req: NextRequest) {
       publicId: uploadResult.public_id,
     });
   } catch (err: any) {
-    const errorDetails = err?.message || (typeof err === 'object' ? JSON.stringify(err) : String(err));
+    let errorDetails = err?.message || (typeof err === 'object' ? JSON.stringify(err) : String(err));
+    if (err?.http_code === 403 || errorDetails.includes('403') || errorDetails.includes('missing permissions')) {
+      errorDetails =
+        'Cloudinary Error (403): The API Key is missing "create" (upload) permissions. In Cloudinary Console, go to Settings -> Access Keys, edit your API key permissions to allow "create", or use your Master API Key.';
+    }
     console.error('Cloudinary upload error:', errorDetails);
     return NextResponse.json(
       { success: false, error: errorDetails || 'Failed to upload image to Cloudinary' },

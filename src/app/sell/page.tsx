@@ -197,9 +197,17 @@ export default function SellPage() {
       // If user selected a local file, upload directly to Cloudinary to get a permanent URL
       if (imageFile) {
         showToast('Saving item photo to Cloudinary...');
-        const permanentUrl = await uploadToCloudinary(imageFile, 'pass-on/listings');
-        if (permanentUrl) {
-          finalImage = permanentUrl;
+        try {
+          const permanentUrl = await uploadToCloudinary(imageFile, 'pass-on/listings');
+          if (permanentUrl) {
+            finalImage = permanentUrl;
+          }
+        } catch (uploadErr) {
+          console.warn('Cloudinary upload warning:', uploadErr);
+          // Graceful fallback so product publishing is never blocked by image CDN permission errors!
+          if (!finalImage && imageUrl.trim()) {
+            finalImage = imageUrl.trim();
+          }
         }
       }
 
