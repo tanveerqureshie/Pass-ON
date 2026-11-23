@@ -50,7 +50,7 @@ Built with an authentic **Modern Brutalist UI** (bold typography, high-contrast 
 - **Icons**: Lucide React
 - **Backend & Database**: Node.js & MongoDB (native connection pooling)
 - **Media & Storage**: Cloudinary CDN
-- **Deployment**: Render Web Service (`render.yaml`) / Vercel
+- **Deployment**: Render Web Service (`render.yaml`)
 - **State & Resilience**: Context API with local persistence and seamless offline/demo preview fallback
 
 ---

@@ -9,7 +9,6 @@ export const fetchCache = 'force-no-store';
 const NO_CACHE_HEADERS = {
   'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
   'CDN-Cache-Control': 'no-store',
-  'Vercel-CDN-Cache-Control': 'no-store',
 };
 
 // GET: Returns all students registered across all devices
