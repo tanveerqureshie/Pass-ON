@@ -12,6 +12,29 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
+    const cloudName = (process.env.CLOUDINARY_CLOUD_NAME || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || '').trim();
+    const apiKey = (process.env.CLOUDINARY_API_KEY || '948987984819147').trim();
+    const apiSecret = (process.env.CLOUDINARY_API_SECRET || 'WXH3MV1nQpb0TWrNHD5n-rilze8').trim();
+
+    if (!cloudName) {
+      console.error('Cloudinary Error: CLOUDINARY_CLOUD_NAME is not set in .env.local');
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            'Missing Cloud Name: Please set CLOUDINARY_CLOUD_NAME in your .env.local file (found in your Cloudinary Dashboard at console.cloudinary.com).',
+        },
+        { status: 400 }
+      );
+    }
+
+    cloudinary.config({
+      cloud_name: cloudName,
+      api_key: apiKey,
+      api_secret: apiSecret,
+      secure: true,
+    });
+
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
     const folder = (formData.get('folder') as string) || 'pass-on';
@@ -48,9 +71,10 @@ export async function POST(req: NextRequest) {
       publicId: uploadResult.public_id,
     });
   } catch (err: any) {
-    console.error('Cloudinary upload error:', err);
+    const errorDetails = err?.message || (typeof err === 'object' ? JSON.stringify(err) : String(err));
+    console.error('Cloudinary upload error:', errorDetails);
     return NextResponse.json(
-      { success: false, error: err?.message || 'Failed to upload image to Cloudinary' },
+      { success: false, error: errorDetails || 'Failed to upload image to Cloudinary' },
       { status: 500 }
     );
   }
