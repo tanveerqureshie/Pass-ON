@@ -194,15 +194,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  // Synchronize state with central Next.js server API endpoints (Bidirectional Smart Merge)
+  // Synchronize state with central Next.js server API endpoints (Bidirectional Smart Merge with Cache Busting)
   const syncFromServer = async () => {
     try {
+      const ts = Date.now();
       const [resStudents, resListings, resInquiries, resReports, resLogs] = await Promise.all([
-        fetch('/api/students', { cache: 'no-store' }),
-        fetch('/api/listings', { cache: 'no-store' }),
-        fetch('/api/inquiries', { cache: 'no-store' }),
-        fetch('/api/reports', { cache: 'no-store' }),
-        fetch('/api/logs', { cache: 'no-store' }),
+        fetch(`/api/students?t=${ts}`, { cache: 'no-store' }),
+        fetch(`/api/listings?t=${ts}`, { cache: 'no-store' }),
+        fetch(`/api/inquiries?t=${ts}`, { cache: 'no-store' }),
+        fetch(`/api/reports?t=${ts}`, { cache: 'no-store' }),
+        fetch(`/api/logs?t=${ts}`, { cache: 'no-store' }),
       ]);
 
       if (resStudents.ok) {

@@ -4,15 +4,28 @@ import { Listing } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+
+const NO_CACHE_HEADERS = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+  'CDN-Cache-Control': 'no-store',
+  'Vercel-CDN-Cache-Control': 'no-store',
+};
 
 // GET: Returns all marketplace listings across all devices
 export async function GET() {
   try {
     const listings = await getAllListings();
-    return NextResponse.json({ success: true, listings });
+    return NextResponse.json(
+      { success: true, listings },
+      { headers: NO_CACHE_HEADERS }
+    );
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Failed to fetch listings';
-    return NextResponse.json({ success: false, error: msg }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: msg },
+      { status: 500, headers: NO_CACHE_HEADERS }
+    );
   }
 }
 
@@ -23,15 +36,21 @@ export async function POST(req: NextRequest) {
     if (!body || !body.title || !body.categoryId) {
       return NextResponse.json(
         { success: false, error: 'Title and category are required' },
-        { status: 400 }
+        { status: 400, headers: NO_CACHE_HEADERS }
       );
     }
 
     const saved = await saveListing(body);
-    return NextResponse.json({ success: true, listing: saved });
+    return NextResponse.json(
+      { success: true, listing: saved },
+      { headers: NO_CACHE_HEADERS }
+    );
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Failed to save listing';
-    return NextResponse.json({ success: false, error: msg }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: msg },
+      { status: 500, headers: NO_CACHE_HEADERS }
+    );
   }
 }
 

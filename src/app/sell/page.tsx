@@ -22,8 +22,10 @@ import {
   MessageCircle,
   Instagram,
   Lock,
+  Loader2,
 } from 'lucide-react';
 import { compressImage } from '@/lib/image-compression';
+import { uploadProductImage } from '@/lib/supabase/storage';
 import clsx from 'clsx';
 
 const CATEGORY_FALLBACK: Record<string, string> = {
@@ -69,6 +71,7 @@ export default function SellPage() {
   const [imageMode, setImageMode] = useState<'upload' | 'link'>('upload');
   const [imageUrl, setImageUrl] = useState<string>('');
   const [imageFileName, setImageFileName] = useState<string>('');
+  const [isUploading, setIsUploading] = useState<boolean>(false);
 
   const [borrowDuration, setBorrowDuration] = useState('1 to 2 weeks (for practicals)');
   const [borrowConditions, setBorrowConditions] = useState('Return in original working condition');
@@ -83,28 +86,49 @@ export default function SellPage() {
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      if (!file.type.startsWith('image/')) {
-        showToast('Please upload an image file (PNG, JPG, WEBP).');
-        return;
-      }
-      if (file.size > 15 * 1024 * 1024) {
-        showToast('Image size should be less than 15MB');
-        return;
-      }
-      setImageFileName(file.name);
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      showToast('Please upload an image file (PNG, JPG, WEBP).');
+      return;
+    }
+    if (file.size > 15 * 1024 * 1024) {
+      showToast('Image size should be less than 15MB');
+      return;
+    }
+
+    setImageFileName(file.name);
+    setIsUploading(true);
+
+    try {
+      // 1. Compress image to clean web dimensions if possible
+      let uploadTarget: File | Blob = file;
       try {
-        const compressed = await compressImage(file, 1200, 1200, 0.82);
-        setImageUrl(compressed);
-        showToast('Image processed and ready!');
-      } catch {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setImageUrl(reader.result as string);
-          showToast('Image uploaded successfully!');
-        };
-        reader.readAsDataURL(file);
+        const compressedDataUrl = await compressImage(file, 1400, 1400, 0.85);
+        const res = await fetch(compressedDataUrl);
+        uploadTarget = await res.blob();
+      } catch (compErr) {
+        console.warn('Compression skipped, uploading original file:', compErr);
+        uploadTarget = file;
       }
+
+      showToast('Uploading directly to Supabase storage...');
+
+      // 2. Direct upload to Supabase Storage bucket 'product-images' (No ephemeral Vercel filesystem)
+      const result = await uploadProductImage(uploadTarget, file.name);
+
+      if (result.success && result.publicUrl) {
+        setImageUrl(result.publicUrl);
+        showToast('Photo uploaded permanently to Supabase!');
+      } else {
+        throw new Error(result.error || 'Failed to upload photo');
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Upload failed';
+      console.error('Upload error in sell page:', err);
+      showToast(`Upload failed: ${msg}. Please try again.`);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -606,13 +630,35 @@ export default function SellPage() {
 
               {imageMode === 'upload' ? (
                 <div className="rounded-xl border border-dashed border-ink-300 bg-ink-50 p-5 text-center transition-all hover:border-brand-500 hover:bg-brand-50/30">
-                  <input type="file" id="file-upload" accept="image/*" onChange={handleFileUpload} className="hidden" />
-                  <label htmlFor="file-upload" className="block cursor-pointer space-y-1.5">
-                    <UploadCloud className="mx-auto h-7 w-7 text-brand-600" />
+                  <input
+                    type="file"
+                    id="file-upload"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                    disabled={isUploading}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor={isUploading ? undefined : 'file-upload'}
+                    className={clsx('block space-y-1.5', isUploading ? 'cursor-not-allowed opacity-75' : 'cursor-pointer')}
+                  >
+                    {isUploading ? (
+                      <Loader2 className="mx-auto h-7 w-7 text-brand-600 animate-spin" />
+                    ) : (
+                      <UploadCloud className="mx-auto h-7 w-7 text-brand-600" />
+                    )}
                     <span className="block text-xs font-bold text-ink-900">
-                      {imageFileName ? `Selected: ${imageFileName}` : 'Click to select photo from device'}
+                      {isUploading
+                        ? 'Uploading photo directly to Supabase storage...'
+                        : imageFileName
+                        ? `Selected: ${imageFileName}`
+                        : 'Click to select photo from device'}
                     </span>
-                    <span className="block text-[11px] text-ink-400">PNG, JPG, or WEBP up to 5MB</span>
+                    <span className="block text-[11px] text-ink-400">
+                      {isUploading
+                        ? 'Creating permanent public URL...'
+                        : 'PNG, JPG, or WEBP (Saved permanently to Supabase Storage)'}
+                    </span>
                   </label>
                 </div>
               ) : (
@@ -662,9 +708,18 @@ export default function SellPage() {
               Cancel and return to marketplace
             </Link>
 
-            <Button variant="primary" size="lg" type="submit" className="w-full sm:w-auto">
-              <PlusCircle className="h-4 w-4" />
-              Publish Campus Listing
+            <Button variant="primary" size="lg" type="submit" disabled={isUploading} className="w-full sm:w-auto">
+              {isUploading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Uploading Photo...
+                </>
+              ) : (
+                <>
+                  <PlusCircle className="h-4 w-4" />
+                  Publish Campus Listing
+                </>
+              )}
             </Button>
           </div>
         </form>

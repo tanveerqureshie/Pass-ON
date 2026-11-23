@@ -33,6 +33,8 @@ export default function SignUpPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const [uploadingId, setUploadingId] = useState(false);
+
   const handleIdCardChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -48,9 +50,47 @@ export default function SignUpPage() {
     }
 
     setError('');
+    setUploadingId(true);
+
     try {
-      const compressed = await compressImage(file, 1200, 1200, 0.82);
-      setIdCardImage(compressed);
+      let uploadTarget: File | Blob = file;
+      try {
+        const compressed = await compressImage(file, 1200, 1200, 0.82);
+        const res = await fetch(compressed);
+        uploadTarget = await res.blob();
+      } catch {
+        uploadTarget = file;
+      }
+
+      // Upload directly to Supabase Storage bucket 'verification-docs'
+      const supabase = createClient();
+      const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+      const randomId = typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID()
+        : Math.random().toString(36).substring(2, 9);
+      const filePath = `id-cards/${Date.now()}-${randomId}.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('verification-docs')
+        .upload(filePath, uploadTarget, {
+          contentType: file.type || 'image/jpeg',
+          cacheControl: '31536000',
+          upsert: false,
+        });
+
+      if (!uploadError) {
+        const { data } = supabase.storage.from('verification-docs').getPublicUrl(filePath);
+        if (data?.publicUrl) {
+          setIdCardImage(data.publicUrl);
+          showToast('ID card photo uploaded permanently to Supabase!');
+          setUploadingId(false);
+          return;
+        }
+      }
+
+      // Fallback: compress to compact base64 if storage call failed
+      const fallbackData = await compressImage(file, 800, 800, 0.7);
+      setIdCardImage(fallbackData);
     } catch {
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -59,6 +99,8 @@ export default function SignUpPage() {
         }
       };
       reader.readAsDataURL(file);
+    } finally {
+      setUploadingId(false);
     }
   };
 
