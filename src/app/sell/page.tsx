@@ -8,7 +8,7 @@ import { ListingType, ListingCondition } from '@/lib/types';
 import { Button } from '@/components/ui/Button';
 import { Input, Select, Textarea } from '@/components/ui/Form';
 import { isValidContactNumber } from '@/lib/whatsapp';
-import { uploadImageToStorage } from '@/lib/supabase/storage';
+import { uploadToCloudinary } from '@/lib/cloudinary/upload';
 import {
   PlusCircle,
   Gift,
@@ -194,10 +194,10 @@ export default function SellPage() {
       const calculatedPrice = listingType === 'free' ? 0 : parseFloat(price) || 0;
       let finalImage = imageUrl.trim();
 
-      // If user selected a local file, upload directly to Supabase storage to get a permanent URL
+      // If user selected a local file, upload directly to Cloudinary to get a permanent URL
       if (imageFile) {
-        showToast('Saving item photo to Supabase storage...');
-        const permanentUrl = await uploadImageToStorage(imageFile, 'product-images', 'item');
+        showToast('Saving item photo to Cloudinary...');
+        const permanentUrl = await uploadToCloudinary(imageFile, 'pass-on/listings');
         if (permanentUrl) {
           finalImage = permanentUrl;
         }

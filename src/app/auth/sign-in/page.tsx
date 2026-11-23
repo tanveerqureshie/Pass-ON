@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useApp, ADMIN_CREDENTIALS } from '@/context/AppContext';
 import { UserProfile } from '@/lib/types';
-import { createClient } from '@/lib/supabase/client';
 import { Input } from '@/components/ui/Form';
 import { Button } from '@/components/ui/Button';
 import { LogIn, ArrowRight } from 'lucide-react';
@@ -54,54 +53,33 @@ export default function SignInPage() {
       return;
     }
 
-    // Supabase auth fallback
+    // MongoDB / Server fallback check
     try {
-      const supabase = createClient();
-      const { data, error: signInErr } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (signInErr) {
-        setError('Email or password is incorrect.');
-      } else if (data.user) {
-        const studentProfile: UserProfile = {
-          id: data.user.id,
-          email: (data.user.email || email).trim().toLowerCase(),
-          fullName: data.user.user_metadata?.full_name || 'College Student',
-          collegeId: data.user.user_metadata?.college_id || 'mait',
-          collegeName: data.user.user_metadata?.college_name || 'Delhi College',
-          collegeShortName: data.user.user_metadata?.college_short_name || 'DELHI',
-          branch: data.user.user_metadata?.branch || 'CSE',
-          role: 'student',
-          verificationStatus: (data.user.user_metadata?.verification_status as any) || 'pending',
-          createdAt: data.user.created_at || new Date().toISOString(),
-        };
-
-        // Guarantee this student profile is persisted to Supabase database so admin sees them in verification queue
-        try {
-          await fetch('/api/students', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(studentProfile),
-          });
-        } catch (postErr) {
-          console.error('Error syncing signed-in student to server:', postErr);
+      const res = await fetch('/api/students');
+      if (res.ok) {
+        const json = await res.json();
+        const serverStudents: UserProfile[] = json?.students || [];
+        const found = serverStudents.find(
+          (s) =>
+            s.email.toLowerCase() === email.trim().toLowerCase() &&
+            (!s.password || s.password === password)
+        );
+        if (found) {
+          setCurrentUser(found);
+          try {
+            localStorage.setItem('passon_user_v3', JSON.stringify(found));
+          } catch {}
+          showToast(`Welcome back, ${found.fullName}!`);
+          router.push(found.role === 'admin' ? '/admin' : '/dashboard');
+          return;
         }
-
-        setCurrentUser(studentProfile);
-        try {
-          localStorage.setItem('passon_user_v3', JSON.stringify(studentProfile));
-        } catch {}
-        showToast('Welcome back to Pass ON!');
-        router.push('/dashboard');
-        return;
       }
     } catch {
-      setError('Could not sign you in. Please try again.');
-    } finally {
-      setLoading(false);
+      // Ignore
     }
+
+    setError('Email or password is incorrect.');
+    setLoading(false);
   };
 
   return (

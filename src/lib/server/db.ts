@@ -1,4 +1,4 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { getDb } from '@/lib/mongodb/client';
 import fs from 'fs';
 import path from 'path';
 import {
@@ -9,23 +9,6 @@ import {
   AuditLog,
   VerificationStatus,
 } from '@/lib/types';
-
-const SUPABASE_URL =
-  process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://xpspymjknipcyoachatz.supabase.co';
-const SUPABASE_KEY =
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhwc3B5bWprbmlwY3lvYWNoYXR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUyNDUzMDIsImV4cCI6MjExMDgyMTMwMn0.x_LH6jyTrZ1IpJU7g5KZ9T_RG-Zb_OBpLeQDq6RkftM';
-
-let supabaseInstance: SupabaseClient | null = null;
-function getSupabase(): SupabaseClient {
-  if (!supabaseInstance) {
-    supabaseInstance = createClient(SUPABASE_URL, SUPABASE_KEY, {
-      auth: { persistSession: false },
-    });
-  }
-  return supabaseInstance;
-}
 
 export interface ServerDbData {
   students: UserProfile[];
@@ -43,7 +26,7 @@ let memoryDb: ServerDbData = {
   auditLogs: [],
 };
 
-// Local JSON disk persistence helpers for backup / resilience
+// Local JSON disk persistence helpers for backup / fallback resilience
 function getPrimaryPath(): string {
   return path.join(process.cwd(), 'data', 'db.json');
 }
@@ -61,6 +44,25 @@ function syncLocalBackup(data: Partial<ServerDbData>): void {
     // Non-fatal if read-only filesystem
   }
 }
+
+function loadLocalBackup(): void {
+  try {
+    const primaryPath = getPrimaryPath();
+    if (fs.existsSync(primaryPath)) {
+      const parsed = JSON.parse(fs.readFileSync(primaryPath, 'utf-8'));
+      if (parsed) {
+        if (Array.isArray(parsed.students)) memoryDb.students = parsed.students;
+        if (Array.isArray(parsed.listings)) memoryDb.listings = parsed.listings;
+        if (Array.isArray(parsed.inquiries)) memoryDb.inquiries = parsed.inquiries;
+        if (Array.isArray(parsed.reports)) memoryDb.reports = parsed.reports;
+        if (Array.isArray(parsed.auditLogs)) memoryDb.auditLogs = parsed.auditLogs;
+      }
+    }
+  } catch {
+    // Non-fatal
+  }
+}
+loadLocalBackup();
 
 // ==========================================
 // LISTINGS
@@ -146,26 +148,26 @@ function fromDbListing(row: any): Listing {
 
 export async function getAllListings(): Promise<Listing[]> {
   try {
-    const supabase = getSupabase();
-    const { data, error } = await supabase
-      .from('listings')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const db = await getDb();
+    const rows = await db
+      .collection('listings')
+      .find({})
+      .sort({ created_at: -1 })
+      .toArray();
 
-    if (!error && Array.isArray(data)) {
-      const items = data.map(fromDbListing);
+    if (Array.isArray(rows) && rows.length > 0) {
+      const items = rows.map(fromDbListing);
       memoryDb.listings = items;
       syncLocalBackup({ listings: items });
       return items;
     }
   } catch (err) {
-    console.error('Supabase getAllListings failed, using memory cache:', err);
+    console.error('MongoDB getAllListings failed, using memory fallback:', err);
   }
   return memoryDb.listings;
 }
 
 export async function saveListing(listing: Listing): Promise<Listing> {
-  // Update memory state first
   const existingIdx = memoryDb.listings.findIndex((l) => l.id === listing.id);
   if (existingIdx >= 0) {
     memoryDb.listings[existingIdx] = listing;
@@ -175,14 +177,15 @@ export async function saveListing(listing: Listing): Promise<Listing> {
   syncLocalBackup({ listings: memoryDb.listings });
 
   try {
-    const supabase = getSupabase();
+    const db = await getDb();
     const row = toDbListing(listing);
-    const { error } = await supabase.from('listings').upsert(row, { onConflict: 'id' });
-    if (error) {
-      console.error('Supabase saveListing upsert error:', error);
-    }
+    await db.collection('listings').updateOne(
+      { id: listing.id },
+      { $set: row },
+      { upsert: true }
+    );
   } catch (err) {
-    console.error('Supabase saveListing failed:', err);
+    console.error('MongoDB saveListing failed:', err);
   }
 
   return listing;
@@ -194,18 +197,15 @@ export async function deleteListing(id: string): Promise<boolean> {
   syncLocalBackup({ listings: memoryDb.listings });
 
   try {
-    const supabase = getSupabase();
-    // Also remove any inquiries and reports attached to this listing
-    await supabase.from('inquiries').delete().eq('listing_id', cleanId);
-    await supabase.from('reports').delete().eq('listing_id', cleanId);
-    const { error } = await supabase.from('listings').delete().eq('id', cleanId);
-    if (error) {
-      console.error('Supabase deleteListing error:', error);
-      return false;
-    }
+    const db = await getDb();
+    await Promise.all([
+      db.collection('listings').deleteOne({ id: cleanId }),
+      db.collection('inquiries').deleteMany({ listing_id: cleanId }),
+      db.collection('reports').deleteMany({ listing_id: cleanId }),
+    ]);
     return true;
   } catch (err) {
-    console.error('Supabase deleteListing failed:', err);
+    console.error('MongoDB deleteListing failed:', err);
     return false;
   }
 }
@@ -271,20 +271,21 @@ function fromDbProfile(row: any): UserProfile {
 
 export async function getAllStudents(): Promise<UserProfile[]> {
   try {
-    const supabase = getSupabase();
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const db = await getDb();
+    const rows = await db
+      .collection('students')
+      .find({})
+      .sort({ created_at: -1 })
+      .toArray();
 
-    if (!error && Array.isArray(data)) {
-      const items = data.map(fromDbProfile);
+    if (Array.isArray(rows) && rows.length > 0) {
+      const items = rows.map(fromDbProfile);
       memoryDb.students = items;
       syncLocalBackup({ students: items });
       return items;
     }
   } catch (err) {
-    console.error('Supabase getAllStudents failed, using cache:', err);
+    console.error('MongoDB getAllStudents failed, using fallback:', err);
   }
   return memoryDb.students;
 }
@@ -302,35 +303,17 @@ export async function saveStudent(student: UserProfile): Promise<UserProfile> {
   syncLocalBackup({ students: memoryDb.students });
 
   try {
-    const supabase = getSupabase();
+    const db = await getDb();
     const row = toDbProfile(student);
     row.email = cleanEmail;
 
-    // Check if a profile with this email already exists in Supabase to reuse its primary key ID
-    const { data: existingProfile } = await supabase
-      .from('profiles')
-      .select('id, verification_status')
-      .ilike('email', cleanEmail)
-      .maybeSingle();
-
-    if (existingProfile?.id) {
-      row.id = existingProfile.id;
-      // Do not accidentally revert an already-approved status back to pending if not specified
-      if (!student.verificationStatus || student.verificationStatus === 'pending') {
-        if (existingProfile.verification_status === 'approved') {
-          row.verification_status = 'approved';
-        }
-      }
-    }
-
-    const { error } = await supabase.from('profiles').upsert(row, { onConflict: 'email' });
-    if (error) {
-      console.error('Supabase saveStudent upsert error:', error);
-      // Secondary attempt with id conflict
-      await supabase.from('profiles').upsert(row, { onConflict: 'id' });
-    }
+    await db.collection('students').updateOne(
+      { $or: [{ id: student.id }, { email: cleanEmail }] },
+      { $set: row },
+      { upsert: true }
+    );
   } catch (err) {
-    console.error('Supabase saveStudent failed:', err);
+    console.error('MongoDB saveStudent failed:', err);
   }
 
   return student;
@@ -354,7 +337,7 @@ export async function updateStudentStatus(
   }
 
   try {
-    const supabase = getSupabase();
+    const db = await getDb();
     const updates: Record<string, any> = {
       verification_status: status,
       updated_at: new Date().toISOString(),
@@ -368,31 +351,17 @@ export async function updateStudentStatus(
       updates.verified_by = verifiedBy || null;
     }
 
-    // Try matching by id first
-    let { data, error } = await supabase
-      .from('profiles')
-      .update(updates)
-      .eq('id', userId)
-      .select()
-      .maybeSingle();
+    const result = await db.collection('students').findOneAndUpdate(
+      { $or: [{ id: userId }, { email: userId.toLowerCase() }] },
+      { $set: updates },
+      { returnDocument: 'after' }
+    );
 
-    // If not found by id, try matching by email
-    if (!data) {
-      const byEmail = await supabase
-        .from('profiles')
-        .update(updates)
-        .eq('email', userId.toLowerCase())
-        .select()
-        .maybeSingle();
-      data = byEmail.data;
-      error = byEmail.error;
-    }
-
-    if (!error && data) {
-      return fromDbProfile(data);
+    if (result) {
+      return fromDbProfile(result);
     }
   } catch (err) {
-    console.error('Supabase updateStudentStatus failed:', err);
+    console.error('MongoDB updateStudentStatus failed:', err);
   }
 
   return existing || null;
@@ -442,20 +411,21 @@ function fromDbInquiry(row: any): Inquiry {
 
 export async function getAllInquiries(): Promise<Inquiry[]> {
   try {
-    const supabase = getSupabase();
-    const { data, error } = await supabase
-      .from('inquiries')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const db = await getDb();
+    const rows = await db
+      .collection('inquiries')
+      .find({})
+      .sort({ created_at: -1 })
+      .toArray();
 
-    if (!error && Array.isArray(data)) {
-      const items = data.map(fromDbInquiry);
+    if (Array.isArray(rows) && rows.length > 0) {
+      const items = rows.map(fromDbInquiry);
       memoryDb.inquiries = items;
       syncLocalBackup({ inquiries: items });
       return items;
     }
   } catch (err) {
-    console.error('Supabase getAllInquiries failed:', err);
+    console.error('MongoDB getAllInquiries failed:', err);
   }
   return memoryDb.inquiries;
 }
@@ -470,14 +440,15 @@ export async function saveInquiry(inquiry: Inquiry): Promise<Inquiry> {
   syncLocalBackup({ inquiries: memoryDb.inquiries });
 
   try {
-    const supabase = getSupabase();
+    const db = await getDb();
     const row = toDbInquiry(inquiry);
-    const { error } = await supabase.from('inquiries').upsert(row, { onConflict: 'id' });
-    if (error) {
-      console.error('Supabase saveInquiry upsert error:', error);
-    }
+    await db.collection('inquiries').updateOne(
+      { id: inquiry.id },
+      { $set: row },
+      { upsert: true }
+    );
   } catch (err) {
-    console.error('Supabase saveInquiry failed:', err);
+    console.error('MongoDB saveInquiry failed:', err);
   }
 
   return inquiry;
@@ -494,11 +465,11 @@ export async function updateInquiryStatus(
   }
 
   try {
-    const supabase = getSupabase();
-    const { error } = await supabase.from('inquiries').update({ status }).eq('id', id);
-    return !error;
+    const db = await getDb();
+    const res = await db.collection('inquiries').updateOne({ id }, { $set: { status } });
+    return res.acknowledged;
   } catch (err) {
-    console.error('Supabase updateInquiryStatus failed:', err);
+    console.error('MongoDB updateInquiryStatus failed:', err);
     return false;
   }
 }
@@ -540,20 +511,21 @@ function fromDbReport(row: any): Report {
 
 export async function getAllReports(): Promise<Report[]> {
   try {
-    const supabase = getSupabase();
-    const { data, error } = await supabase
-      .from('reports')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const db = await getDb();
+    const rows = await db
+      .collection('reports')
+      .find({})
+      .sort({ created_at: -1 })
+      .toArray();
 
-    if (!error && Array.isArray(data)) {
-      const items = data.map(fromDbReport);
+    if (Array.isArray(rows) && rows.length > 0) {
+      const items = rows.map(fromDbReport);
       memoryDb.reports = items;
       syncLocalBackup({ reports: items });
       return items;
     }
   } catch (err) {
-    console.error('Supabase getAllReports failed:', err);
+    console.error('MongoDB getAllReports failed:', err);
   }
   return memoryDb.reports;
 }
@@ -568,14 +540,15 @@ export async function saveReport(report: Report): Promise<Report> {
   syncLocalBackup({ reports: memoryDb.reports });
 
   try {
-    const supabase = getSupabase();
+    const db = await getDb();
     const row = toDbReport(report);
-    const { error } = await supabase.from('reports').upsert(row, { onConflict: 'id' });
-    if (error) {
-      console.error('Supabase saveReport upsert error:', error);
-    }
+    await db.collection('reports').updateOne(
+      { id: report.id },
+      { $set: row },
+      { upsert: true }
+    );
   } catch (err) {
-    console.error('Supabase saveReport failed:', err);
+    console.error('MongoDB saveReport failed:', err);
   }
 
   return report;
@@ -594,7 +567,7 @@ export async function updateReportStatus(
   }
 
   try {
-    const supabase = getSupabase();
+    const db = await getDb();
     const updates: Record<string, any> = {
       status,
       resolved_at: status === 'action_taken' ? new Date().toISOString() : null,
@@ -602,10 +575,10 @@ export async function updateReportStatus(
     if (adminNotes) {
       updates.admin_notes = adminNotes;
     }
-    const { error } = await supabase.from('reports').update(updates).eq('id', id);
-    return !error;
+    const res = await db.collection('reports').updateOne({ id }, { $set: updates });
+    return res.acknowledged;
   } catch (err) {
-    console.error('Supabase updateReportStatus failed:', err);
+    console.error('MongoDB updateReportStatus failed:', err);
     return false;
   }
 }
@@ -642,20 +615,21 @@ function fromDbAuditLog(row: any): AuditLog {
 
 export async function getAllAuditLogs(): Promise<AuditLog[]> {
   try {
-    const supabase = getSupabase();
-    const { data, error } = await supabase
-      .from('admin_audit_logs')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(100);
+    const db = await getDb();
+    const rows = await db
+      .collection('audit_logs')
+      .find({})
+      .sort({ created_at: -1 })
+      .limit(100)
+      .toArray();
 
-    if (!error && Array.isArray(data)) {
-      const items = data.map(fromDbAuditLog);
+    if (Array.isArray(rows) && rows.length > 0) {
+      const items = rows.map(fromDbAuditLog);
       memoryDb.auditLogs = items;
       return items;
     }
   } catch (err) {
-    console.error('Supabase getAllAuditLogs failed:', err);
+    console.error('MongoDB getAllAuditLogs failed:', err);
   }
   return memoryDb.auditLogs;
 }
@@ -665,11 +639,11 @@ export async function saveAuditLog(log: AuditLog): Promise<AuditLog> {
   if (memoryDb.auditLogs.length > 200) memoryDb.auditLogs.pop();
 
   try {
-    const supabase = getSupabase();
+    const db = await getDb();
     const row = toDbAuditLog(log);
-    await supabase.from('admin_audit_logs').insert(row);
+    await db.collection('audit_logs').insertOne(row);
   } catch (err) {
-    console.error('Supabase saveAuditLog failed:', err);
+    console.error('MongoDB saveAuditLog failed:', err);
   }
 
   return log;

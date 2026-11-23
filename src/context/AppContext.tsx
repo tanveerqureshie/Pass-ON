@@ -15,7 +15,6 @@ import {
 import { INITIAL_COLLEGES } from '@/lib/data/colleges';
 import { INITIAL_CATEGORIES } from '@/lib/data/categories';
 import { SEED_LISTINGS } from '@/lib/data/seed-listings';
-import { createClient } from '@/lib/supabase/client';
 
 export const ADMIN_EMAIL = 'mrtanveerqureshi@gmail.com';
 export const ADMIN_PASSWORD = 'MrVeer9906';
@@ -596,12 +595,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = () => {
-    try {
-      const supabase = createClient();
-      supabase.auth.signOut();
-    } catch {
-      // Ignored
-    }
     setCurrentUser(null);
     try {
       localStorage.removeItem(STORAGE_KEY_USER);

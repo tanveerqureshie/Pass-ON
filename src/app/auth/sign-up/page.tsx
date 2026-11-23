@@ -5,8 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
-import { createClient } from '@/lib/supabase/client';
-import { uploadImageToStorage } from '@/lib/supabase/storage';
+import { uploadToCloudinary } from '@/lib/cloudinary/upload';
 import { Input, Select } from '@/components/ui/Form';
 import { Button } from '@/components/ui/Button';
 import { UserPlus, ArrowLeft, ArrowRight, Check, GraduationCap, UploadCloud, Camera, Image as ImageIcon, X, Trash2 } from 'lucide-react';
@@ -80,10 +79,10 @@ export default function SignUpPage() {
     try {
       const selectedCol = colleges.find((c) => c.id === collegeId);
 
-      // Permanently upload student photo to Supabase Storage
+      // Permanently upload student photo to Cloudinary
       let permanentPhotoUrl = idCardImage;
       if (idCardFile) {
-        const uploadedUrl = await uploadImageToStorage(idCardFile, 'verification-docs', 'id_card');
+        const uploadedUrl = await uploadToCloudinary(idCardFile, 'pass-on/verification');
         if (uploadedUrl) {
           permanentPhotoUrl = uploadedUrl;
         }
@@ -108,32 +107,6 @@ export default function SignUpPage() {
         createdAt: new Date().toISOString(),
       };
       await registerStudent(newStudent);
-
-      // Also register into Supabase Auth if available
-      try {
-        const supabase = createClient();
-        await supabase.auth.signUp({
-          email: email.trim().toLowerCase(),
-          password,
-          options: {
-            data: {
-              full_name: fullName.trim(),
-              college_id: collegeId,
-              college_name: selectedCol?.name,
-              college_short_name: selectedCol?.short_name,
-              branch,
-              id_card_url: permanentPhotoUrl,
-              phone_number: phoneNumber.trim(),
-              instagram_handle: instagramHandle.trim().replace(/^@/, ''),
-              academic_year: academicYear,
-              role: 'student',
-              verification_status: 'pending',
-            },
-          },
-        });
-      } catch {
-        // Fallback to local demo storage handled gracefully
-      }
 
       showToast('Account created! Awaiting campus verification.');
       router.push('/dashboard');
