@@ -99,7 +99,7 @@ export default function SignUpPage() {
         verificationStatus: 'pending',
         createdAt: new Date().toISOString(),
       };
-      registerStudent(newStudent);
+      await registerStudent(newStudent);
 
       // Also register into Supabase Auth if available
       try {

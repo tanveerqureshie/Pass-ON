@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useApp } from '@/context/AppContext';
 import { UserProfile } from '@/lib/types';
 import { Button } from '@/components/ui/Button';
@@ -58,15 +57,14 @@ export default function AdminUsersPage() {
     return true;
   });
 
-  const handleConfirmReject = (e: React.FormEvent) => {
+  const handleConfirmReject = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!rejectionModalUser) return;
-    rejectStudent(
-      rejectionModalUser.id,
-      rejectionReason || 'Enrollment number could not be verified against college database.'
-    );
+    const targetId = rejectionModalUser.id;
+    const reason = rejectionReason.trim() || 'Enrollment number could not be verified against college database.';
     setRejectionModalUser(null);
     setRejectionReason('');
+    await rejectStudent(targetId, reason);
   };
 
   const tabs = [
@@ -253,12 +251,9 @@ export default function AdminUsersPage() {
                             className="group relative flex items-center gap-2.5 rounded-xl border-2 border-teal-500/80 bg-teal-50/70 dark:bg-teal-950/40 p-1.5 transition hover:scale-[1.02] hover:shadow-md cursor-pointer text-left"
                           >
                             <div className="relative h-12 w-20 overflow-hidden rounded-lg bg-slate-900 border border-teal-600/40">
-                              <Image
+                              <img
                                 src={u.idCardUrl}
                                 alt={`ID Card of ${u.fullName}`}
-                                fill
-                                sizes="80px"
-                                unoptimized
                                 className="h-full w-full object-cover"
                               />
                               <div className="absolute inset-0 grid place-items-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -391,12 +386,9 @@ export default function AdminUsersPage() {
             {/* High-res Image Preview */}
             <div className="relative aspect-[16/10] max-h-[440px] w-full overflow-hidden rounded-2xl border-2 border-teal-500/40 bg-slate-950 flex items-center justify-center p-2 shadow-inner">
               {inspectingIdUser.idCardUrl ? (
-                <Image
+                <img
                   src={inspectingIdUser.idCardUrl}
                   alt={`Student ID of ${inspectingIdUser.fullName}`}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 900px"
-                  unoptimized
                   className="h-full w-full object-contain"
                 />
               ) : (

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import {
   College,
   Category,
@@ -24,6 +24,7 @@ export const ADMIN_PASSWORD = 'MrVeer9906';
    NOTE: keep this server-side in a real deployment. */
 export const ADMIN_CREDENTIALS: ReadonlyArray<{ email: string; password: string; name?: string }> = [
   { email: 'mrtanveerqureshi@gmail.com', password: 'MrVeer9906', name: 'Tanveer Qureshi (Founder)' },
+  { email: 'mrtanveerqureshie@gmail.com', password: 'MrVeer9906', name: 'Tanveer Qureshi (Founder)' },
   { email: 'admin321@gmail.com', password: 'Admin321', name: 'Campus Admin Partner' },
   { email: 'admin321@gmail.com', password: 'admin321', name: 'Campus Admin Partner' },
   { email: 'passon@gmail.com', password: 'passon@321', name: 'Pass ON Team' },
@@ -31,6 +32,7 @@ export const ADMIN_CREDENTIALS: ReadonlyArray<{ email: string; password: string;
 
 const ADMIN_EMAILS: ReadonlyArray<string> = [
   ADMIN_EMAIL,
+  'mrtanveerqureshie@gmail.com',
   'admin321@gmail.com',
   'admin@passon.in',
   'passon@gmail.com',
@@ -65,9 +67,9 @@ interface AppContextType {
 
   // Verification & Student Management
   registeredStudents: UserProfile[];
-  registerStudent: (student: UserProfile) => void;
-  approveStudent: (userId: string) => void;
-  rejectStudent: (userId: string, reason: string) => void;
+  registerStudent: (student: UserProfile) => Promise<boolean> | void;
+  approveStudent: (userId: string) => Promise<boolean> | void;
+  rejectStudent: (userId: string, reason: string) => Promise<boolean> | void;
 
   // Colleges
   colleges: College[];
@@ -86,7 +88,7 @@ interface AppContextType {
   listings: Listing[];
   addListing: (listing: Omit<Listing, 'id' | 'createdAt' | 'updatedAt'>) => Listing | null;
   updateListing: (id: string, updates: Partial<Listing>) => void;
-  deleteListing: (id: string) => void;
+  deleteListing: (id: string) => Promise<boolean> | void;
   updateListingStatus: (id: string, status: ListingStatus) => void;
 
   // Saved Listings
@@ -122,6 +124,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 // Fresh V3 storage keys so legacy dummy data is not rehydrated
 const STORAGE_KEY_LISTINGS = 'passon_listings_v3';
+const STORAGE_KEY_DELETED_LISTINGS = 'passon_deleted_listings_v3';
 const STORAGE_KEY_SAVED = 'passon_saved_v3';
 const STORAGE_KEY_USER = 'passon_user_v3';
 const STORAGE_KEY_STUDENTS = 'passon_students_v3';
@@ -132,6 +135,9 @@ const STORAGE_KEY_REPORTS = 'passon_reports_v3';
 const STORAGE_KEY_LOGS = 'passon_logs_v3';
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
+  // Tombstone set of permanently deleted listing IDs to prevent re-hydration from stale network caches
+  const deletedListingIds = useRef<Set<string>>(new Set());
+
   // Initial state: starts completely fresh with null user and clean student list
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [registeredStudents, setRegisteredStudents] = useState<UserProfile[]>([]);
@@ -192,8 +198,111 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  // Synchronize state with central Next.js server API endpoints (Bidirectional Smart Merge with Cache Busting)
+  const syncFromServer = async () => {
+    try {
+      const ts = Date.now();
+      const [resStudents, resListings, resInquiries, resReports, resLogs] = await Promise.all([
+        fetch(`/api/students?t=${ts}`, { cache: 'no-store' }),
+        fetch(`/api/listings?t=${ts}`, { cache: 'no-store' }),
+        fetch(`/api/inquiries?t=${ts}`, { cache: 'no-store' }),
+        fetch(`/api/reports?t=${ts}`, { cache: 'no-store' }),
+        fetch(`/api/logs?t=${ts}`, { cache: 'no-store' }),
+      ]);
+
+      if (resStudents.ok) {
+        const data = await resStudents.json();
+        if (data.success && Array.isArray(data.students)) {
+          setRegisteredStudents(data.students);
+          try {
+            localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(data.students));
+          } catch {}
+
+          // If current logged-in user is a student, sync verification status updates
+          setCurrentUser((prev) => {
+            if (!prev) return null;
+            if (prev.role === 'admin') return prev;
+            const updatedProfile = data.students.find(
+              (s: UserProfile) =>
+                s.id === prev.id || s.email.toLowerCase() === prev.email.toLowerCase()
+            );
+            if (
+              updatedProfile &&
+              (updatedProfile.verificationStatus !== prev.verificationStatus ||
+                updatedProfile.role !== prev.role)
+            ) {
+              const merged = { ...prev, ...updatedProfile };
+              try {
+                localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(merged));
+              } catch {}
+              return merged;
+            }
+            return prev;
+          });
+        }
+      }
+
+      if (resListings.ok) {
+        const data = await resListings.json();
+        if (data.success && Array.isArray(data.listings)) {
+          // Filter out any listings that have been deleted locally to prevent resurrection from stale network caches
+          const freshListings = data.listings.filter(
+            (l: Listing) => !deletedListingIds.current.has(l.id)
+          );
+          setListings(freshListings);
+          try {
+            localStorage.setItem(STORAGE_KEY_LISTINGS, JSON.stringify(freshListings));
+          } catch {}
+        }
+      }
+
+      if (resInquiries.ok) {
+        const inqData = await resInquiries.json();
+        if (inqData.success && Array.isArray(inqData.inquiries)) {
+          setInquiries(inqData.inquiries);
+          try {
+            localStorage.setItem(STORAGE_KEY_INQUIRIES, JSON.stringify(inqData.inquiries));
+          } catch {}
+        }
+      }
+
+      if (resReports.ok) {
+        const repData = await resReports.json();
+        if (repData.success && Array.isArray(repData.reports)) {
+          setReports(repData.reports);
+          try {
+            localStorage.setItem(STORAGE_KEY_REPORTS, JSON.stringify(repData.reports));
+          } catch {}
+        }
+      }
+
+      if (resLogs.ok) {
+        const logsData = await resLogs.json();
+        if (logsData.success && Array.isArray(logsData.logs) && logsData.logs.length > 0) {
+          setAuditLogs(logsData.logs);
+          try {
+            localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(logsData.logs));
+          } catch {}
+        }
+      }
+    } catch {
+      // Offline fallback
+    }
+  };
+
   useEffect(() => {
     try {
+      // Restore deleted listing IDs tombstone
+      const storedDeleted = localStorage.getItem(STORAGE_KEY_DELETED_LISTINGS);
+      if (storedDeleted) {
+        try {
+          const parsed = JSON.parse(storedDeleted) as string[];
+          if (Array.isArray(parsed)) {
+            parsed.forEach((id) => deletedListingIds.current.add(id));
+          }
+        } catch {}
+      }
+
       // Drop pre-v3 browser data so old demo users/listings cannot reappear.
       localStorage.removeItem('passon_listings');
       localStorage.removeItem('passon_students');
@@ -201,7 +310,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const storedListings = localStorage.getItem(STORAGE_KEY_LISTINGS);
       if (storedListings) {
         const parsed = JSON.parse(storedListings) as Listing[];
-        setListings(parsed.filter((listing) => !listing.isDemo));
+        setListings(
+          parsed.filter((listing) => !listing.isDemo && !deletedListingIds.current.has(listing.id))
+        );
       }
 
       const storedSaved = localStorage.getItem(STORAGE_KEY_SAVED);
@@ -252,6 +363,29 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     } catch {
       // Ignored
     }
+
+    // Immediately sync with central server DB
+    syncFromServer();
+
+    // Auto-poll central database every 4 seconds for cross-device updates
+    const interval = setInterval(syncFromServer, 4000);
+
+    const handleVisibilityChange = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        syncFromServer();
+      }
+    };
+
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+    }
+
+    return () => {
+      clearInterval(interval);
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      }
+    };
   }, []);
 
   const showToast = (msg: string) => {
@@ -263,21 +397,52 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const isUserVerified = currentUser?.role === 'admin' || currentUser?.verificationStatus === 'approved';
 
-  // Register student (from personal email signup)
-  const registerStudent = (student: UserProfile) => {
-    const updated = [student, ...registeredStudents.filter((s) => s.id !== student.id && s.email !== student.email)];
-    setRegisteredStudents(updated);
-    localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(updated));
+  // Register student (from personal email signup) - async to ensure server persistence before navigation
+  const registerStudent = async (student: UserProfile): Promise<boolean> => {
+    const cleanStudent: UserProfile = {
+      ...student,
+      email: student.email.trim().toLowerCase(),
+      verificationStatus: student.verificationStatus || 'pending',
+    };
 
-    setCurrentUser(student);
-    localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(student));
+    const updated = [
+      cleanStudent,
+      ...registeredStudents.filter(
+        (s) => s.id !== cleanStudent.id && s.email.toLowerCase() !== cleanStudent.email
+      ),
+    ];
+    setRegisteredStudents(updated);
+    try {
+      localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(updated));
+    } catch {}
+
+    setCurrentUser(cleanStudent);
+    try {
+      localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(cleanStudent));
+    } catch {}
+
+    // Persist to central server database immediately and await confirmation
+    try {
+      const res = await fetch('/api/students', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cleanStudent),
+      });
+      const data = await res.json();
+      if (data.success) {
+        await syncFromServer();
+      }
+    } catch (err) {
+      console.error('Error saving student to server:', err);
+    }
 
     logAdminAction(
       'New Student Registered',
       'user',
-      student.id,
-      `Student ${student.fullName} (${student.email}) registered from ${student.collegeName}. Awaiting verification review.`
+      cleanStudent.id,
+      `Student ${cleanStudent.fullName} (${cleanStudent.email}) registered from ${cleanStudent.collegeName}. Awaiting verification review.`
     );
+    return true;
   };
 
   // Login with personal email & admin password authentication
@@ -323,9 +488,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return null;
   };
 
-  const approveStudent = (userId: string) => {
+  const approveStudent = async (userId: string) => {
     const updated = registeredStudents.map((s) =>
-      s.id === userId
+      s.id === userId || s.email.toLowerCase() === userId.toLowerCase()
         ? {
             ...s,
             verificationStatus: 'approved' as VerificationStatus,
@@ -336,28 +501,48 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         : s
     );
     setRegisteredStudents(updated);
-    localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(updated));
+    try {
+      localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(updated));
+    } catch {}
 
     // If current logged-in user is this student, update session
-    if (currentUser?.id === userId) {
-      const selfUpdated = { ...currentUser, verificationStatus: 'approved' as VerificationStatus };
+    if (currentUser && currentUser.role !== 'admin' && (currentUser.id === userId || currentUser.email.toLowerCase() === userId.toLowerCase())) {
+      const selfUpdated = { ...currentUser, verificationStatus: 'approved' as VerificationStatus, rejectionReason: undefined };
       setCurrentUser(selfUpdated);
-      localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(selfUpdated));
+      try {
+        localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(selfUpdated));
+      } catch {}
     }
 
-    const student = registeredStudents.find((s) => s.id === userId);
+    try {
+      await fetch('/api/students', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          verificationStatus: 'approved',
+          verifiedBy: currentUser?.id,
+        }),
+      });
+      await syncFromServer();
+    } catch (err) {
+      console.error('Error approving student on server:', err);
+    }
+
+    const student = registeredStudents.find((s) => s.id === userId || s.email.toLowerCase() === userId.toLowerCase());
     logAdminAction(
       'Approved Student Verification',
       'user',
       userId,
-      `Verified ${student?.fullName} (${student?.enrollmentNumber}) against ${student?.collegeName} department records.`
+      `Verified ${student?.fullName || 'student'} (${student?.enrollmentNumber || 'no-id'}) against ${student?.collegeName || 'college'} department records.`
     );
     showToast(`Student ${student?.fullName || 'account'} approved and verified.`);
+    return true;
   };
 
-  const rejectStudent = (userId: string, reason: string) => {
+  const rejectStudent = async (userId: string, reason: string) => {
     const updated = registeredStudents.map((s) =>
-      s.id === userId
+      s.id === userId || s.email.toLowerCase() === userId.toLowerCase()
         ? {
             ...s,
             verificationStatus: 'rejected' as VerificationStatus,
@@ -366,26 +551,48 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         : s
     );
     setRegisteredStudents(updated);
-    localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(updated));
+    try {
+      localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(updated));
+    } catch {}
 
-    if (currentUser?.id === userId) {
+    // Never degrade or lock out active admin sessions during moderation
+    if (currentUser && currentUser.role !== 'admin' && (currentUser.id === userId || currentUser.email.toLowerCase() === userId.toLowerCase())) {
       const selfUpdated = {
         ...currentUser,
         verificationStatus: 'rejected' as VerificationStatus,
         rejectionReason: reason,
       };
       setCurrentUser(selfUpdated);
-      localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(selfUpdated));
+      try {
+        localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(selfUpdated));
+      } catch {}
     }
 
-    const student = registeredStudents.find((s) => s.id === userId);
+    try {
+      await fetch('/api/students', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          verificationStatus: 'rejected',
+          rejectionReason: reason,
+          verifiedBy: currentUser?.id,
+        }),
+      });
+      await syncFromServer();
+    } catch (err) {
+      console.error('Error rejecting student on server:', err);
+    }
+
+    const student = registeredStudents.find((s) => s.id === userId || s.email.toLowerCase() === userId.toLowerCase());
     logAdminAction(
       'Rejected Student Verification',
       'user',
       userId,
-      `Rejected ${student?.fullName}. Reason: ${reason}`
+      `Rejected ${student?.fullName || 'student'} (${student?.enrollmentNumber || 'no-id'}): ${reason}`
     );
     showToast(`Verification rejected for ${student?.fullName || 'student'}.`);
+    return true;
   };
 
   const logout = () => {
@@ -396,21 +603,45 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       // Ignored
     }
     setCurrentUser(null);
-    localStorage.removeItem(STORAGE_KEY_USER);
+    try {
+      localStorage.removeItem(STORAGE_KEY_USER);
+    } catch {}
     showToast('Signed out of Pass ON');
   };
 
   const updateProfile = (updates: Partial<UserProfile>) => {
     if (!currentUser) return;
-    const updated = { ...currentUser, ...updates };
+    const isReapplying = currentUser.verificationStatus === 'rejected';
+    const updated: UserProfile = {
+      ...currentUser,
+      ...updates,
+      verificationStatus: isReapplying ? ('pending' as VerificationStatus) : currentUser.verificationStatus,
+      rejectionReason: isReapplying ? undefined : currentUser.rejectionReason,
+    };
     setCurrentUser(updated);
-    localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(updated));
+    try {
+      localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(updated));
+    } catch {}
 
     const updatedList = registeredStudents.map((s) => (s.id === currentUser.id ? updated : s));
     setRegisteredStudents(updatedList);
-    localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(updatedList));
+    try {
+      localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(updatedList));
+    } catch {}
 
-    showToast('Profile updated successfully!');
+    fetch('/api/students', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updated),
+    })
+      .then(() => syncFromServer())
+      .catch((err) => console.error('Error updating profile on server:', err));
+
+    showToast(
+      isReapplying
+        ? 'Profile updated and resubmitted for verification!'
+        : 'Profile updated successfully!'
+    );
   };
 
   const addListing = (itemData: Omit<Listing, 'id' | 'createdAt' | 'updatedAt'>): Listing | null => {
@@ -430,25 +661,78 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const updated = [newListing, ...listings];
     setListings(updated);
-    localStorage.setItem(STORAGE_KEY_LISTINGS, JSON.stringify(updated));
+    try {
+      localStorage.setItem(STORAGE_KEY_LISTINGS, JSON.stringify(updated));
+    } catch {}
+
+    // Sync listing to central server database
+    fetch('/api/listings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newListing),
+    })
+      .then(() => syncFromServer())
+      .catch((err) => console.error('Error adding listing to server:', err));
+
     showToast(`Listing "${newListing.title}" published successfully!`);
     return newListing;
   };
 
   const updateListing = (id: string, updates: Partial<Listing>) => {
+    const existing = listings.find((l) => l.id === id);
     const updated = listings.map((l) =>
       l.id === id ? { ...l, ...updates, updatedAt: new Date().toISOString() } : l
     );
     setListings(updated);
-    localStorage.setItem(STORAGE_KEY_LISTINGS, JSON.stringify(updated));
+    try {
+      localStorage.setItem(STORAGE_KEY_LISTINGS, JSON.stringify(updated));
+    } catch {}
+
+    if (existing) {
+      const merged = { ...existing, ...updates, updatedAt: new Date().toISOString() };
+      fetch('/api/listings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(merged),
+      })
+        .then(() => syncFromServer())
+        .catch((err) => console.error('Error updating listing on server:', err));
+    }
+
     showToast('Listing updated successfully!');
   };
 
-  const deleteListing = (id: string) => {
-    const updated = listings.filter((l) => l.id !== id);
+  const deleteListing = async (id: string): Promise<boolean> => {
+    const cleanId = id.trim();
+    // 1. Mark ID in tombstone set so syncFromServer never resurrects it
+    deletedListingIds.current.add(cleanId);
+    try {
+      localStorage.setItem(
+        STORAGE_KEY_DELETED_LISTINGS,
+        JSON.stringify(Array.from(deletedListingIds.current))
+      );
+    } catch {}
+
+    // 2. Remove immediately from local state
+    const updated = listings.filter((l) => l.id !== cleanId);
     setListings(updated);
-    localStorage.setItem(STORAGE_KEY_LISTINGS, JSON.stringify(updated));
-    showToast('Listing removed.');
+    try {
+      localStorage.setItem(STORAGE_KEY_LISTINGS, JSON.stringify(updated));
+    } catch {}
+
+    // 3. Sync delete to central server database with cache-busting timestamp
+    try {
+      const res = await fetch(`/api/listings?id=${encodeURIComponent(cleanId)}&t=${Date.now()}`, {
+        method: 'DELETE',
+      });
+      await syncFromServer();
+      showToast('Listing removed permanently.');
+      return true;
+    } catch (err) {
+      console.error('Error deleting listing from server:', err);
+      showToast('Listing removed.');
+      return false;
+    }
   };
 
   const updateListingStatus = (id: string, status: ListingStatus) => {
@@ -493,7 +777,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const updated = [newInquiry, ...inquiries];
     setInquiries(updated);
-    localStorage.setItem(STORAGE_KEY_INQUIRIES, JSON.stringify(updated));
+    try {
+      localStorage.setItem(STORAGE_KEY_INQUIRIES, JSON.stringify(updated));
+    } catch {}
+
+    // Persist inquiry to central database immediately
+    fetch('/api/inquiries', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newInquiry),
+    })
+      .then(() => syncFromServer())
+      .catch((err) => console.error('Error saving inquiry:', err));
+
     showToast('Inquiry sent to seller! Check dashboard for responses.');
     return true;
   };
@@ -516,7 +812,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     const updatedReports = [newReport, ...reports];
     setReports(updatedReports);
-    localStorage.setItem(STORAGE_KEY_REPORTS, JSON.stringify(updatedReports));
+    try {
+      localStorage.setItem(STORAGE_KEY_REPORTS, JSON.stringify(updatedReports));
+    } catch {}
+
+    // Persist report to central database immediately
+    fetch('/api/reports', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newReport),
+    })
+      .then(() => syncFromServer())
+      .catch((err) => console.error('Error submitting report:', err));
 
     updateListing(listingId, { isReported: true });
 
@@ -534,7 +841,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       r.id === id ? { ...r, status, adminNotes: adminNotes || r.adminNotes } : r
     );
     setReports(updated);
-    localStorage.setItem(STORAGE_KEY_REPORTS, JSON.stringify(updated));
+    try {
+      localStorage.setItem(STORAGE_KEY_REPORTS, JSON.stringify(updated));
+    } catch {}
+
+    // Persist status update to central database immediately
+    fetch('/api/reports', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status, adminNotes }),
+    })
+      .then(() => syncFromServer())
+      .catch((err) => console.error('Error updating report status:', err));
+
     showToast(`Report updated to ${status}.`);
   };
 
@@ -549,7 +868,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const addCollege = (college: College) => {
     const updated = [...colleges, college];
     setColleges(updated);
-    localStorage.setItem(STORAGE_KEY_COLLEGES, JSON.stringify(updated));
+    try {
+      localStorage.setItem(STORAGE_KEY_COLLEGES, JSON.stringify(updated));
+    } catch {}
     logAdminAction('Added College', 'college', college.id, `Added institution: ${college.name}`);
     showToast(`College ${college.name} added!`);
   };
@@ -557,7 +878,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const updateCollege = (id: string, updates: Partial<College>) => {
     const updated = colleges.map((c) => (c.id === id ? { ...c, ...updates } : c));
     setColleges(updated);
-    localStorage.setItem(STORAGE_KEY_COLLEGES, JSON.stringify(updated));
+    try {
+      localStorage.setItem(STORAGE_KEY_COLLEGES, JSON.stringify(updated));
+    } catch {}
     logAdminAction('Updated College', 'college', id, `Updated institution settings for ${id}`);
     showToast('College details updated.');
   };
@@ -594,7 +917,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
     const updated = [newLog, ...auditLogs];
     setAuditLogs(updated);
-    localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(updated));
+    try {
+      localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(updated));
+    } catch {}
+
+    // Persist audit log to central database
+    fetch('/api/logs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newLog),
+    }).catch(() => {});
   };
 
   const selectedCollege = colleges.find((c) => c.id === selectedCollegeId) || colleges[0];

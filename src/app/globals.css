@@ -105,7 +105,7 @@ img {
 --------------------------------------------------------------------------- */
 @layer components {
   .container-x {
-    @apply mx-auto w-full max-w-[1560px] px-3 sm:px-5 lg:px-6;
+    @apply mx-auto w-full max-w-[1600px] px-4 sm:px-6 lg:px-8;
   }
 
   .section {
@@ -439,6 +439,253 @@ img {
   }
   .shine-sweep {
     animation: shine-sweep 0.9s ease-out forwards;
+  }
+
+  /* ─── Ultra-clean Glassmorphism & Iridescent Oily Sheen & Neon Glows ─── */
+  .glass-oily {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.85) 0%,
+      rgba(241, 245, 255, 0.75) 45%,
+      rgba(245, 243, 255, 0.8) 100%
+    );
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow:
+      0 8px 32px -4px rgba(37, 99, 235, 0.08),
+      0 2px 8px rgba(15, 23, 42, 0.04),
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.95),
+      inset 0 -1px 2px 0 rgba(99, 102, 241, 0.12);
+  }
+  .dark .glass-oily {
+    background: linear-gradient(
+      135deg,
+      rgba(15, 23, 42, 0.85) 0%,
+      rgba(30, 27, 75, 0.55) 50%,
+      rgba(15, 23, 42, 0.9) 100%
+    );
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow:
+      0 8px 32px -4px rgba(0, 0, 0, 0.5),
+      0 2px 8px rgba(0, 0, 0, 0.3),
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.15),
+      inset 0 -1px 2px 0 rgba(99, 102, 241, 0.25);
+  }
+
+  /* Iridescent oily border sheen */
+  .border-oily {
+    position: relative;
+  }
+  .border-oily::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.6), rgba(168, 85, 247, 0.5), rgba(6, 182, 212, 0.6), rgba(16, 185, 129, 0.4));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+  }
+  .border-oily:hover::after {
+    opacity: 1;
+  }
+
+  /* Neon Glow Effects */
+  .neon-glow-blue {
+    box-shadow: 0 0 24px rgba(37, 99, 235, 0.35), 0 0 48px rgba(37, 99, 235, 0.15);
+  }
+  .neon-glow-cyan {
+    box-shadow: 0 0 24px rgba(6, 182, 212, 0.35), 0 0 48px rgba(6, 182, 212, 0.15);
+  }
+  .neon-glow-purple {
+    box-shadow: 0 0 24px rgba(147, 51, 234, 0.35), 0 0 48px rgba(147, 51, 234, 0.15);
+  }
+  .neon-text-glow {
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.6), 0 0 40px rgba(99, 102, 241, 0.3);
+  }
+
+  /* Animated Shimmering Gradient Text */
+  @keyframes gradient-shift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+  .animate-gradient-text {
+    background-size: 200% auto;
+    animation: gradient-shift 6s ease infinite;
+  }
+
+  /* ─── Award-Winning Hero Transition Reveal for "Pass It On. Save More." ─── */
+  @keyframes word-reveal-up {
+    0% {
+      opacity: 0;
+      transform: translateY(115%) rotateX(-18deg) scale(0.92);
+      filter: blur(14px);
+    }
+    60% {
+      filter: blur(2px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) rotateX(0deg) scale(1);
+      filter: blur(0);
+    }
+  }
+
+  @keyframes hero-badge-reveal {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px) scale(0.92);
+      filter: blur(8px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+  }
+
+  @keyframes gradient-flow-bg {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  @keyframes mesh-orb-float-1 {
+    0%, 100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    33% {
+      transform: translate3d(40px, -35px, 0) scale(1.15);
+    }
+    66% {
+      transform: translate3d(-30px, 25px, 0) scale(0.92);
+    }
+  }
+
+  @keyframes mesh-orb-float-2 {
+    0%, 100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    33% {
+      transform: translate3d(-45px, 30px, 0) scale(0.9);
+    }
+    66% {
+      transform: translate3d(35px, -20px, 0) scale(1.12);
+    }
+  }
+
+  @keyframes mesh-orb-float-3 {
+    0%, 100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    50% {
+      transform: translate3d(25px, 30px, 0) scale(1.1);
+    }
+  }
+
+  @keyframes text-shimmer-sweep {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  .reveal-badge {
+    animation: hero-badge-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .reveal-word {
+    display: inline-block;
+    will-change: transform, opacity, filter;
+    transform-origin: center bottom;
+    animation: word-reveal-up 1.05s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .reveal-word-1 { animation-delay: 80ms; }
+  .reveal-word-2 { animation-delay: 160ms; }
+  .reveal-word-3 { animation-delay: 240ms; }
+  .reveal-word-4 { animation-delay: 380ms; }
+  .reveal-word-5 { animation-delay: 480ms; }
+
+  /* Animated multi-stop flowing gradient on home screen */
+  .animate-gradient-mesh-flow {
+    background-size: 300% 300%;
+    animation: gradient-flow-bg 12s ease-in-out infinite;
+  }
+
+  .animate-gradient-flow-fast {
+    background-size: 250% auto;
+    animation: gradient-flow-bg 5s ease-in-out infinite;
+  }
+
+  .animate-mesh-orb-1 {
+    animation: mesh-orb-float-1 14s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .animate-mesh-orb-2 {
+    animation: mesh-orb-float-2 18s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .animate-mesh-orb-3 {
+    animation: mesh-orb-float-3 12s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .hero-gradient {
+    background-size: 180% 180%;
+    animation: hero-gradient-shift 16s ease-in-out infinite;
+  }
+
+  @keyframes hero-gradient-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  .hero-title-line {
+    display: inline-block;
+    animation: title-reveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .hero-title-line-delay {
+    animation-delay: 120ms;
+  }
+
+  @keyframes title-reveal {
+    from {
+      opacity: 0;
+      transform: translateY(0.65em);
+      filter: blur(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
   }
 
   /* Deep 3D "plate" shadow for product / listing cards */

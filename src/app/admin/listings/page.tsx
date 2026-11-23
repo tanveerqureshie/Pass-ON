@@ -50,9 +50,9 @@ export default function AdminListingsPage() {
     showToast(`Listing "${title}" restored to active status.`);
   };
 
-  const handleDeleteListing = (id: string, title: string) => {
+  const handleDeleteListing = async (id: string, title: string) => {
     if (confirm(`Are you sure you want to permanently delete "${title}"?`)) {
-      deleteListing(id);
+      await deleteListing(id);
       logAdminAction('Deleted Listing', 'listing', id, `Permanently deleted: "${title}".`);
       showToast(`Listing "${title}" removed.`);
     }

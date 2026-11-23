@@ -156,9 +156,9 @@ export default function ManageListingsPage() {
                   </Link>
 
                   <button
-                    onClick={() => {
+                    onClick={async () => {
                       if (confirm('Are you sure you want to delete this listing?')) {
-                        deleteListing(item.id);
+                        await deleteListing(item.id);
                       }
                     }}
                     title="Delete listing"

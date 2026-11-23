@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useApp, ADMIN_CREDENTIALS } from '@/context/AppContext';
+import { UserProfile } from '@/lib/types';
 import { createClient } from '@/lib/supabase/client';
 import { Input } from '@/components/ui/Form';
 import { Button } from '@/components/ui/Button';
@@ -64,16 +65,34 @@ export default function SignInPage() {
       if (signInErr) {
         setError('Email or password is incorrect.');
       } else if (data.user) {
-        setCurrentUser({
+        const studentProfile: UserProfile = {
           id: data.user.id,
-          email: data.user.email || email,
+          email: (data.user.email || email).trim().toLowerCase(),
           fullName: data.user.user_metadata?.full_name || 'College Student',
           collegeId: data.user.user_metadata?.college_id || 'mait',
+          collegeName: data.user.user_metadata?.college_name || 'Delhi College',
+          collegeShortName: data.user.user_metadata?.college_short_name || 'DELHI',
           branch: data.user.user_metadata?.branch || 'CSE',
-          role: data.user.user_metadata?.role || 'student',
-          verificationStatus: data.user.user_metadata?.verification_status || 'approved',
-          createdAt: data.user.created_at,
-        });
+          role: 'student',
+          verificationStatus: (data.user.user_metadata?.verification_status as any) || 'pending',
+          createdAt: data.user.created_at || new Date().toISOString(),
+        };
+
+        // Guarantee this student profile is persisted to Supabase database so admin sees them in verification queue
+        try {
+          await fetch('/api/students', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(studentProfile),
+          });
+        } catch (postErr) {
+          console.error('Error syncing signed-in student to server:', postErr);
+        }
+
+        setCurrentUser(studentProfile);
+        try {
+          localStorage.setItem('passon_user_v3', JSON.stringify(studentProfile));
+        } catch {}
         showToast('Welcome back to Pass ON!');
         router.push('/dashboard');
         return;
