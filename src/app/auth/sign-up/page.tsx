@@ -10,7 +10,6 @@ import { Input, Select } from '@/components/ui/Form';
 import { Button } from '@/components/ui/Button';
 import { UserPlus, ArrowLeft, ArrowRight, Check, GraduationCap, UploadCloud, Camera, Image as ImageIcon, X, Trash2 } from 'lucide-react';
 import { UserProfile } from '@/lib/types';
-import { compressImage } from '@/lib/image-compression';
 import clsx from 'clsx';
 
 export default function SignUpPage() {
@@ -33,9 +32,7 @@ export default function SignUpPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const [uploadingId, setUploadingId] = useState(false);
-
-  const handleIdCardChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleIdCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -44,64 +41,19 @@ export default function SignUpPage() {
       return;
     }
 
-    if (file.size > 15 * 1024 * 1024) {
-      setError('ID card photo must be less than 15MB.');
+    if (file.size > 5 * 1024 * 1024) {
+      setError('ID card photo must be less than 5MB.');
       return;
     }
 
     setError('');
-    setUploadingId(true);
-
-    try {
-      let uploadTarget: File | Blob = file;
-      try {
-        const compressed = await compressImage(file, 1200, 1200, 0.82);
-        const res = await fetch(compressed);
-        uploadTarget = await res.blob();
-      } catch {
-        uploadTarget = file;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (event.target?.result) {
+        setIdCardImage(event.target.result as string);
       }
-
-      // Upload directly to Supabase Storage bucket 'verification-docs'
-      const supabase = createClient();
-      const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-      const randomId = typeof crypto !== 'undefined' && crypto.randomUUID
-        ? crypto.randomUUID()
-        : Math.random().toString(36).substring(2, 9);
-      const filePath = `id-cards/${Date.now()}-${randomId}.${ext}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('verification-docs')
-        .upload(filePath, uploadTarget, {
-          contentType: file.type || 'image/jpeg',
-          cacheControl: '31536000',
-          upsert: false,
-        });
-
-      if (!uploadError) {
-        const { data } = supabase.storage.from('verification-docs').getPublicUrl(filePath);
-        if (data?.publicUrl) {
-          setIdCardImage(data.publicUrl);
-          showToast('ID card photo uploaded permanently to Supabase!');
-          setUploadingId(false);
-          return;
-        }
-      }
-
-      // Fallback: compress to compact base64 if storage call failed
-      const fallbackData = await compressImage(file, 800, 800, 0.7);
-      setIdCardImage(fallbackData);
-    } catch {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target?.result) {
-          setIdCardImage(event.target.result as string);
-        }
-      };
-      reader.readAsDataURL(file);
-    } finally {
-      setUploadingId(false);
-    }
+    };
+    reader.readAsDataURL(file);
   };
 
   const selectedColObj = colleges.find((c) => c.id === collegeId);
@@ -297,9 +249,12 @@ export default function SignUpPage() {
                 {idCardImage ? (
                   <div className="relative overflow-hidden rounded-2xl border-2 border-teal-500/80 bg-teal-50/40 dark:bg-teal-950/40 p-2.5">
                     <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-slate-900">
-                      <img
+                      <Image
                         src={idCardImage}
                         alt="Uploaded College ID Card"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 640px"
+                        unoptimized
                         className="h-full w-full object-contain"
                       />
                       <div className="absolute top-2 right-2 flex items-center gap-1.5">

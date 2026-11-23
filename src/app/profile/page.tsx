@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useApp } from '@/context/AppContext';
 import { Input, Select } from '@/components/ui/Form';
 import { Button } from '@/components/ui/Button';
@@ -124,8 +125,15 @@ export default function ProfilePage() {
             </p>
             {currentUser?.idCardUrl && (
               <div className="pt-2 flex items-center gap-3 border-t border-black/5 mt-2">
-                <div className="h-12 w-20 overflow-hidden rounded-lg border border-teal-500/60 bg-slate-900 shrink-0">
-                  <img src={currentUser.idCardUrl} alt="Uploaded College ID Card" className="h-full w-full object-cover" />
+                <div className="relative h-12 w-20 shrink-0 overflow-hidden rounded-lg border border-teal-500/60 bg-slate-900">
+                  <Image
+                    src={currentUser.idCardUrl}
+                    alt="Uploaded College ID Card"
+                    fill
+                    sizes="80px"
+                    unoptimized
+                    className="h-full w-full object-cover"
+                  />
                 </div>
                 <div>
                   <span className="block text-xs font-bold text-ink-900">Submitted College ID Card</span>

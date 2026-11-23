@@ -36,10 +36,10 @@ const MEMBERS: TeamMember[] = [
     websiteDisplay: 'www.tanveerqureshie.tech',
   },
   {
-    name: 'Aastha',
-    role: 'Co-Founder & Operations Lead',
-    badge: 'Co-Founder',
-    bio: 'Co-founder driving inter-campus partnerships, female-student privacy initiatives (like Instagram DM alternatives), community guidelines, and campus ambassador operations across Delhi institutes.',
+    name: 'Aastha Pasrija',
+    role: 'Associate Founder & Operations Lead',
+    badge: 'Associate Founder',
+    bio: 'Driving inter-campus partnerships, managing campus ambassador operations, and strengthening student engagement across Delhi’s educational institutions. Focused on building meaningful collaborations, streamlining operations, and expanding the platform’s reach within the student community.',
     image: '/team/member-2.jpg',
   },
 ];

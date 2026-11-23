@@ -53,32 +53,6 @@ export default function SignInPage() {
       return;
     }
 
-    // If not found in local memory, check central server (registered on another device)
-    try {
-      const res = await fetch('/api/students', { cache: 'no-store' });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success && Array.isArray(data.students)) {
-          const found = data.students.find(
-            (s: { email: string; [key: string]: unknown }) =>
-              s.email.toLowerCase() === trimmedEmail
-          );
-          if (found) {
-            setCurrentUser(found);
-            try {
-              localStorage.setItem('passon_user_v3', JSON.stringify(found));
-            } catch {}
-            showToast(`Welcome back, ${found.fullName}!`);
-            setLoading(false);
-            router.push(found.role === 'admin' ? '/admin' : '/dashboard');
-            return;
-          }
-        }
-      }
-    } catch {
-      // Continue to Supabase auth fallback
-    }
-
     // Supabase auth fallback
     try {
       const supabase = createClient();
