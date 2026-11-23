@@ -8,6 +8,7 @@ import { ListingType, ListingCondition } from '@/lib/types';
 import { Button } from '@/components/ui/Button';
 import { Input, Select, Textarea } from '@/components/ui/Form';
 import { isValidContactNumber } from '@/lib/whatsapp';
+import { uploadImageToStorage } from '@/lib/supabase/storage';
 import {
   PlusCircle,
   Gift,
@@ -67,7 +68,9 @@ export default function SellPage() {
   // Image Upload or Link
   const [imageMode, setImageMode] = useState<'upload' | 'link'>('upload');
   const [imageUrl, setImageUrl] = useState<string>('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageFileName, setImageFileName] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const [borrowDuration, setBorrowDuration] = useState('1 to 2 weeks (for practicals)');
   const [borrowConditions, setBorrowConditions] = useState('Return in original working condition');
@@ -83,17 +86,16 @@ export default function SellPage() {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        showToast('Image size should be less than 5MB');
+      if (file.size > 10 * 1024 * 1024) {
+        showToast('Image size should be less than 10MB');
         return;
       }
+      setImageFile(file);
       setImageFileName(file.name);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImageUrl(reader.result as string);
-        showToast('Image uploaded successfully!');
-      };
-      reader.readAsDataURL(file);
+      // Instant local preview
+      const previewUrl = URL.createObjectURL(file);
+      setImageUrl(previewUrl);
+      showToast('Photo selected! Will be stored in Supabase.');
     }
   };
 
@@ -152,7 +154,7 @@ export default function SellPage() {
     );
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: Record<string, string> = {};
 
@@ -186,43 +188,67 @@ export default function SellPage() {
       return;
     }
 
-    const calculatedPrice = listingType === 'free' ? 0 : parseFloat(price) || 0;
-    const finalImage = imageUrl.trim() || getDefaultImageForCategory(categoryId);
-    const cleanedIg = instagramHandle.trim().replace(/^@/, '');
+    setIsSubmitting(true);
 
-    const newListing = addListing({
-      ownerId: currentUser?.id || `student-${Date.now()}`,
-      ownerName: currentUser?.fullName || 'Verified Senior',
-      ownerCollegeId: collegeId,
-      ownerBranch: department,
-      ownerAcademicYear: academicYear,
-      title,
-      description,
-      categoryId,
-      categoryName: selectedCategoryObj?.name || 'Academic Materials',
-      subcategory: subcategory || (selectedCategoryObj?.subcategories[0] ?? ''),
-      listingType,
-      price: calculatedPrice,
-      condition,
-      collegeId,
-      collegeName: selectedCollegeObj?.name || 'Delhi College',
-      collegeShortName: selectedCollegeObj?.short_name || 'DELHI',
-      department,
-      academicYear,
-      preferredPickupLocation,
-      pickupInstructions,
-      contactPreference,
-      whatsappNumber: whatsappNumber.trim(),
-      instagramHandle: cleanedIg,
-      images: [finalImage],
-      status: 'active',
-      borrowDuration: listingType === 'borrow' ? borrowDuration : undefined,
-      borrowConditions: listingType === 'borrow' ? borrowConditions : undefined,
-      exchangePreferences: listingType === 'exchange' ? exchangePreferences : undefined,
-    });
+    try {
+      const calculatedPrice = listingType === 'free' ? 0 : parseFloat(price) || 0;
+      let finalImage = imageUrl.trim();
 
-    if (newListing) {
-      router.push(`/item/${newListing.id}`);
+      // If user selected a local file, upload directly to Supabase storage to get a permanent URL
+      if (imageFile) {
+        showToast('Saving item photo to Supabase storage...');
+        const permanentUrl = await uploadImageToStorage(imageFile, 'product-images', 'item');
+        if (permanentUrl) {
+          finalImage = permanentUrl;
+        }
+      }
+
+      if (!finalImage) {
+        finalImage = getDefaultImageForCategory(categoryId);
+      }
+
+      const cleanedIg = instagramHandle.trim().replace(/^@/, '');
+
+      const newListing = await addListing({
+        ownerId: currentUser?.id || `student-${Date.now()}`,
+        ownerName: currentUser?.fullName || 'Verified Senior',
+        ownerCollegeId: collegeId,
+        ownerBranch: department,
+        ownerAcademicYear: academicYear,
+        title,
+        description,
+        categoryId,
+        categoryName: selectedCategoryObj?.name || 'Academic Materials',
+        subcategory: subcategory || (selectedCategoryObj?.subcategories[0] ?? ''),
+        listingType,
+        price: calculatedPrice,
+        condition,
+        collegeId,
+        collegeName: selectedCollegeObj?.name || 'Delhi College',
+        collegeShortName: selectedCollegeObj?.short_name || 'DELHI',
+        department,
+        academicYear,
+        preferredPickupLocation,
+        pickupInstructions,
+        contactPreference,
+        whatsappNumber: whatsappNumber.trim(),
+        instagramHandle: cleanedIg,
+        images: [finalImage],
+        status: 'active',
+        borrowDuration: listingType === 'borrow' ? borrowDuration : undefined,
+        borrowConditions: listingType === 'borrow' ? borrowConditions : undefined,
+        exchangePreferences: listingType === 'exchange' ? exchangePreferences : undefined,
+      });
+
+      if (newListing) {
+        showToast('Listing published permanently to Supabase!');
+        router.push(`/item/${newListing.id}`);
+      }
+    } catch (err) {
+      console.error('Failed to publish listing:', err);
+      showToast('Failed to save listing. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -633,9 +659,15 @@ export default function SellPage() {
               Cancel and return to marketplace
             </Link>
 
-            <Button variant="primary" size="lg" type="submit" className="w-full sm:w-auto">
+            <Button
+              variant="primary"
+              size="lg"
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full sm:w-auto"
+            >
               <PlusCircle className="h-4 w-4" />
-              Publish Campus Listing
+              {isSubmitting ? 'Publishing to Supabase...' : 'Publish Campus Listing'}
             </Button>
           </div>
         </form>

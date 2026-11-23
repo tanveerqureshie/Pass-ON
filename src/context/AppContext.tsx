@@ -86,7 +86,7 @@ interface AppContextType {
 
   // Listings
   listings: Listing[];
-  addListing: (listing: Omit<Listing, 'id' | 'createdAt' | 'updatedAt'>) => Listing | null;
+  addListing: (listing: Omit<Listing, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Listing | null> | Listing | null;
   updateListing: (id: string, updates: Partial<Listing>) => void;
   deleteListing: (id: string) => Promise<boolean> | void;
   updateListingStatus: (id: string, status: ListingStatus) => void;
@@ -644,7 +644,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
-  const addListing = (itemData: Omit<Listing, 'id' | 'createdAt' | 'updatedAt'>): Listing | null => {
+  const addListing = async (itemData: Omit<Listing, 'id' | 'createdAt' | 'updatedAt'>): Promise<Listing | null> => {
     if (!isUserVerified) {
       showToast('Verification Required: Only approved students can post campus listings.');
       return null;
@@ -665,14 +665,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem(STORAGE_KEY_LISTINGS, JSON.stringify(updated));
     } catch {}
 
-    // Sync listing to central server database
-    fetch('/api/listings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newListing),
-    })
-      .then(() => syncFromServer())
-      .catch((err) => console.error('Error adding listing to server:', err));
+    // Sync listing to central server database and wait for confirmation so it is never lost
+    try {
+      await fetch('/api/listings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newListing),
+      });
+      await syncFromServer();
+    } catch (err) {
+      console.error('Error adding listing to server:', err);
+    }
 
     showToast(`Listing "${newListing.title}" published successfully!`);
     return newListing;

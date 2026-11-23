@@ -298,13 +298,13 @@ img {
   .bg-notebook-grid {
     background-size: 26px 26px;
     background-image: 
-      linear-gradient(to right, rgba(37, 99, 235, 0.045) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(37, 99, 235, 0.045) 1px, transparent 1px);
+      linear-gradient(to right, rgba(37, 99, 235, 0.09) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(37, 99, 235, 0.09) 1px, transparent 1px);
   }
   .dark .bg-notebook-grid {
     background-image: 
-      linear-gradient(to right, rgba(59, 130, 246, 0.06) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(59, 130, 246, 0.06) 1px, transparent 1px);
+      linear-gradient(to right, rgba(59, 130, 246, 0.12) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(59, 130, 246, 0.12) 1px, transparent 1px);
   }
 
   /* Hero Gradient & Mesh Animations */

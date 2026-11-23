@@ -85,7 +85,7 @@ export default function HomePage() {
       {/* ───────────────────────────── Hero: Centered Stage with Background Illustration ───────────────────────────── */}
       <section className="relative overflow-hidden bg-gradient-to-b from-blue-100/60 via-indigo-50/40 via-purple-50/30 to-white dark:from-slate-950 dark:via-[#030712] dark:to-[#020617] animate-gradient-mesh-flow px-0 pt-14 pb-16 sm:pt-24 sm:pb-28 lg:pt-32 lg:pb-36 min-h-[560px] lg:min-h-[640px] flex items-center border-b border-slate-200/80 dark:border-slate-800 transition-colors">
         {/* Subtle notebook grid inside hero for texture */}
-        <div className="pointer-events-none absolute inset-0 bg-notebook-grid opacity-50" />
+        <div className="pointer-events-none absolute inset-0 bg-notebook-grid opacity-60" />
 
         {/* Ambient Animated Flowing Mesh Gradient Lighting Orbs */}
         <div className="pointer-events-none absolute -left-24 -top-24 h-[420px] w-[420px] sm:h-[500px] sm:w-[500px] rounded-full bg-gradient-to-tr from-blue-500/25 via-cyan-400/20 to-transparent blur-3xl animate-mesh-orb-1" />
@@ -102,8 +102,8 @@ export default function HomePage() {
             sizes="100vw"
             className="w-full h-full object-cover object-center opacity-30 dark:opacity-15 select-none"
           />
-          {/* Subtle gradient wash over background image to keep typography ultra-crisp */}
-          <div className="absolute inset-0 bg-gradient-to-b from-white/70 via-white/50 to-white/90 dark:from-[#020617]/85 dark:via-[#020617]/70 dark:to-[#020617]" />
+          {/* Subtle gradient wash over background image to keep typography ultra-crisp while letting the grid shine */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/20 to-white/70 dark:from-[#020617]/50 dark:via-[#020617]/30 dark:to-[#020617]/80" />
         </div>
 
         {/* Centered Hero Content */}

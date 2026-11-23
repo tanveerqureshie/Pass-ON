@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
 import { createClient } from '@/lib/supabase/client';
+import { uploadImageToStorage } from '@/lib/supabase/storage';
 import { Input, Select } from '@/components/ui/Form';
 import { Button } from '@/components/ui/Button';
 import { UserPlus, ArrowLeft, ArrowRight, Check, GraduationCap, UploadCloud, Camera, Image as ImageIcon, X, Trash2 } from 'lucide-react';
@@ -28,6 +29,7 @@ export default function SignUpPage() {
   const [branch, setBranch] = useState('CSE');
   const [academicYear, setAcademicYear] = useState('2nd Year');
   const [idCardImage, setIdCardImage] = useState<string>('');
+  const [idCardFile, setIdCardFile] = useState<File | null>(null);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -41,19 +43,16 @@ export default function SignUpPage() {
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      setError('ID card photo must be less than 5MB.');
+    if (file.size > 8 * 1024 * 1024) {
+      setError('ID card photo must be less than 8MB.');
       return;
     }
 
     setError('');
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (event.target?.result) {
-        setIdCardImage(event.target.result as string);
-      }
-    };
-    reader.readAsDataURL(file);
+    setIdCardFile(file);
+    // Instant local preview
+    const previewUrl = URL.createObjectURL(file);
+    setIdCardImage(previewUrl);
   };
 
   const selectedColObj = colleges.find((c) => c.id === collegeId);
@@ -71,7 +70,7 @@ export default function SignUpPage() {
     e.preventDefault();
     setError('');
 
-    if (!idCardImage) {
+    if (!idCardFile && !idCardImage) {
       setError('Please upload your College ID Card photo for campus verification.');
       return;
     }
@@ -80,6 +79,15 @@ export default function SignUpPage() {
 
     try {
       const selectedCol = colleges.find((c) => c.id === collegeId);
+
+      // Permanently upload student photo to Supabase Storage
+      let permanentPhotoUrl = idCardImage;
+      if (idCardFile) {
+        const uploadedUrl = await uploadImageToStorage(idCardFile, 'verification-docs', 'id_card');
+        if (uploadedUrl) {
+          permanentPhotoUrl = uploadedUrl;
+        }
+      }
 
       // Register into local state & Supabase
       const newStudent: UserProfile = {
@@ -92,7 +100,7 @@ export default function SignUpPage() {
         collegeName: selectedCol?.name || 'Delhi College',
         collegeShortName: selectedCol?.short_name || 'DELHI',
         branch,
-        idCardUrl: idCardImage,
+        idCardUrl: permanentPhotoUrl,
         academicYear,
         password,
         role: 'student',
@@ -114,7 +122,7 @@ export default function SignUpPage() {
               college_name: selectedCol?.name,
               college_short_name: selectedCol?.short_name,
               branch,
-              id_card_url: idCardImage,
+              id_card_url: permanentPhotoUrl,
               phone_number: phoneNumber.trim(),
               instagram_handle: instagramHandle.trim().replace(/^@/, ''),
               academic_year: academicYear,
