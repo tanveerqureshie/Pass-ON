@@ -48,25 +48,33 @@ Built with an authentic **Modern Brutalist UI** (bold typography, high-contrast 
 - **Framework**: Next.js 14+ (App Router, React 18, TypeScript)
 - **Styling**: Tailwind CSS with custom Modern Brutalist design tokens
 - **Icons**: Lucide React
-- **Backend & Auth**: Supabase Auth (`@supabase/supabase-js`, `@supabase/ssr`), PostgreSQL RLS
+- **Backend & Database**: Node.js & MongoDB (native connection pooling)
+- **Media & Storage**: Cloudinary CDN
+- **Deployment**: Render Web Service (`render.yaml`) / Vercel
 - **State & Resilience**: Context API with local persistence and seamless offline/demo preview fallback
 
 ---
 
+## Deploying on Render
 
-## Database Migration & Seed
+This project is pre-configured for 1-click deployment on [Render](https://render.com):
 
-The database schema and seed data are located in the `supabase/` directory:
-
-1. **`supabase/schema.sql`**:
-   - Defines tables: `profiles`, `colleges`, `departments`, `categories`, `listings`, `saved_listings`, `inquiries`, `reports`, `admin_audit_logs`.
-   - Sets up PostgreSQL ENUMs and Row Level Security (RLS) policies.
-2. **`supabase/seed.sql`**:
-   - Populates initial verified Delhi colleges with locations and branches.
-   - Populates 4 primary academic categories and verified subcategories.
-
-To apply:
-Copy and paste the contents of `supabase/schema.sql` followed by `supabase/seed.sql` into your Supabase Dashboard SQL Editor.
+1. **Push your code to GitHub / GitLab**.
+2. **In Render Dashboard**:
+   - Click **New +** -> **Blueprint** (or **Web Service**).
+   - Connect your repository (`Pass-ON`).
+   - Render will automatically detect [`render.yaml`](file:///home/tanveer/Documents/Projects/Pass%20ON/render.yaml) and configure:
+     - **Build Command**: `npm install && npm run build`
+     - **Start Command**: `npm run start` (listening on dynamic `$PORT`)
+     - **Node Version**: 20 LTS (from [`.nvmrc`](file:///home/tanveer/Documents/Projects/Pass%20ON/.nvmrc))
+3. **Set Environment Variables in Render**:
+   - `MONGODB_URI`: `mongodb+srv://mrtanveerqureshie_db_user:mrtanveerqureshie_db_user@cluster0.tz8jdmn.mongodb.net/PassON?retryWrites=true&w=majority`
+   - `CLOUDINARY_API_KEY`: `948987984819147`
+   - `CLOUDINARY_API_SECRET`: `WXH3MV1nQpb0TWrNHD5n-rilze8`
+   - `CLOUDINARY_CLOUD_NAME`: `<your_cloud_name>`
+   - `NEXT_PUBLIC_APP_NAME`: `Pass ON`
+   - `NEXT_PUBLIC_APP_TAGLINE`: `Pass It On. Save More.`
+4. Click **Apply / Deploy**!
 
 ---
 

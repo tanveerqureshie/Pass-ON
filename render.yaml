@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: pass-on
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: NEXT_PUBLIC_APP_NAME
+        value: "Pass ON"
+      - key: NEXT_PUBLIC_APP_TAGLINE
+        value: "Pass It On. Save More."
