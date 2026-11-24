@@ -12,6 +12,8 @@
     "node": ">=18.18.0"
   },
   "dependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "bcryptjs": "^3.0.3",
     "cloudinary": "^2.11.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.453.0",

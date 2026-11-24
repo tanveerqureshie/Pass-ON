@@ -121,7 +121,7 @@ export const CollegeSlider: React.FC<CollegeSliderProps> = ({ colleges }) => {
               <span>Campus Network Directory</span>
             </div>
             <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-ink-950 dark:text-white tracking-tight">
-              Explore Delhi College Campuses
+              Explore Your Campus
             </h2>
             <p className="mt-2 text-sm sm:text-base lg:text-lg text-ink-500 dark:text-slate-400 max-w-2xl leading-relaxed">
               Swipe or drag horizontally to inspect student handover hubs, metro connectivity, placements, and live campus listings.

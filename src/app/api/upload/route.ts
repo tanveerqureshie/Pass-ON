@@ -1,32 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'pass-on',
-  api_key: process.env.CLOUDINARY_API_KEY || '948987984819147',
-  api_secret: process.env.CLOUDINARY_API_SECRET || 'WXH3MV1nQpb0TWrNHD5n-rilze8',
-  secure: true,
-});
-
 export const dynamic = 'force-dynamic';
+
+const NO_CACHE_HEADERS = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+  'CDN-Cache-Control': 'no-store',
+};
+
+const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 export async function POST(req: NextRequest) {
   try {
-    const cloudName = (process.env.CLOUDINARY_CLOUD_NAME || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || '').trim();
+    const cloudName = (
+      process.env.CLOUDINARY_CLOUD_NAME ||
+      process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ||
+      'uwcca34j'
+    ).trim();
     const apiKey = (process.env.CLOUDINARY_API_KEY || '948987984819147').trim();
     const apiSecret = (process.env.CLOUDINARY_API_SECRET || 'WXH3MV1nQpb0TWrNHD5n-rilze8').trim();
-
-    if (!cloudName) {
-      console.error('Cloudinary Error: CLOUDINARY_CLOUD_NAME is not set in .env.local');
-      return NextResponse.json(
-        {
-          success: false,
-          error:
-            'Missing Cloud Name: Please set CLOUDINARY_CLOUD_NAME in your .env.local file (found in your Cloudinary Dashboard at console.cloudinary.com).',
-        },
-        { status: 400 }
-      );
-    }
 
     cloudinary.config({
       cloud_name: cloudName,
@@ -37,22 +30,47 @@ export async function POST(req: NextRequest) {
 
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
-    const folder = (formData.get('folder') as string) || 'pass-on';
+    const folder = (formData.get('folder') as string) || 'passiton/products';
 
     if (!file) {
-      return NextResponse.json({ success: false, error: 'No file provided' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: 'No file provided' },
+        { status: 400, headers: NO_CACHE_HEADERS }
+      );
+    }
+
+    // 1. File type whitelist check
+    if (!ALLOWED_MIME_TYPES.includes(file.type.toLowerCase())) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Invalid file type: ${file.type}. Allowed formats are JPG, PNG, and WEBP.`,
+        },
+        { status: 400, headers: NO_CACHE_HEADERS }
+      );
+    }
+
+    // 2. Max size check (5MB)
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `File size exceeds the 5MB limit (${(file.size / (1024 * 1024)).toFixed(1)}MB).`,
+        },
+        { status: 400, headers: NO_CACHE_HEADERS }
+      );
     }
 
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Stream upload directly to Cloudinary
+    // 3. Upload stream to Cloudinary
     try {
       const uploadResult = await new Promise<any>((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
           {
             folder,
-            resource_type: 'auto',
+            resource_type: 'image',
           },
           (error, result) => {
             if (error) {
@@ -66,34 +84,49 @@ export async function POST(req: NextRequest) {
       });
 
       const secureUrl = uploadResult.secure_url || uploadResult.url;
-      return NextResponse.json({
-        success: true,
-        url: secureUrl,
-        publicId: uploadResult.public_id,
-        storage: 'cloudinary',
-      });
+      return NextResponse.json(
+        {
+          success: true,
+          secure_url: secureUrl,
+          url: secureUrl,
+          public_id: uploadResult.public_id,
+          publicId: uploadResult.public_id,
+          storage: 'cloudinary',
+        },
+        { headers: NO_CACHE_HEADERS }
+      );
     } catch (cldErr: any) {
-      console.warn('Cloudinary upload warning, saving permanent image to database:', cldErr?.message || cldErr);
+      console.warn('Cloudinary upload warning:', cldErr?.message || cldErr);
+
+      // In case Cloudinary returns 403 missing permissions, provide persistent base64 data URL
+      // so user listings are never lost, but keep informative warning
       const mimeType = file.type || 'image/jpeg';
       const base64Data = buffer.toString('base64');
       const permanentDataUrl = `data:${mimeType};base64,${base64Data}`;
-      return NextResponse.json({
-        success: true,
-        url: permanentDataUrl,
-        storage: 'database-permanent',
-        warning: 'Image saved permanently in database.',
-      });
+
+      let errorNotice = 'Cloudinary upload notice: stored locally in DB.';
+      if (cldErr?.http_code === 403 || String(cldErr?.message).includes('403') || String(cldErr?.message).includes('missing permissions')) {
+        errorNotice = 'Cloudinary Error (403): API Key needs "create" permission in Cloudinary Console -> Settings -> Access Keys.';
+      }
+
+      return NextResponse.json(
+        {
+          success: true,
+          secure_url: permanentDataUrl,
+          url: permanentDataUrl,
+          public_id: `db_${Date.now()}`,
+          publicId: `db_${Date.now()}`,
+          storage: 'database-permanent',
+          warning: errorNotice,
+        },
+        { headers: NO_CACHE_HEADERS }
+      );
     }
   } catch (err: any) {
-    let errorDetails = err?.message || (typeof err === 'object' ? JSON.stringify(err) : String(err));
-    if (err?.http_code === 403 || errorDetails.includes('403') || errorDetails.includes('missing permissions')) {
-      errorDetails =
-        'Cloudinary Error (403): The API Key is missing "create" (upload) permissions. In Cloudinary Console, go to Settings -> Access Keys, edit your API key permissions to allow "create", or use your Master API Key.';
-    }
-    console.error('Cloudinary upload error:', errorDetails);
+    const errorDetails = err?.message || 'Failed to upload image';
     return NextResponse.json(
-      { success: false, error: errorDetails || 'Failed to upload image to Cloudinary' },
-      { status: 500 }
+      { success: false, error: errorDetails },
+      { status: 500, headers: NO_CACHE_HEADERS }
     );
   }
 }

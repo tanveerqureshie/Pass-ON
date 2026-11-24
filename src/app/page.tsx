@@ -83,54 +83,59 @@ export default function HomePage() {
   return (
     <div className="bg-white dark:bg-[#020617] bg-notebook-grid min-h-screen text-ink-950 dark:text-slate-100 transition-colors duration-300">
       {/* ───────────────────────────── Hero: Centered Stage with Background Illustration ───────────────────────────── */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-neutral-100/70 via-neutral-50/40 to-white dark:from-neutral-950 dark:via-black dark:to-black px-0 pt-10 pb-12 sm:pt-20 sm:pb-24 lg:pt-28 lg:pb-32 flex items-center border-b border-neutral-200 dark:border-neutral-800 transition-colors">
+      <section className="relative overflow-hidden bg-gradient-to-b from-neutral-900/60 via-black/80 to-black px-0 pt-10 pb-12 sm:pt-20 sm:pb-24 lg:pt-28 lg:pb-32 flex items-center border-b border-neutral-200 dark:border-neutral-800 transition-colors">
         {/* Subtle notebook grid inside hero for texture */}
-        <div className="pointer-events-none absolute inset-0 bg-notebook-grid opacity-50" />
+        <div className="pointer-events-none absolute inset-0 bg-notebook-grid opacity-30" />
 
         {/* Ambient Animated Lighting (Subtle Monochrome glow, hidden on tiny screens for smooth performance) */}
-        <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 sm:h-[450px] sm:w-[450px] rounded-full bg-neutral-200/50 dark:bg-neutral-800/30 blur-3xl" />
-        <div className="pointer-events-none absolute -right-20 top-10 h-64 w-64 sm:h-[450px] sm:w-[450px] rounded-full bg-neutral-200/50 dark:bg-neutral-800/30 blur-3xl" />
+        <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 sm:h-[450px] sm:w-[450px] rounded-full bg-blue-600/15 dark:bg-blue-600/20 blur-3xl" />
+        <div className="pointer-events-none absolute -right-20 top-10 h-64 w-64 sm:h-[450px] sm:w-[450px] rounded-full bg-indigo-600/15 dark:bg-indigo-600/20 blur-3xl" />
 
-        {/* Full-width Background Illustration */}
+        {/* Full-width Background Illustration with rich overlay for text legibility */}
         <div className="pointer-events-none absolute inset-0 w-full h-full overflow-hidden z-0">
           <Image
             src="/hero-exchange.png"
             alt="Campus exchange background"
             fill
             priority
+            fetchPriority="high"
             sizes="100vw"
-            className="w-full h-full object-cover object-center opacity-20 dark:opacity-10 select-none"
+            className="w-full h-full object-cover object-center opacity-45 dark:opacity-40 select-none"
           />
-          {/* Subtle gradient wash over background image */}
-          <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/40 to-white/90 dark:from-black/80 dark:via-black/60 dark:to-black" />
+          {/* Text-legibility overlay gradient */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: 'linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.75))',
+            }}
+          />
         </div>
 
         {/* Centered Hero Content */}
         <div className="container-x relative z-10 w-full px-4 sm:px-6">
           <div className="max-w-4xl mx-auto text-center space-y-4 sm:space-y-6">
             {/* Live Campus Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-white/90 dark:bg-neutral-900/90 border border-neutral-300 dark:border-neutral-700 text-[10px] sm:text-xs font-bold text-neutral-900 dark:text-neutral-100 shadow-xs backdrop-blur-md">
+            <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-black/60 border border-neutral-700 text-[10px] sm:text-xs font-bold text-white shadow-xs backdrop-blur-md">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
-              <span>Delhi&apos;s Verified Student Marketplace</span>
-              <span className="text-neutral-400 dark:text-neutral-600">•</span>
-              <span className="text-neutral-600 dark:text-neutral-300">11 Campuses Live</span>
+              <span className="text-neutral-400">•</span>
+              <span className="text-neutral-200">11 Campuses Live</span>
             </div>
 
-            {/* Headline with Clean Black & White Typography */}
-            <h1 className="font-display text-[2.25rem] xs:text-[2.75rem] sm:text-5xl md:text-6xl lg:text-[4.75rem] font-black tracking-tight text-neutral-950 dark:text-white leading-[1.08] sm:leading-[1.04]">
+            {/* Headline with Clean Typography */}
+            <h1 className="font-display text-[2.25rem] xs:text-[2.75rem] sm:text-5xl md:text-6xl lg:text-[4.75rem] font-black tracking-tight text-white leading-[1.08] sm:leading-[1.04]">
               <span className="inline-block">
                 <span>Pass It On.</span>
               </span>{' '}
-              <span className="inline-block bg-gradient-to-r from-neutral-950 via-neutral-700 to-neutral-500 dark:from-white dark:via-neutral-300 dark:to-neutral-500 bg-clip-text text-transparent">
+              <span className="inline-block bg-gradient-to-r from-white via-neutral-200 to-neutral-400 bg-clip-text text-transparent">
                 Save More.
               </span>
             </h1>
 
             {/* Subtitle */}
-            <p className="text-xs sm:text-base lg:text-lg text-neutral-600 dark:text-neutral-400 leading-relaxed font-normal max-w-2xl mx-auto px-2">
+            <p className="text-xs sm:text-base lg:text-lg text-neutral-300 leading-relaxed font-normal max-w-2xl mx-auto px-2">
               Seniors&apos; textbooks, gadgets and hostel essentials find their next owner — campus verified, zero fees and direct handovers.
             </p>
 
@@ -289,7 +294,7 @@ export default function HomePage() {
           </Reveal>
 
           {studentListings.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 sm:gap-7">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-6 lg:gap-7">
               {studentListings.map((listing) => (
                 <ListingCard key={listing.id} listing={listing} />
               ))}

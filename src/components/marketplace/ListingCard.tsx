@@ -86,10 +86,10 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
               src={listing.images[0]}
               alt={listing.title}
               loading="lazy"
-              className="aspect-[4/3] w-full bg-[#f7f7f8] object-contain transition-transform duration-500 group-hover:scale-[1.04]"
+              className="aspect-square sm:aspect-[4/3] w-full bg-[#f7f7f8] dark:bg-slate-800 object-cover transition-transform duration-500 group-hover:scale-[1.04]"
             />
           ) : (
-            <div className="flex aspect-[4/3] w-full flex-col items-center justify-center p-4 text-center">
+            <div className="flex aspect-square sm:aspect-[4/3] w-full flex-col items-center justify-center p-4 text-center">
               <Sparkles className="mb-2 h-8 w-8 text-slate-300" />
               <span className="text-xs font-bold text-slate-500">{listing.categoryName || 'Campus Item'}</span>
             </div>

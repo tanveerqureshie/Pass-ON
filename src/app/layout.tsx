@@ -27,8 +27,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="flex min-h-screen flex-col bg-[#f7f7f8] text-ink-950 selection:bg-brand-600 selection:text-white">
+    <html lang="en" className="dark">
+      <body className="flex min-h-screen flex-col bg-[#f7f7f8] dark:bg-[#020617] text-ink-950 dark:text-slate-100 selection:bg-brand-600 selection:text-white transition-colors duration-300">
         <AppProvider>
           <CartProvider>
             <Navbar />

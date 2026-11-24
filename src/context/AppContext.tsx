@@ -161,22 +161,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   ]);
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
-  // Sync theme with HTML class — always default to clean light/white mode unless explicitly set to 'dark'
+  // Sync theme with HTML class — default to dark mode unless explicitly overridden in localStorage
   useEffect(() => {
     try {
       const savedTheme = localStorage.getItem('passon_theme') as 'light' | 'dark' | null;
-      if (savedTheme === 'dark') {
-        setTheme('dark');
-        document.documentElement.classList.add('dark');
-      } else {
+      if (savedTheme === 'light') {
         setTheme('light');
         document.documentElement.classList.remove('dark');
+      } else {
+        setTheme('dark');
+        document.documentElement.classList.add('dark');
       }
     } catch {
-      setTheme('light');
-      document.documentElement.classList.remove('dark');
+      setTheme('dark');
+      document.documentElement.classList.add('dark');
     }
   }, []);
 
