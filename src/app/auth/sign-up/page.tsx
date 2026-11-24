@@ -49,9 +49,14 @@ export default function SignUpPage() {
 
     setError('');
     setIdCardFile(file);
-    // Instant local preview
-    const previewUrl = URL.createObjectURL(file);
-    setIdCardImage(previewUrl);
+    // Permanent Data URL preview (never expires like blob URLs)
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === 'string') {
+        setIdCardImage(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   const selectedColObj = colleges.find((c) => c.id === collegeId);

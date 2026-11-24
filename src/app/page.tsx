@@ -83,16 +83,15 @@ export default function HomePage() {
   return (
     <div className="bg-white dark:bg-[#020617] bg-notebook-grid min-h-screen text-ink-950 dark:text-slate-100 transition-colors duration-300">
       {/* ───────────────────────────── Hero: Centered Stage with Background Illustration ───────────────────────────── */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-blue-100/60 via-indigo-50/40 via-purple-50/30 to-white dark:from-slate-950 dark:via-[#030712] dark:to-[#020617] animate-gradient-mesh-flow px-0 pt-14 pb-16 sm:pt-24 sm:pb-28 lg:pt-32 lg:pb-36 min-h-[560px] lg:min-h-[640px] flex items-center border-b border-slate-200/80 dark:border-slate-800 transition-colors">
+      <section className="relative overflow-hidden bg-gradient-to-b from-neutral-100/70 via-neutral-50/40 to-white dark:from-neutral-950 dark:via-black dark:to-black px-0 pt-10 pb-12 sm:pt-20 sm:pb-24 lg:pt-28 lg:pb-32 flex items-center border-b border-neutral-200 dark:border-neutral-800 transition-colors">
         {/* Subtle notebook grid inside hero for texture */}
-        <div className="pointer-events-none absolute inset-0 bg-notebook-grid opacity-60" />
+        <div className="pointer-events-none absolute inset-0 bg-notebook-grid opacity-50" />
 
-        {/* Ambient Animated Flowing Mesh Gradient Lighting Orbs */}
-        <div className="pointer-events-none absolute -left-24 -top-24 h-[420px] w-[420px] sm:h-[500px] sm:w-[500px] rounded-full bg-gradient-to-tr from-blue-500/25 via-cyan-400/20 to-transparent blur-3xl animate-mesh-orb-1" />
-        <div className="pointer-events-none absolute -right-20 top-10 h-[440px] w-[440px] sm:h-[520px] sm:w-[520px] rounded-full bg-gradient-to-bl from-indigo-500/25 via-purple-500/20 to-transparent blur-3xl animate-mesh-orb-2" />
-        <div className="pointer-events-none absolute left-1/3 bottom-0 h-80 w-80 rounded-full bg-gradient-to-t from-cyan-400/20 via-blue-400/15 to-transparent blur-3xl animate-mesh-orb-3" />
+        {/* Ambient Animated Lighting (Subtle Monochrome glow, hidden on tiny screens for smooth performance) */}
+        <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 sm:h-[450px] sm:w-[450px] rounded-full bg-neutral-200/50 dark:bg-neutral-800/30 blur-3xl" />
+        <div className="pointer-events-none absolute -right-20 top-10 h-64 w-64 sm:h-[450px] sm:w-[450px] rounded-full bg-neutral-200/50 dark:bg-neutral-800/30 blur-3xl" />
 
-        {/* Full-width Background Illustration (100% Edge-to-edge, zero space left and right) */}
+        {/* Full-width Background Illustration */}
         <div className="pointer-events-none absolute inset-0 w-full h-full overflow-hidden z-0">
           <Image
             src="/hero-exchange.png"
@@ -100,105 +99,100 @@ export default function HomePage() {
             fill
             priority
             sizes="100vw"
-            className="w-full h-full object-cover object-center opacity-30 dark:opacity-15 select-none"
+            className="w-full h-full object-cover object-center opacity-20 dark:opacity-10 select-none"
           />
-          {/* Subtle gradient wash over background image to keep typography ultra-crisp while letting the grid shine */}
-          <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/20 to-white/70 dark:from-[#020617]/50 dark:via-[#020617]/30 dark:to-[#020617]/80" />
+          {/* Subtle gradient wash over background image */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/40 to-white/90 dark:from-black/80 dark:via-black/60 dark:to-black" />
         </div>
 
         {/* Centered Hero Content */}
-        <div className="container-x relative z-10 w-full">
-          <div className="max-w-5xl mx-auto text-center space-y-6 sm:space-y-8">
-            {/* Live Campus Badge with Staged Reveal */}
-            <div className="reveal-badge inline-flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full glass-oily border-oily text-[11px] sm:text-xs md:text-sm font-extrabold text-blue-700 dark:text-cyan-300 shadow-sm backdrop-blur-md">
-              <span className="relative flex h-2 sm:h-2.5 w-2 sm:w-2.5">
+        <div className="container-x relative z-10 w-full px-4 sm:px-6">
+          <div className="max-w-4xl mx-auto text-center space-y-4 sm:space-y-6">
+            {/* Live Campus Badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-white/90 dark:bg-neutral-900/90 border border-neutral-300 dark:border-neutral-700 text-[10px] sm:text-xs font-bold text-neutral-900 dark:text-neutral-100 shadow-xs backdrop-blur-md">
+              <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 sm:h-2.5 w-2 sm:w-2.5 bg-emerald-500"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
               <span>Delhi&apos;s Verified Student Marketplace</span>
-              <span className="hidden xs:inline text-slate-400 dark:text-slate-500">•</span>
-              <span className="hidden xs:inline text-slate-600 dark:text-slate-300">11 Campuses Live</span>
+              <span className="text-neutral-400 dark:text-neutral-600">•</span>
+              <span className="text-neutral-600 dark:text-neutral-300">11 Campuses Live</span>
             </div>
 
-            {/* Headline with Award-Winning Kinetic Word Reveal & Iridescent Flowing Gradient */}
-            <h1 className="font-display text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[5.25rem] font-black tracking-tight text-ink-950 dark:text-white leading-[1.08] sm:leading-[1.04]">
-              <span className="inline-block overflow-hidden pb-1">
-                <span className="reveal-word reveal-word-1 mr-2 sm:mr-3.5">Pass</span>
-                <span className="reveal-word reveal-word-2 mr-2 sm:mr-3.5">It</span>
-                <span className="reveal-word reveal-word-3 mr-2 sm:mr-3.5">On.</span>
+            {/* Headline with Clean Black & White Typography */}
+            <h1 className="font-display text-[2.25rem] xs:text-[2.75rem] sm:text-5xl md:text-6xl lg:text-[4.75rem] font-black tracking-tight text-neutral-950 dark:text-white leading-[1.08] sm:leading-[1.04]">
+              <span className="inline-block">
+                <span>Pass It On.</span>
               </span>{' '}
-              <span className="inline-block overflow-hidden pb-1">
-                <span className="reveal-word reveal-word-4 mr-2 sm:mr-3.5 bg-gradient-to-r from-blue-600 via-indigo-500 via-purple-500 to-cyan-400 dark:from-blue-400 dark:via-indigo-300 dark:via-purple-300 dark:to-cyan-300 bg-clip-text text-transparent animate-gradient-flow-fast drop-shadow-sm font-black">
-                  Save
-                </span>
-                <span className="reveal-word reveal-word-5 bg-gradient-to-r from-blue-600 via-indigo-500 via-purple-500 to-cyan-400 dark:from-blue-400 dark:via-indigo-300 dark:via-purple-300 dark:to-cyan-300 bg-clip-text text-transparent animate-gradient-flow-fast drop-shadow-sm font-black">
-                  More.
-                </span>
+              <span className="inline-block bg-gradient-to-r from-neutral-950 via-neutral-700 to-neutral-500 dark:from-white dark:via-neutral-300 dark:to-neutral-500 bg-clip-text text-transparent">
+                Save More.
               </span>
             </h1>
 
             {/* Subtitle */}
-            <p className="text-sm sm:text-lg lg:text-xl text-slate-600 dark:text-slate-300 leading-relaxed font-medium max-w-3xl mx-auto px-2">
-              Seniors&apos; textbooks, gadgets and hostel essentials find their next owner — verified, free to use and zero commission.
+            <p className="text-xs sm:text-base lg:text-lg text-neutral-600 dark:text-neutral-400 leading-relaxed font-normal max-w-2xl mx-auto px-2">
+              Seniors&apos; textbooks, gadgets and hostel essentials find their next owner — campus verified, zero fees and direct handovers.
             </p>
 
-            {/* Search Bar (Centered Glassmorphism with Iridescent Oily Sheen & Neon Aura) */}
+            {/* Search Bar (Clean Black & White with Rounded Styling) */}
             <form
               onSubmit={handleSearchSubmit}
-              className="relative flex w-full max-w-3xl mx-auto items-center rounded-2xl glass-oily border-oily p-1.5 sm:p-2 shadow-[0_12px_36px_-4px_rgba(15,23,42,0.12)] hover:shadow-[0_16px_40px_-4px_rgba(37,99,235,0.25),0_0_24px_rgba(6,182,212,0.2)] focus-within:shadow-[0_16px_40px_-4px_rgba(37,99,235,0.35),0_0_30px_rgba(59,130,246,0.3)] transition-shadow group"
+              className="relative flex w-full max-w-2xl mx-auto items-center rounded-2xl sm:rounded-full bg-white/95 dark:bg-neutral-900/95 border border-neutral-300 dark:border-neutral-700 p-1.5 sm:p-2 shadow-sm focus-within:ring-2 focus-within:ring-black dark:focus-within:ring-white transition-all group"
             >
-              <Search className="h-4 w-4 sm:h-5 sm:w-5 text-slate-400 dark:text-slate-400 ml-2.5 sm:ml-3 shrink-0 group-hover:text-blue-500 transition-colors" />
+              <Search className="h-4 w-4 sm:h-5 sm:w-5 text-neutral-400 ml-2.5 sm:ml-3 shrink-0 group-hover:text-black dark:group-hover:text-white transition-colors" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search textbooks, notes, lab gear, calculators..."
-                className="w-full bg-transparent px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-base text-ink-950 dark:text-white placeholder:text-slate-400 focus:outline-none"
+                placeholder="Search textbooks, notes, lab gear, tech..."
+                className="w-full bg-transparent px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-neutral-950 dark:text-white placeholder:text-neutral-400 focus:outline-none"
               />
               <button
                 type="submit"
-                className="shrink-0 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-3.5 sm:px-7 py-2 sm:py-3 text-xs sm:text-sm font-extrabold shadow-md shadow-blue-500/30 transition-all hover:shadow-[0_0_20px_rgba(37,99,235,0.5)] active:scale-95"
+                className="shrink-0 rounded-xl sm:rounded-full bg-black hover:bg-neutral-800 text-white dark:bg-white dark:text-black dark:hover:bg-neutral-200 px-4 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all"
               >
                 Search
               </button>
             </form>
 
-            {/* 3 Action CTAs (Centered with Neon Glow & Glassmorphism) */}
-            <div className="flex flex-col w-full sm:w-auto items-stretch sm:items-center justify-center gap-2.5 sm:gap-3.5 pt-2 sm:flex-row sm:flex-wrap">
+            {/* Action CTAs (Mobile Responsive: Primary full-width + Secondary 2-col on mobile) */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 pt-1 w-full max-w-xl mx-auto">
               <Link
                 href="/explore"
-                className="group inline-flex h-11 sm:h-13 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-600 via-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 sm:px-9 text-xs sm:text-sm font-extrabold shadow-lg shadow-blue-500/25 transition-all hover:shadow-[0_0_25px_rgba(37,99,235,0.5)] hover:-translate-y-0.5 active:translate-y-0"
+                className="w-full sm:w-auto inline-flex h-11 sm:h-12 items-center justify-center gap-2 rounded-xl sm:rounded-full bg-black text-white hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 px-6 sm:px-7 text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all"
               >
                 Explore Campus Items
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link
-                href="/sell"
-                className="inline-flex h-11 sm:h-13 items-center justify-center gap-2 rounded-full glass-oily border-oily hover:shadow-[0_0_20px_rgba(168,85,247,0.3)] text-slate-800 dark:text-slate-100 px-6 sm:px-8 text-xs sm:text-sm font-extrabold transition-all hover:-translate-y-0.5 active:translate-y-0"
-              >
-                Pass On an Item
-              </Link>
-              <Link
-                href="/store"
-                className="inline-flex h-11 sm:h-13 items-center justify-center gap-2 rounded-full glass-oily border-oily hover:shadow-[0_0_20px_rgba(6,182,212,0.3)] text-slate-800 dark:text-slate-100 px-6 sm:px-8 text-xs sm:text-sm font-extrabold transition-all hover:-translate-y-0.5 active:translate-y-0"
-              >
-                Shop Our Store
-              </Link>
+              <div className="grid grid-cols-2 gap-2 w-full sm:w-auto sm:flex">
+                <Link
+                  href="/sell"
+                  className="inline-flex h-11 sm:h-12 items-center justify-center rounded-xl sm:rounded-full border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-900 dark:text-neutral-100 px-4 sm:px-6 text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all"
+                >
+                  Pass On Item
+                </Link>
+                <Link
+                  href="/store"
+                  className="inline-flex h-11 sm:h-12 items-center justify-center rounded-xl sm:rounded-full border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-900 dark:text-neutral-100 px-4 sm:px-6 text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all"
+                >
+                  Campus Store
+                </Link>
+              </div>
             </div>
 
-            {/* 3 Perks (Centered with Glassmorphism & Iridescent Sheen) */}
-            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 pt-2 text-[11px] sm:text-xs md:text-sm font-bold text-slate-700 dark:text-slate-300">
-              <span className="inline-flex items-center gap-1.5 sm:gap-2 glass-oily border-oily px-3 py-1.5 sm:px-4 sm:py-2 rounded-full shadow-sm hover:scale-105 transition-transform duration-300">
-                <ShieldCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-600 dark:text-cyan-400 shrink-0" />
-                Verified enrollment IDs
+            {/* 3 Perks (Compact, responsive, black & white badges) */}
+            <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 pt-1 text-[10px] sm:text-xs font-semibold text-neutral-600 dark:text-neutral-400">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-xs">
+                <ShieldCheck className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                Verified IDs
               </span>
-              <span className="inline-flex items-center gap-1.5 sm:gap-2 glass-oily border-oily px-3 py-1.5 sm:px-4 sm:py-2 rounded-full shadow-sm hover:scale-105 transition-transform duration-300">
-                <Tag className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-600 dark:text-cyan-400 shrink-0" />
-                Zero fees, zero commission
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-xs">
+                <Tag className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-neutral-700 dark:text-neutral-300 shrink-0" />
+                Zero Commission
               </span>
-              <span className="inline-flex items-center gap-1.5 sm:gap-2 glass-oily border-oily px-3 py-1.5 sm:px-4 sm:py-2 rounded-full shadow-sm hover:scale-105 transition-transform duration-300">
-                <MessageCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-600 dark:text-cyan-400 shrink-0" />
-                WhatsApp handovers
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-xs">
+                <MessageCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-neutral-700 dark:text-neutral-300 shrink-0" />
+                WhatsApp Direct
               </span>
             </div>
           </div>

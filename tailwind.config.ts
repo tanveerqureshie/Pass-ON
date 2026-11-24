@@ -6,19 +6,19 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        /* Primary — Royal Blue #2563EB */
+        /* Primary — Sleek Black & White Monochrome */
         brand: {
-          50: '#EFF6FF',
-          100: '#DBEAFE',
-          200: '#BFDBFE',
-          300: '#93C5FD',
-          400: '#60A5FA',
-          500: '#3B82F6',
-          600: '#2563EB', // Primary Royal Blue
-          700: '#1D4ED8',
-          800: '#1E40AF',
-          900: '#1E3A8A',
-          950: '#172554',
+          50: '#FAFAFA',
+          100: '#F5F5F5',
+          200: '#E5E5E5',
+          300: '#D4D4D4',
+          400: '#A3A3A3',
+          500: '#737373',
+          600: '#171717', // Primary Charcoal / Black
+          700: '#0A0A0A',
+          800: '#000000',
+          900: '#000000',
+          950: '#000000',
         },
         blue: {
           DEFAULT: '#2563EB',

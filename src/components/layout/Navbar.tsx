@@ -295,7 +295,7 @@ export const Navbar: React.FC = () => {
                 }}
                 aria-label="Account menu"
                 title="Account"
-                className="grid h-10 w-10 place-items-center rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 shadow-xs"
+                className="grid h-10 w-10 place-items-center rounded-full border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-850 text-neutral-800 dark:text-neutral-200 transition hover:border-black dark:hover:border-white hover:text-black dark:hover:text-white shadow-xs"
               >
                 <User className="h-[18px] w-[18px]" />
               </button>
@@ -303,19 +303,19 @@ export const Navbar: React.FC = () => {
               {guestMenuOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setGuestMenuOpen(false)} />
-                  <div className="absolute right-0 top-full z-50 mt-2 w-48 animate-pop-in overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lift p-2 space-y-1">
+                  <div className="absolute right-0 top-full z-50 mt-2 w-48 animate-pop-in overflow-hidden rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-lift p-2 space-y-1">
                     <Link
                       href="/auth/sign-in"
                       onClick={() => setGuestMenuOpen(false)}
-                      className="flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-blue-950/60 hover:text-blue-600 dark:hover:text-blue-400 transition"
+                      className="flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-xs font-bold text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-black dark:hover:text-white transition"
                     >
-                      <LogIn className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                      <LogIn className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />
                       Login
                     </Link>
                     <Link
                       href="/auth/sign-up"
                       onClick={() => setGuestMenuOpen(false)}
-                      className="flex items-center gap-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2.5 text-xs font-bold shadow-xs transition"
+                      className="flex items-center gap-2.5 rounded-xl bg-black hover:bg-neutral-800 text-white dark:bg-white dark:text-black dark:hover:bg-neutral-200 px-3.5 py-2.5 text-xs font-bold shadow-xs transition"
                     >
                       <UserPlus className="h-4 w-4" />
                       Create account
@@ -419,14 +419,14 @@ export const Navbar: React.FC = () => {
                 <Link
                   href="/auth/sign-in"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex-1 rounded-xl border border-ink-300 dark:border-slate-700 bg-white dark:bg-slate-800 py-2.5 text-center text-xs font-bold text-ink-900 dark:text-slate-100 shadow-xs"
+                  className="flex-1 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-850 py-2.5 text-center text-xs font-bold text-neutral-900 dark:text-neutral-100 shadow-xs"
                 >
                   Login
                 </Link>
                 <Link
                   href="/auth/sign-up"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex-1 rounded-xl bg-blue-600 hover:bg-blue-700 py-2.5 text-center text-xs font-bold text-white shadow-xs"
+                  className="flex-1 rounded-xl bg-black hover:bg-neutral-800 text-white dark:bg-white dark:text-black dark:hover:bg-neutral-200 py-2.5 text-center text-xs font-bold shadow-xs transition"
                 >
                   Create account
                 </Link>

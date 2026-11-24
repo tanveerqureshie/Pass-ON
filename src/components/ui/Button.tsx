@@ -13,7 +13,7 @@ const base =
 
 const variants: Record<Variant, string> = {
   primary:
-    'bg-brand-600 text-white shadow-chip hover:bg-brand-700 active:bg-brand-800 active:scale-[0.98]',
+    'bg-brand-600 text-white dark:bg-white dark:text-black shadow-chip hover:bg-brand-700 dark:hover:bg-neutral-200 active:bg-brand-800 active:scale-[0.98]',
   dark:
     'bg-ink-950 text-white shadow-chip hover:bg-ink-800 active:bg-ink-900 active:scale-[0.98]',
   outline:

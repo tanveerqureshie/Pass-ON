@@ -92,10 +92,15 @@ export default function SellPage() {
       }
       setImageFile(file);
       setImageFileName(file.name);
-      // Instant local preview
-      const previewUrl = URL.createObjectURL(file);
-      setImageUrl(previewUrl);
-      showToast('Photo selected! Will be stored in Supabase.');
+      // Permanent Data URL preview (never expires like blob URLs)
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          setImageUrl(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
+      showToast('Photo selected! Ready for permanent storage.');
     }
   };
 

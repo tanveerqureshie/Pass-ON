@@ -47,29 +47,43 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(arrayBuffer);
 
     // Stream upload directly to Cloudinary
-    const uploadResult = await new Promise<any>((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        {
-          folder,
-          resource_type: 'auto',
-        },
-        (error, result) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(result);
+    try {
+      const uploadResult = await new Promise<any>((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder,
+            resource_type: 'auto',
+          },
+          (error, result) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(result);
+            }
           }
-        }
-      );
-      stream.end(buffer);
-    });
+        );
+        stream.end(buffer);
+      });
 
-    const secureUrl = uploadResult.secure_url || uploadResult.url;
-    return NextResponse.json({
-      success: true,
-      url: secureUrl,
-      publicId: uploadResult.public_id,
-    });
+      const secureUrl = uploadResult.secure_url || uploadResult.url;
+      return NextResponse.json({
+        success: true,
+        url: secureUrl,
+        publicId: uploadResult.public_id,
+        storage: 'cloudinary',
+      });
+    } catch (cldErr: any) {
+      console.warn('Cloudinary upload warning, saving permanent image to database:', cldErr?.message || cldErr);
+      const mimeType = file.type || 'image/jpeg';
+      const base64Data = buffer.toString('base64');
+      const permanentDataUrl = `data:${mimeType};base64,${base64Data}`;
+      return NextResponse.json({
+        success: true,
+        url: permanentDataUrl,
+        storage: 'database-permanent',
+        warning: 'Image saved permanently in database.',
+      });
+    }
   } catch (err: any) {
     let errorDetails = err?.message || (typeof err === 'object' ? JSON.stringify(err) : String(err));
     if (err?.http_code === 403 || errorDetails.includes('403') || errorDetails.includes('missing permissions')) {

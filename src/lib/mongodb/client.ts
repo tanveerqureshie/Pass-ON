@@ -2,7 +2,7 @@ import { MongoClient, Db } from 'mongodb';
 
 const uri =
   process.env.MONGODB_URI ||
-  'mongodb+srv://mrtanveerqureshie_db_user:mrtanveerqureshie_db_user@cluster0.tz8jdmn.mongodb.net/PassON?retryWrites=true&w=majority';
+  'mongodb+srv://mrtanveerqureshie_db_user:zlu2dzs0TKGrtTZb@cluster0.vcvz0uu.mongodb.net/PassON?retryWrites=true&w=majority';
 
 let client: MongoClient | null = null;
 let clientPromise: Promise<MongoClient> | null = null;
