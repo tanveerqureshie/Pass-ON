@@ -1,8 +1,10 @@
 import { MongoClient, Db } from 'mongodb';
 
-const uri =
-  process.env.MONGODB_URI ||
-  'mongodb+srv://mrtanveerqureshie_db_user:zlu2dzs0TKGrtTZb@cluster0.vcvz0uu.mongodb.net/PassON?retryWrites=true&w=majority';
+const uri = process.env.MONGODB_URI || '';
+
+if (!uri && process.env.NODE_ENV === 'production') {
+  console.warn('Warning: MONGODB_URI is not set in environment variables');
+}
 
 let client: MongoClient | null = null;
 let clientPromise: Promise<MongoClient> | null = null;
