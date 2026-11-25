@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDb } from '@/lib/mongodb/client';
-import { saveStudent, getAllStudents } from '@/lib/server/db';
+import { getDb } from '@/backend/db/mongodb';
+import { saveStudent, getAllStudents, updateStudentStatus } from '@/lib/server/db';
 import { UserProfile, VerificationStatus } from '@/lib/types';
-import bcrypt from 'bcryptjs';
+import { attachSessionCookie, hashPassword, sanitizeUser } from '@/backend/services/auth.service';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -13,49 +13,12 @@ const NO_CACHE_HEADERS = {
   'CDN-Cache-Control': 'no-store',
 };
 
-// In-memory rate limiting map: ip -> { count, firstAttempt }
-// Rate limiting: Max 5 login attempts / 15 min per IP
-const loginRateLimitMap = new Map<string, { count: number; firstAttempt: number }>();
-const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
-const MAX_LOGIN_ATTEMPTS = 5;
-
-function checkRateLimit(ip: string): { allowed: boolean; retryAfterMinutes?: number } {
-  const now = Date.now();
-  const entry = loginRateLimitMap.get(ip);
-  if (!entry) {
-    return { allowed: true };
-  }
-  if (now - entry.firstAttempt > RATE_LIMIT_WINDOW_MS) {
-    loginRateLimitMap.delete(ip);
-    return { allowed: true };
-  }
-  if (entry.count >= MAX_LOGIN_ATTEMPTS) {
-    const remainingMs = RATE_LIMIT_WINDOW_MS - (now - entry.firstAttempt);
-    return { allowed: false, retryAfterMinutes: Math.ceil(remainingMs / 60000) };
-  }
-  return { allowed: true };
-}
-
-function recordFailedAttempt(ip: string) {
-  const now = Date.now();
-  const entry = loginRateLimitMap.get(ip);
-  if (!entry || now - entry.firstAttempt > RATE_LIMIT_WINDOW_MS) {
-    loginRateLimitMap.set(ip, { count: 1, firstAttempt: now });
-  } else {
-    entry.count += 1;
-  }
-}
-
-function resetRateLimit(ip: string) {
-  loginRateLimitMap.delete(ip);
-}
-
-// GET: Returns all students registered across all devices
+// GET: Returns all students registered across all devices (sanitized)
 export async function GET() {
   try {
     const students = await getAllStudents();
     return NextResponse.json(
-      { success: true, students },
+      { success: true, students: students.map((s) => sanitizeUser(s)) },
       { headers: NO_CACHE_HEADERS }
     );
   } catch (err: unknown) {
@@ -67,7 +30,7 @@ export async function GET() {
   }
 }
 
-// POST: Registers a new student with strict validation, duplicate check, and bcrypt hashing
+// POST: Registers a new student with strict validation, duplicate check, bcrypt hashing & session cookie
 export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as Partial<UserProfile> & { password?: string };
@@ -83,36 +46,34 @@ export async function POST(req: NextRequest) {
         { status: 400, headers: NO_CACHE_HEADERS }
       );
     }
-    const nameRegex = /^[a-zA-Z\s.'-]+$/;
-    if (!nameRegex.test(fullName)) {
+    if (!/^[a-zA-Z\s.'-]+$/.test(fullName)) {
       return NextResponse.json(
         { success: false, field: 'fullName', message: 'Name can only contain letters and spaces.' },
         { status: 400, headers: NO_CACHE_HEADERS }
       );
     }
 
-    // 2. Email validation: Valid format regex
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email || !emailRegex.test(email)) {
+    // 2. Email validation
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return NextResponse.json(
         { success: false, field: 'email', message: 'Please enter a valid email address.' },
         { status: 400, headers: NO_CACHE_HEADERS }
       );
     }
 
-    // 3. Password validation: Min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 symbol
+    // 3. Password validation: Min 8 chars, 1 upper, 1 lower, 1 number, 1 symbol
     if (!password || password.length < 8) {
       return NextResponse.json(
         { success: false, field: 'password', message: 'Password must be at least 8 characters.' },
         { status: 400, headers: NO_CACHE_HEADERS }
       );
     }
-    const hasUpper = /[A-Z]/.test(password);
-    const hasLower = /[a-z]/.test(password);
-    const hasNumber = /[0-9]/.test(password);
-    const hasSymbol = /[^A-Za-z0-9]/.test(password);
-
-    if (!hasUpper || !hasLower || !hasNumber || !hasSymbol) {
+    if (
+      !/[A-Z]/.test(password) ||
+      !/[a-z]/.test(password) ||
+      !/[0-9]/.test(password) ||
+      !/[^A-Za-z0-9]/.test(password)
+    ) {
       return NextResponse.json(
         {
           success: false,
@@ -126,7 +87,6 @@ export async function POST(req: NextRequest) {
     // 4. Duplicate email check in MongoDB & Memory
     try {
       const db = await getDb();
-      // Ensure unique index exists on email
       try {
         await db.collection('students').createIndex({ email: 1 }, { unique: true });
       } catch {
@@ -144,7 +104,6 @@ export async function POST(req: NextRequest) {
       console.warn('MongoDB duplicate check fallback:', dbErr);
     }
 
-    // Also check memory fallback
     const allStudents = await getAllStudents();
     const duplicate = allStudents.find((s) => s.email.toLowerCase() === email && s.id !== body.id);
     if (duplicate) {
@@ -154,9 +113,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 5. Password Hashing with bcrypt (salt rounds >= 10)
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    // 5. Hash password with bcrypt (10 rounds)
+    const hashedPassword = await hashPassword(password);
 
     const studentToSave: UserProfile = {
       id: body.id || `student_${Date.now()}`,
@@ -179,10 +137,18 @@ export async function POST(req: NextRequest) {
     };
 
     const saved = await saveStudent(studentToSave);
-    return NextResponse.json(
-      { success: true, student: saved },
+    const safeStudent = sanitizeUser(saved);
+
+    const res = NextResponse.json(
+      { success: true, student: safeStudent },
       { headers: NO_CACHE_HEADERS }
     );
+    attachSessionCookie(res, {
+      id: saved.id,
+      email: saved.email,
+      role: saved.role || 'student',
+    });
+    return res;
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Failed to register student';
     return NextResponse.json(
@@ -209,7 +175,6 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    const { updateStudentStatus } = await import('@/lib/server/db');
     const updated = await updateStudentStatus(
       body.userId,
       body.verificationStatus,
@@ -218,7 +183,7 @@ export async function PATCH(req: NextRequest) {
     );
 
     return NextResponse.json(
-      { success: true, student: updated },
+      { success: true, student: updated ? sanitizeUser(updated) : null },
       { headers: NO_CACHE_HEADERS }
     );
   } catch (err: unknown) {

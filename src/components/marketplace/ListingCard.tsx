@@ -5,31 +5,27 @@ import Link from 'next/link';
 import { Listing } from '@/lib/types';
 import { useApp } from '@/context/AppContext';
 import { getWhatsAppUrl } from '@/lib/whatsapp';
-import { Heart, MapPin, MessageCircle, Sparkles, ArrowRight, Instagram } from 'lucide-react';
+import { Heart, MapPin, MessageCircle, Sparkles, GraduationCap, Instagram } from 'lucide-react';
 import clsx from 'clsx';
 
 interface ListingCardProps {
   listing: Listing;
 }
 
-/** Type/price chip shown top-left of cover */
-function TypeChip({ listing }: { listing: Listing }) {
-  const base = 'rounded-full px-2.5 py-1 text-[11px] font-extrabold shadow-sm uppercase tracking-wide';
-  if (listing.listingType === 'free')
-    return <span className={clsx(base, 'bg-emerald-500 text-white')}>🎁 FREE</span>;
-  if (listing.listingType === 'borrow')
-    return <span className={clsx(base, 'bg-sky-500 text-white')}>↔ Borrow</span>;
-  if (listing.listingType === 'exchange')
-    return <span className={clsx(base, 'bg-violet-500 text-white')}>⇄ Exchange</span>;
-  return <span className={clsx(base, 'bg-blue-600 text-white')}>₹{listing.price.toLocaleString('en-IN')}</span>;
+function PricePill({ listing }: { listing: Listing }) {
+  const base =
+    'px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md font-display font-bold text-xs sm:text-base shadow-sm border border-outline-soft dark:border-slate-700';
+  if (listing.listingType === 'free') return <span className={clsx(base, 'text-mint')}>FREE</span>;
+  if (listing.listingType === 'borrow') return <span className={clsx(base, 'text-lavender-dark dark:text-lavender')}>Borrow</span>;
+  if (listing.listingType === 'exchange') return <span className={clsx(base, 'text-lavender-dark dark:text-lavender')}>Exchange</span>;
+  return <span className={clsx(base, 'text-mint')}>₹{listing.price.toLocaleString('en-IN')}</span>;
 }
 
 export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
-  const { isListingSaved, toggleSaveListing, selectedCollegeId, showToast } = useApp();
+  const { isListingSaved, toggleSaveListing, showToast } = useApp();
 
   const isSaved = isListingSaved(listing.id);
   const isAvailable = listing.status === 'active';
-  const isMyCollege = listing.collegeId === selectedCollegeId;
 
   const handleContactClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -75,45 +71,66 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
     toggleSaveListing(listing.id);
   };
 
+  const conditionText = listing.condition.replace(/_/g, ' ');
+  const isMintCondition = conditionText.toLowerCase().includes('new') || conditionText.toLowerCase().includes('mint');
+
   return (
-    <article className="card-3d group flex flex-col overflow-hidden rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-[0_6px_18px_-4px_rgba(15,23,42,0.1),0_2px_6px_rgba(15,23,42,0.06)] hover:shadow-[0_16px_32px_-6px_rgba(37,99,235,0.18),0_6px_14px_rgba(15,23,42,0.08)] hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300">
+    <article className="group flex flex-col rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900 border border-outline-soft dark:border-slate-800 hover:border-mint/60 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-mint/5 transition-all duration-300 hover:-translate-y-1.5">
       {/* Cover */}
-      <div className="relative overflow-hidden bg-slate-100 dark:bg-slate-800">
-        <Link href={`/item/${listing.id}`} aria-label={listing.title}>
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-muted dark:bg-slate-800">
+        <Link href={`/item/${listing.id}`} aria-label={listing.title} className="block w-full h-full">
           {listing.images && listing.images.length > 0 ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={listing.images[0]}
               alt={listing.title}
               loading="lazy"
-              className="aspect-square sm:aspect-[4/3] w-full bg-[#f7f7f8] dark:bg-slate-800 object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
-            <div className="flex aspect-square sm:aspect-[4/3] w-full flex-col items-center justify-center p-4 text-center">
-              <Sparkles className="mb-2 h-8 w-8 text-slate-300" />
-              <span className="text-xs font-bold text-slate-500">{listing.categoryName || 'Campus Item'}</span>
+            <div className="flex w-full h-full flex-col items-center justify-center p-4 text-center">
+              <Sparkles className="mb-2 h-8 w-8 text-text-muted/40" />
+              <span className="text-xs font-bold text-text-muted">{listing.categoryName || 'Campus Item'}</span>
             </div>
           )}
         </Link>
 
-        <div className="absolute left-3 top-3 z-10">
-          <TypeChip listing={listing} />
+        {/* Price Pill Top-Left */}
+        <div className="absolute top-2.5 left-2.5 sm:top-3.5 sm:left-3.5 z-10">
+          <PricePill listing={listing} />
         </div>
 
-        <div className="absolute right-3 top-3 z-10 flex items-center gap-1.5">
-          <span className="rounded-full border border-slate-200 bg-white/95 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-700 shadow-sm backdrop-blur">
-            {listing.condition.replace('_', ' ')}
+        {/* Condition & Save Top-Right */}
+        <div className="absolute top-2.5 right-2.5 sm:top-3.5 sm:right-3.5 z-10 flex items-center gap-1.5">
+          <span
+            className={clsx(
+              'hidden xs:inline-block px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-[11px] font-bold capitalize',
+              isMintCondition
+                ? 'bg-mint-light text-mint-dark'
+                : 'bg-lavender text-lavender-dark'
+            )}
+          >
+            {conditionText}
           </span>
           <button
+            type="button"
             onClick={handleSaveClick}
             aria-label={isSaved ? 'Remove from saved' : 'Save listing'}
             className={clsx(
-              'place-items-center rounded-full p-1.5 shadow-sm transition',
-              isSaved ? 'bg-blue-600 text-white' : 'bg-white/95 text-slate-600 hover:bg-white hover:text-blue-600'
+              'grid h-7 w-7 sm:h-8 sm:w-8 place-items-center rounded-full shadow-sm transition',
+              isSaved
+                ? 'bg-mint text-white'
+                : 'bg-white/95 dark:bg-slate-900/95 text-text-muted hover:text-mint'
             )}
           >
             <Heart className={clsx('h-3.5 w-3.5', isSaved && 'fill-current')} />
           </button>
+        </div>
+
+        {/* College Pill Bottom-Left */}
+        <div className="absolute bottom-2.5 left-2.5 sm:bottom-3 sm:left-3.5 flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md text-text-main dark:text-white text-[10px] sm:text-[11px] font-semibold border border-outline-soft/60 dark:border-slate-700">
+          <GraduationCap className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-mint shrink-0" />
+          <span className="truncate max-w-[100px] sm:max-w-none">{listing.collegeShortName}</span>
         </div>
 
         {!isAvailable && (
@@ -126,67 +143,54 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
       </div>
 
       {/* Body */}
-      <div className="flex flex-1 flex-col p-4 sm:p-5">
-        <div className="flex items-center justify-between gap-2">
-          <span
-            className={clsx(
-              'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide',
-              isMyCollege ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
-            )}
-          >
-            <MapPin className="h-3 w-3 shrink-0" />
-            {listing.collegeShortName}
-          </span>
-          {listing.viewsCount !== undefined && listing.viewsCount > 0 && (
-            <span className="text-[10px] font-semibold text-slate-400">{listing.viewsCount} views</span>
-          )}
+      <div className="p-3.5 sm:p-6 flex flex-col flex-1 justify-between gap-2.5 sm:gap-4">
+        <div>
+          <Link href={`/item/${listing.id}`}>
+            <h3 className="font-display font-bold text-xs sm:text-base text-text-main dark:text-white group-hover:text-mint transition-colors line-clamp-1 sm:line-clamp-2">
+              {listing.title}
+            </h3>
+          </Link>
+          <p className="hidden sm:line-clamp-2 text-xs text-text-muted dark:text-slate-400 mt-2 leading-relaxed">
+            {listing.description}
+          </p>
         </div>
 
-        <Link href={`/item/${listing.id}`} className="mt-2 block">
-          <h3 className="font-display text-[15px] font-extrabold leading-snug text-ink-950 dark:text-slate-100 transition-colors line-clamp-2 hover:text-blue-600 dark:hover:text-blue-400">
-            {listing.title}
-          </h3>
-        </Link>
+        <div className="flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs text-text-muted dark:text-slate-400">
+          <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-mint shrink-0" />
+          <span className="truncate">Pickup: {listing.preferredPickupLocation}</span>
+        </div>
 
-        <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">{listing.description}</p>
-
-        <p className="mt-3 flex items-center gap-1.5 border-t border-slate-100 dark:border-slate-800 pt-3 text-[11px] text-slate-500 dark:text-slate-400">
-          <span className="font-bold text-slate-700 dark:text-slate-300">Pickup:</span>
-          <span className="truncate">{listing.preferredPickupLocation}</span>
-        </p>
-      </div>
-
-      {/* Footer */}
-      <div className="grid grid-cols-2 gap-2 px-4 pb-4 sm:px-5 sm:pb-5">
-        <Link
-          href={`/item/${listing.id}`}
-          className="inline-flex h-9.5 items-center justify-center gap-1 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-800 dark:text-slate-200 transition hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700"
-        >
-          Details
-          <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
-
-        {listing.contactPreference === 'instagram' || (!listing.whatsappNumber && listing.instagramHandle) ? (
-          <button
-            onClick={handleContactClick}
-            disabled={!isAvailable}
-            title="Directly message seller on Instagram"
-            className="inline-flex h-9.5 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 text-xs font-bold text-white transition hover:opacity-90 disabled:opacity-40"
+        <div className="pt-1 sm:pt-2 flex items-center gap-1.5 sm:gap-2">
+          {listing.contactPreference === 'instagram' || (!listing.whatsappNumber && listing.instagramHandle) ? (
+            <button
+              type="button"
+              onClick={handleContactClick}
+              disabled={!isAvailable}
+              title="Message seller on Instagram"
+              className="flex-1 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1 sm:gap-1.5 shadow-sm transition-all disabled:opacity-40"
+            >
+              <Instagram className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span>Instagram</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleContactClick}
+              disabled={!isAvailable}
+              title="Chat with student seller on WhatsApp"
+              className="flex-1 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-mint hover:bg-mint-dark text-white text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1 sm:gap-1.5 shadow-sm shadow-mint/20 transition-all disabled:opacity-40"
+            >
+              <MessageCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span>WhatsApp</span>
+            </button>
+          )}
+          <Link
+            href={`/item/${listing.id}`}
+            className="px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-surface-muted dark:bg-slate-800 hover:bg-lavender-light dark:hover:bg-slate-700 text-text-muted dark:text-slate-300 hover:text-lavender-dark text-[11px] sm:text-xs font-semibold transition-all text-center"
           >
-            <Instagram className="h-3.5 w-3.5" />
-            Instagram
-          </button>
-        ) : (
-          <button
-            onClick={handleContactClick}
-            disabled={!isAvailable}
-            title="Directly chat with student seller on WhatsApp"
-            className="inline-flex h-9.5 items-center justify-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-xs font-bold text-white transition shadow-sm shadow-blue-500/20 disabled:opacity-40"
-          >
-            <MessageCircle className="h-3.5 w-3.5" />
-            WhatsApp
-          </button>
-        )}
+            Details
+          </Link>
+        </div>
       </div>
     </article>
   );

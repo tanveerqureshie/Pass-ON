@@ -161,23 +161,36 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   ]);
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
-  // Sync theme with HTML class — default to dark mode unless explicitly overridden in localStorage
+  // Sync theme with HTML class — default to light mode (Stitch UI) unless explicitly set to 'dark' in localStorage
   useEffect(() => {
     try {
       const savedTheme = localStorage.getItem('passon_theme') as 'light' | 'dark' | null;
-      if (savedTheme === 'light') {
-        setTheme('light');
-        document.documentElement.classList.remove('dark');
-      } else {
+      if (savedTheme === 'dark') {
         setTheme('dark');
         document.documentElement.classList.add('dark');
+      } else {
+        setTheme('light');
+        document.documentElement.classList.remove('dark');
       }
     } catch {
-      setTheme('dark');
-      document.documentElement.classList.add('dark');
+      setTheme('light');
+      document.documentElement.classList.remove('dark');
     }
+
+    // Hydrate authenticated session from HTTP-only cookie if available
+    fetch('/api/auth/me', { cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.success && data.user) {
+          setCurrentUser((prev) => prev || data.user);
+          try {
+            localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(data.user));
+          } catch {}
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const toggleTheme = () => {
@@ -599,7 +612,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     try {
       localStorage.removeItem(STORAGE_KEY_USER);
     } catch {}
-    showToast('Signed out of Pass ON');
+    fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+    showToast('Signed out of PassOn');
   };
 
   const updateProfile = (updates: Partial<UserProfile>) => {

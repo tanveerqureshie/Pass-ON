@@ -1,101 +1,81 @@
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { ShieldCheck, MessageCircle, Heart, Github, Instagram, Mail } from 'lucide-react';
+import { GraduationCap, ShieldCheck } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="mt-20 bg-slate-950 text-slate-300">
-      <div className="h-1.5 w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500" />
-      <div className="container-x grid grid-cols-1 gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Brand */}
-        <div>
-          <Link href="/" className="inline-block" aria-label="Pass ON home">
-            <Image
-              src="/logo-dark-mode.png"
-              alt="Pass ON"
-              width={140}
-              height={38}
-              className="h-8 sm:h-9 w-auto object-contain"
-            />
-          </Link>
-          <p className="mt-3 max-w-xs text-xs sm:text-sm leading-relaxed text-slate-400">
-            Pass It On. Save More. The verified student marketplace connecting college seniors and juniors across campus.
-          </p>
-          <div className="mt-4 flex items-center gap-2">
-            {[
-              { icon: Instagram, label: 'Instagram', href: 'https://www.instagram.com/' },
-              { icon: Github, label: 'GitHub', href: 'https://github.com/' },
-              { icon: Mail, label: 'Email', href: 'mailto:hello@passon.in' },
-            ].map(({ icon: Icon, label, href }) => (
-              <a
-                key={label}
-                href={href}
-                aria-label={label}
-                target="_blank"
-                rel="noreferrer"
-                className="grid h-8 w-8 place-items-center rounded-full border border-slate-800 text-slate-400 transition hover:border-blue-500 hover:bg-blue-600 hover:text-white"
-              >
-                <Icon className="h-3.5 w-3.5" />
-              </a>
-            ))}
-          </div>
-        </div>
-
-        {/* Essential Link 1: Marketplace */}
-        <div>
-          <h4 className="text-xs font-bold uppercase tracking-widest text-white">Marketplace</h4>
-          <ul className="mt-4 space-y-2.5 text-xs sm:text-sm">
-            <li><Link href="/explore" className="text-slate-400 transition hover:text-white">Browse All Items</Link></li>
-            <li><Link href="/categories" className="text-slate-400 transition hover:text-white">Categories</Link></li>
-            <li><Link href="/explore?type=free" className="text-slate-400 transition hover:text-white">Free Giveaways</Link></li>
-            <li><Link href="/sell" className="text-slate-400 transition hover:text-white">Sell / Pass On</Link></li>
-          </ul>
-        </div>
-
-        {/* Essential Link 2: Store */}
-        <div>
-          <h4 className="text-xs font-bold uppercase tracking-widest text-white">Store</h4>
-          <ul className="mt-4 space-y-2.5 text-xs sm:text-sm">
-            <li><Link href="/store" className="text-slate-400 transition hover:text-white">Campus Store</Link></li>
-            <li><Link href="/cart" className="text-slate-400 transition hover:text-white">Cart & Checkout</Link></li>
-            <li><Link href="/colleges" className="text-slate-400 transition hover:text-white">Campus Directory</Link></li>
-          </ul>
-        </div>
-
-        {/* Essential Link 3: Trust & Safety + Team */}
-        <div>
-          <h4 className="text-xs font-bold uppercase tracking-widest text-white">Trust & Safety</h4>
-          <ul className="mt-4 space-y-2.5 text-xs text-slate-400">
-            <li className="flex items-start gap-2">
-              <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-400" />
-              <span>Campus ID verification for student listings.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <MessageCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-400" />
-              <span>Direct WhatsApp/IG handovers, zero commission.</span>
-            </li>
-          </ul>
-          <div className="mt-5">
-            <Link
-              href="/team"
-              className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900 px-4 py-1.5 text-xs font-bold text-white transition hover:border-blue-500 hover:bg-blue-600"
-            >
-              Meet the Team →
+    <footer className="w-full bg-white dark:bg-slate-950 border-t border-outline-soft dark:border-slate-800 mt-10 transition-colors">
+      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-10">
+        <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-10 pb-14 border-b border-outline-soft dark:border-slate-800">
+          {/* Brand Column */}
+          <div className="lg:col-span-2 flex flex-col gap-4">
+            <Link href="/" className="flex items-center gap-2.5 w-fit" aria-label="PassOn home">
+              <div className="w-9 h-9 rounded-2xl bg-mint flex items-center justify-center text-white shadow-sm">
+                <GraduationCap className="h-5 w-5" />
+              </div>
+              <span className="font-display font-bold text-xl text-text-main dark:text-white">
+                Pass<span className="text-mint">On</span>
+              </span>
             </Link>
+            <p className="text-xs sm:text-sm text-text-muted dark:text-slate-400 max-w-sm leading-relaxed">
+              The student-first peer marketplace for verified college campuses. Buy, sell, and exchange textbooks,
+              electronics, and dorm essentials with zero platform tax.
+            </p>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-mint-light dark:bg-mint/15 w-fit text-mint-dark dark:text-mint text-xs font-bold border border-mint/20">
+              <ShieldCheck className="h-4 w-4 text-mint shrink-0" />
+              <span>100% Verified Campus Peers</span>
+            </div>
+          </div>
+
+          {/* Marketplace */}
+          <div className="flex flex-col gap-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-text-main dark:text-white">
+              Marketplace
+            </span>
+            <ul className="flex flex-col gap-2.5 text-xs font-medium text-text-muted dark:text-slate-400">
+              <li><Link href="/explore?category=academic" className="hover:text-mint transition-colors">Textbooks &amp; Notes</Link></li>
+              <li><Link href="/explore?category=electronics" className="hover:text-mint transition-colors">Electronics &amp; Gadgets</Link></li>
+              <li><Link href="/explore?category=hostel-essentials" className="hover:text-mint transition-colors">Dorm Essentials</Link></li>
+              <li><Link href="/explore?category=mobility" className="hover:text-mint transition-colors">Cycles &amp; Mobility</Link></li>
+              <li><Link href="/explore?category=lab-equipment" className="hover:text-mint transition-colors">Lab Gear &amp; Uniforms</Link></li>
+            </ul>
+          </div>
+
+          {/* Campuses */}
+          <div className="flex flex-col gap-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-text-main dark:text-white">
+              Campuses
+            </span>
+            <ul className="flex flex-col gap-2.5 text-xs font-medium text-text-muted dark:text-slate-400">
+              <li><Link href="/college/mait" className="hover:text-mint transition-colors">MAIT Delhi</Link></li>
+              <li><Link href="/college/msit" className="hover:text-mint transition-colors">MSIT Janakpuri</Link></li>
+              <li><Link href="/college/usict" className="hover:text-mint transition-colors">USICT Dwarka</Link></li>
+              <li><Link href="/college/usar" className="hover:text-mint transition-colors">USAR East Campus</Link></li>
+              <li><Link href="/colleges" className="hover:text-mint transition-colors">Browse All 11 Hubs</Link></li>
+            </ul>
+          </div>
+
+          {/* Trust & Safety */}
+          <div className="flex flex-col gap-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-text-main dark:text-white">
+              Trust &amp; Safety
+            </span>
+            <ul className="flex flex-col gap-2.5 text-xs font-medium text-text-muted dark:text-slate-400">
+              <li><Link href="/auth/sign-up" className="hover:text-mint transition-colors">Student Verification</Link></li>
+              <li><Link href="/store" className="hover:text-mint transition-colors">Official Campus Store</Link></li>
+              <li><Link href="/explore" className="hover:text-mint transition-colors">Zero-Tax Policy</Link></li>
+              <li><Link href="/team" className="hover:text-mint transition-colors">Meet the Team</Link></li>
+              <li><Link href="/admin" className="hover:text-mint transition-colors">Admin Portal</Link></li>
+            </ul>
           </div>
         </div>
-      </div>
 
-      <div className="border-t border-slate-800/80">
-        <div className="container-x flex flex-col items-center justify-between gap-3 py-5 text-xs text-slate-400 sm:flex-row">
-          <p>© {new Date().getFullYear()} Pass ON. All rights reserved.</p>
-          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-            <Link href="/explore" className="transition hover:text-white">Marketplace</Link>
-            <Link href="/store" className="transition hover:text-white">Store</Link>
-            <Link href="/colleges" className="transition hover:text-white">Campus</Link>
-            <Link href="/team" className="transition hover:text-white">Team</Link>
-            <Link href="/admin" className="transition hover:text-white">Admin</Link>
+        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-medium text-text-muted dark:text-slate-400">
+          <span>© {new Date().getFullYear()} PassOn Technologies. Built for Students.</span>
+          <div className="flex items-center gap-6">
+            <Link href="/explore" className="hover:text-text-main dark:hover:text-white transition-colors">Marketplace</Link>
+            <Link href="/store" className="hover:text-text-main dark:hover:text-white transition-colors">Store</Link>
+            <Link href="/team" className="hover:text-text-main dark:hover:text-white transition-colors">Team</Link>
           </div>
         </div>
       </div>

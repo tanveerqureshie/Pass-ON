@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_standard" name="shell-type"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "mint": "#26C289",
+            "mint-dark": "#005236",
+            "mint-light": "#e8faf3",
+            "lavender": "#E2DFFF",
+            "lavender-dark": "#4a4294",
+            "lavender-light": "#f4f2ff",
+            "surface-bg": "#F8FAFC",
+            "surface-card": "#FFFFFF",
+            "surface-muted": "#F1F5F9",
+            "outline-soft": "#E2E8F0",
+            "text-main": "#0F172A",
+            "text-muted": "#64748B"
+          },
+          fontFamily: {
+            sans: ["Plus Jakarta Sans", "sans-serif"],
+            display: ["Space Grotesk", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    @layer base {
+      html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #F8FAFC;
+        color: #0F172A;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+      }
+    }
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+</head>
+<body class="bg-surface-bg text-text-main antialiased selection:bg-mint selection:text-white">
+<!-- TOP NAVIGATION CHROME -->
+<header class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-xl border-b border-outline-soft/80 shadow-[0_2px_12px_rgba(0,0,0,0.03)]">
+<div class="h-20 max-w-[1320px] mx-auto px-6 sm:px-8 flex items-center justify-between gap-6">
+<!-- Brand & Hub Pill -->
+<div class="flex items-center gap-6">
+<a class="flex items-center gap-2.5 text-text-main group" data-path="marketplace" href="#">
+<div class="w-10 h-10 rounded-2xl bg-mint flex items-center justify-center text-white shadow-md shadow-mint/20 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[22px]">school</span>
+</div>
+<span class="font-display font-bold text-2xl tracking-tight text-text-main">
+            Pass<span class="text-mint">On</span>
+</span>
+</a>
+<!-- Campus Switcher -->
+<button class="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-lavender-light border border-lavender/60 hover:bg-lavender/40 text-lavender-dark transition-all">
+<span class="material-symbols-outlined text-mint text-[18px]">location_on</span>
+<span class="text-xs font-semibold tracking-wide">MAIT - Delhi</span>
+<span class="material-symbols-outlined text-[16px] text-text-muted">expand_more</span>
+</button>
+</div>
+<!-- Center Links -->
+<nav class="hidden lg:flex items-center gap-8 text-sm font-semibold text-text-muted" data-active-classes="text-text-main font-bold">
+<a aria-current="page" class="text-text-main font-bold hover:text-mint transition-colors relative py-1 after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-mint after:rounded-full" data-path="marketplace" href="#">Marketplace</a>
+<a class="hover:text-text-main transition-colors" data-path="categories" href="#categories">Categories</a>
+<a class="hover:text-text-main transition-colors" data-path="listings" href="#listings">Campus Listings</a>
+<a class="hover:text-text-main transition-colors" data-path="campuses" href="#campuses">Campuses</a>
+<a class="hover:text-text-main transition-colors" data-path="community" href="#">Community</a>
+</nav>
+<!-- Right Actions -->
+<div class="flex items-center gap-3">
+<button class="w-10 h-10 rounded-full border border-outline-soft bg-white hover:bg-surface-muted text-text-muted hover:text-text-main flex items-center justify-center transition-all shadow-sm">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</button>
+<a class="relative w-10 h-10 rounded-full border border-outline-soft bg-white hover:bg-surface-muted text-text-muted hover:text-text-main flex items-center justify-center transition-all shadow-sm" data-path="saved-wishlist" href="#">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+<span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-mint text-white text-[10px] font-bold flex items-center justify-center">4</span>
+</a>
+<button class="relative w-10 h-10 rounded-full border border-outline-soft bg-white hover:bg-surface-muted text-text-muted hover:text-text-main flex items-center justify-center transition-all shadow-sm">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-mint"></span>
+</button>
+<a class="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-full bg-mint hover:bg-mint-dark text-white font-semibold text-xs tracking-wide shadow-lg shadow-mint/25 hover:shadow-mint/40 hover:-translate-y-0.5 transition-all" data-path="sell-an-item" href="#">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+<span>Pass an Item</span>
+</a>
+<div class="flex items-center gap-2 pl-2">
+<div class="w-9 h-9 rounded-full bg-lavender flex items-center justify-center border border-lavender-dark/20 text-lavender-dark font-bold text-sm">
+            A
+          </div>
+<span class="hidden xl:inline-block text-xs font-semibold text-text-main">Aastha</span>
+</div>
+</div>
+</div>
+</header>
+<!-- MAIN WRAPPER -->
+<main class="w-full pt-20">
+<!-- HERO SECTION -->
+<section class="relative w-full max-w-[1320px] mx-auto px-6 sm:px-8 pt-16 pb-20 flex flex-col items-center text-center overflow-hidden">
+<!-- Soft ambient backdrop glows -->
+<div class="absolute -top-16 left-1/2 -translate-x-1/2 w-[700px] h-[340px] bg-lavender/50 rounded-full blur-[120px] pointer-events-none -z-10"></div>
+<div class="absolute top-48 left-12 w-[300px] h-[300px] bg-mint/15 rounded-full blur-[100px] pointer-events-none -z-10"></div>
+<div class="absolute top-48 right-12 w-[320px] h-[320px] bg-lavender/40 rounded-full blur-[110px] pointer-events-none -z-10"></div>
+<!-- Campus Live Badge -->
+<div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white border border-lavender shadow-sm mb-6">
+<span class="relative flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-mint opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-mint"></span>
+</span>
+<span class="text-xs font-semibold text-text-muted">11 Verified Delhi NCR Campuses Active</span>
+</div>
+<!-- Hero Heading -->
+<h1 class="font-display text-4xl sm:text-6xl lg:text-7xl font-bold text-text-main tracking-tight max-w-4xl leading-[1.12]">
+        Pass It On. <span class="text-mint">Save More.</span>
+</h1>
+<!-- Subtitle -->
+<p class="text-base sm:text-lg text-text-muted max-w-2xl mt-5 mb-10 leading-relaxed font-normal">
+        Seniors’ textbooks, lab instruments, gadgets &amp; hostel essentials find their next owner — zero platform tax, zero middlemen, 100% verified campus handovers.
+      </p>
+<!-- Spacious Search Bar -->
+<div class="w-full max-w-3xl bg-white border border-outline-soft rounded-full p-2.5 pl-5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-[0_12px_36px_rgba(0,0,0,0.06)] hover:border-mint/50 transition-all mb-8">
+<div class="flex items-center gap-2 w-full sm:w-auto">
+<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-lavender-light text-lavender-dark text-xs font-bold cursor-pointer hover:bg-lavender/50 transition-colors">
+<span class="material-symbols-outlined text-[17px] text-mint">explore_nearby</span>
+<span>All Hubs</span>
+<span class="material-symbols-outlined text-[15px] text-text-muted">expand_more</span>
+</div>
+<div class="w-px h-6 bg-outline-soft hidden sm:block mx-1"></div>
+</div>
+<div class="relative flex-1 w-full flex items-center">
+<span class="material-symbols-outlined text-text-muted text-[22px] ml-1 mr-3">search</span>
+<input class="w-full bg-transparent text-text-main placeholder:text-text-muted/70 text-sm font-medium focus:outline-none" placeholder="Search textbooks, notes, lab gear, tech, drafters..." type="text"/>
+</div>
+<button class="w-full sm:w-auto px-7 py-3 rounded-full bg-mint hover:bg-mint-dark text-white text-xs font-bold tracking-wider flex items-center justify-center gap-2 shadow-md shadow-mint/25 transition-all transform hover:scale-[1.02]">
+<span>Search</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+<!-- Quick Action Pills -->
+<div class="flex flex-wrap items-center justify-center gap-3 mb-10">
+<a class="px-5 py-2.5 rounded-full bg-mint text-white font-semibold text-xs flex items-center gap-2 shadow-sm hover:bg-mint-dark transition-all" data-path="marketplace" href="#">
+<span class="material-symbols-outlined text-[18px]">local_mall</span>
+<span>Explore Campus Items</span>
+</a>
+<a class="px-5 py-2.5 rounded-full bg-lavender text-lavender-dark font-semibold text-xs flex items-center gap-2 hover:bg-lavender/80 transition-all border border-lavender-dark/10" data-path="sell-an-item" href="#">
+<span class="material-symbols-outlined text-mint text-[18px]">add_circle</span>
+<span>Pass On Item</span>
+</a>
+<a class="px-5 py-2.5 rounded-full bg-white border border-outline-soft text-text-main hover:bg-surface-muted font-semibold text-xs flex items-center gap-2 transition-all shadow-sm" data-path="campus-store" href="#">
+<span class="material-symbols-outlined text-[18px] text-text-muted">storefront</span>
+<span>Campus Store</span>
+</a>
+</div>
+<!-- Trust Badges -->
+<div class="flex flex-wrap items-center justify-center gap-y-3 gap-x-8 text-text-muted text-xs font-semibold">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-mint text-[20px]">verified_user</span>
+<span>Verified Student IDs</span>
+</div>
+<div class="w-1 h-1 rounded-full bg-outline-soft hidden sm:block"></div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-mint text-[20px]">payments</span>
+<span>Zero Commission Guarantee</span>
+</div>
+<div class="w-1 h-1 rounded-full bg-outline-soft hidden sm:block"></div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-mint text-[20px]">forum</span>
+<span>Direct WhatsApp Handover</span>
+</div>
+</div>
+</section>
+<!-- SECTION 1: EXPLORE CATEGORIES (ROOMY, UN-CONGESTED, CLEAN) -->
+<section class="w-full max-w-[1320px] mx-auto px-6 sm:px-8 py-20 border-t border-outline-soft/80" id="categories">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
+<div>
+<span class="inline-block px-3 py-1 rounded-full bg-lavender-light border border-lavender text-lavender-dark text-[11px] font-bold uppercase tracking-wider mb-2">
+            Organized By Semester Needs
+          </span>
+<h2 class="font-display text-3xl sm:text-4xl font-bold text-text-main">Explore Categories</h2>
+<p class="text-text-muted text-sm sm:text-base mt-2">
+            From first-year drafting gear to final-year project monitors and hostel handovers.
+          </p>
+</div>
+<a class="text-sm font-bold text-mint hover:text-mint-dark flex items-center gap-1 group self-start md:self-auto" data-path="categories" href="#">
+<span>All Categories</span>
+<span class="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</a>
+</div>
+<!-- Categories Grid: 6 Roomy, Airy Cards -->
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
+<!-- Category 1 -->
+<a class="group flex flex-col items-center text-center p-6 rounded-3xl bg-white border border-outline-soft hover:border-mint/60 hover:shadow-xl hover:shadow-mint/5 transition-all duration-300 hover:-translate-y-1.5" data-path="categories" href="#">
+<div class="w-16 h-16 rounded-2xl bg-mint-light flex items-center justify-center text-mint mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[32px]">menu_book</span>
+</div>
+<span class="font-display text-sm font-bold text-text-main group-hover:text-mint transition-colors">Academic Materials</span>
+<span class="text-xs text-text-muted mt-1 font-medium">Textbooks &amp; PYQs</span>
+</a>
+<!-- Category 2 -->
+<a class="group flex flex-col items-center text-center p-6 rounded-3xl bg-white border border-outline-soft hover:border-mint/60 hover:shadow-xl hover:shadow-mint/5 transition-all duration-300 hover:-translate-y-1.5" data-path="categories" href="#">
+<div class="w-16 h-16 rounded-2xl bg-lavender-light flex items-center justify-center text-lavender-dark mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[32px]">handyman</span>
+</div>
+<span class="font-display text-sm font-bold text-text-main group-hover:text-mint transition-colors">Engineering &amp; Lab</span>
+<span class="text-xs text-text-muted mt-1 font-medium">Drafters &amp; Aprons</span>
+</a>
+<!-- Category 3 -->
+<a class="group flex flex-col items-center text-center p-6 rounded-3xl bg-white border border-outline-soft hover:border-mint/60 hover:shadow-xl hover:shadow-mint/5 transition-all duration-300 hover:-translate-y-1.5" data-path="categories" href="#">
+<div class="w-16 h-16 rounded-2xl bg-mint-light flex items-center justify-center text-mint mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[32px]">devices</span>
+</div>
+<span class="font-display text-sm font-bold text-text-main group-hover:text-mint transition-colors">Electronics &amp; Tech</span>
+<span class="text-xs text-text-muted mt-1 font-medium">Calculators &amp; Screens</span>
+</a>
+<!-- Category 4 -->
+<a class="group flex flex-col items-center text-center p-6 rounded-3xl bg-white border border-outline-soft hover:border-mint/60 hover:shadow-xl hover:shadow-mint/5 transition-all duration-300 hover:-translate-y-1.5" data-path="categories" href="#">
+<div class="w-16 h-16 rounded-2xl bg-lavender-light flex items-center justify-center text-lavender-dark mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[32px]">bed</span>
+</div>
+<span class="font-display text-sm font-bold text-text-main group-hover:text-mint transition-colors">Hostel Essentials</span>
+<span class="text-xs text-text-muted mt-1 font-medium">Kettles &amp; Lamps</span>
+</a>
+<!-- Category 5 -->
+<a class="group flex flex-col items-center text-center p-6 rounded-3xl bg-white border border-outline-soft hover:border-mint/60 hover:shadow-xl hover:shadow-mint/5 transition-all duration-300 hover:-translate-y-1.5" data-path="categories" href="#">
+<div class="w-16 h-16 rounded-2xl bg-mint-light flex items-center justify-center text-mint mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[32px]">pedal_bike</span>
+</div>
+<span class="font-display text-sm font-bold text-text-main group-hover:text-mint transition-colors">Cycles &amp; Mobility</span>
+<span class="text-xs text-text-muted mt-1 font-medium">Bikes &amp; U-Locks</span>
+</a>
+<!-- Category 6 -->
+<a class="group flex flex-col items-center text-center p-6 rounded-3xl bg-white border border-outline-soft hover:border-mint/60 hover:shadow-xl hover:shadow-mint/5 transition-all duration-300 hover:-translate-y-1.5" data-path="categories" href="#">
+<div class="w-16 h-16 rounded-2xl bg-lavender-light flex items-center justify-center text-lavender-dark mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[32px]">architecture</span>
+</div>
+<span class="font-display text-sm font-bold text-text-main group-hover:text-mint transition-colors">Design Supplies</span>
+<span class="text-xs text-text-muted mt-1 font-medium">Drawing Boards &amp; Sets</span>
+</a>
+</div>
+</section>
+<!-- SECTION 2: LIVE CAMPUS LISTINGS (GENEROUS PADDING, CRISP CARDS) -->
+<section class="w-full max-w-[1320px] mx-auto px-6 sm:px-8 py-20 border-t border-outline-soft/80" id="listings">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+<div>
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-mint-light text-mint-dark text-xs font-bold mb-2">
+<span class="material-symbols-outlined text-[15px]">verified</span>
+<span>Straight from Verified Students</span>
+</div>
+<h2 class="font-display text-3xl sm:text-4xl font-bold text-text-main">Live Campus Listings</h2>
+<p class="text-text-muted text-sm sm:text-base mt-2">
+            Textbooks, calculators, lab aprons &amp; electronics listed by students across Delhi right now.
+          </p>
+</div>
+<a class="text-sm font-bold text-mint hover:text-mint-dark flex items-center gap-1 group self-start md:self-auto" data-path="marketplace" href="#">
+<span>Explore All 380+ Items</span>
+<span class="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</a>
+</div>
+<!-- Filter Chips Bar with generous breathing room -->
+<div class="flex items-center gap-2.5 overflow-x-auto pb-4 mb-10 no-scrollbar">
+<button class="px-5 py-2.5 rounded-full bg-mint text-white text-xs font-bold shadow-md shadow-mint/20 whitespace-nowrap">
+          All Products
+        </button>
+<button class="px-5 py-2.5 rounded-full bg-white border border-outline-soft hover:border-mint text-text-muted hover:text-text-main text-xs font-semibold whitespace-nowrap transition-all">
+          Books &amp; Notes
+        </button>
+<button class="px-5 py-2.5 rounded-full bg-white border border-outline-soft hover:border-mint text-text-muted hover:text-text-main text-xs font-semibold whitespace-nowrap transition-all">
+          Engineering &amp; Lab
+        </button>
+<button class="px-5 py-2.5 rounded-full bg-white border border-outline-soft hover:border-mint text-text-muted hover:text-text-main text-xs font-semibold whitespace-nowrap transition-all">
+          Electronics &amp; Tech
+        </button>
+<button class="px-5 py-2.5 rounded-full bg-white border border-outline-soft hover:border-mint text-text-muted hover:text-text-main text-xs font-semibold whitespace-nowrap transition-all">
+          Hostel Essentials
+        </button>
+<button class="px-5 py-2.5 rounded-full bg-lavender-light border border-lavender text-lavender-dark hover:bg-lavender text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-mint">card_giftcard</span>
+<span>Free Giveaways</span>
+</button>
+</div>
+<!-- Product Cards Grid: 4-Column with wide gap (gap-8) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+<!-- Product Card 1: Casio Calculator -->
+<div class="group flex flex-col rounded-3xl bg-white border border-outline-soft hover:border-mint/60 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-mint/5 transition-all duration-300 hover:-translate-y-1.5">
+<div class="relative aspect-[4/3] w-full overflow-hidden bg-surface-muted">
+<div class="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform duration-500" data-alt="Realistic crisp product photo of a Casio scientific calculator on a clean student study desk." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCI81AwjQ3X7_F7xJBSMK2D3VInbCIQf98F2cGIqXr6ZJnpfTRTuwbP5G8w2R7lThBtZHZ1EtQhK8SWVWQdLsZCOUJfyFehMJA2RCFGT9KPzaOw3EepgeYvOP9FMzSwcH3bgoEuzMuV2JSHhA7B6Hu4TXVmGf0Bq856dt-i3549k1tvgF26Hfs9TtOATrDGeX9-Kf9kfkmjbOJMLqKLod4pIcH72vRylhti8aEIYJ0')"></div>
+<!-- Price pill in crisp mint background -->
+<span class="absolute top-3.5 left-3.5 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md text-mint font-display font-bold text-base shadow-sm border border-outline-soft">
+              ₹749
+            </span>
+<!-- Soft Lavender Condition Tag -->
+<span class="absolute top-3.5 right-3.5 px-2.5 py-1 rounded-full bg-lavender text-lavender-dark text-[11px] font-bold">
+              Good
+            </span>
+<div class="absolute bottom-3 left-3.5 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-text-main text-[11px] font-semibold border border-outline-soft/60">
+<span class="material-symbols-outlined text-[14px] text-mint">school</span>
+<span>MAIT Rohini</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-1 justify-between gap-4">
+<div>
+<h3 class="font-display font-bold text-base text-text-main group-hover:text-mint transition-colors">
+                Casio fx-991EX ClassWiz
+              </h3>
+<p class="text-xs text-text-muted mt-2 line-clamp-2 leading-relaxed">
+                All matrix, calculus &amp; complex mode keys working crisp. Fresh battery installed last month.
+              </p>
+</div>
+<div class="flex items-center gap-1.5 text-xs text-text-muted">
+<span class="material-symbols-outlined text-[16px] text-mint">location_on</span>
+<span class="truncate">Pickup: College Canteen / Gate</span>
+</div>
+<div class="pt-2 flex items-center gap-2">
+<a class="flex-1 py-2.5 rounded-2xl bg-mint hover:bg-mint-dark text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm shadow-mint/20 transition-all" href="#">
+<span class="material-symbols-outlined text-[16px]">chat</span>
+<span>WhatsApp</span>
+</a>
+<button class="px-4 py-2.5 rounded-2xl bg-surface-muted hover:bg-lavender-light text-text-muted hover:text-lavender-dark text-xs font-semibold transition-all">
+                Details
+              </button>
+</div>
+</div>
+</div>
+<!-- Product Card 2: Mechanics Textbook -->
+<div class="group flex flex-col rounded-3xl bg-white border border-outline-soft hover:border-mint/60 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-mint/5 transition-all duration-300 hover:-translate-y-1.5">
+<div class="relative aspect-[4/3] w-full overflow-hidden bg-surface-muted">
+<div class="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform duration-500" data-alt="Engineering Mechanics textbook with neat notes on academic table." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDENN_pqXDyjBpGLmbPvPMGLzDoKG8bpAJkd-Sqyk2XNR_XqdNOat-IfJ3zPqcsiWj8Iq1pXIQmdjUIExhiImaLSvzytbQ5O3dGHOBOxtkMUBODpf85iJPMxBiS_kyQThbXT0kU_3tSgBP0UM4sGkWU3jA-tOEX7o-ZqLE5Y9E7w8gKVT94iJW0U9lLzk5zXprizFTmD7pdNTt_P5CjSs0TDA5SLP1CELFbEm3tsac')"></div>
+<span class="absolute top-3.5 left-3.5 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md text-mint font-display font-bold text-base shadow-sm border border-outline-soft">
+              ₹420
+            </span>
+<span class="absolute top-3.5 right-3.5 px-2.5 py-1 rounded-full bg-mint-light text-mint-dark text-[11px] font-bold">
+              Like New
+            </span>
+<div class="absolute bottom-3 left-3.5 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-text-main text-[11px] font-semibold border border-outline-soft/60">
+<span class="material-symbols-outlined text-[14px] text-mint">school</span>
+<span>USICT Dwarka</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-1 justify-between gap-4">
+<div>
+<h3 class="font-display font-bold text-base text-text-main group-hover:text-mint transition-colors">
+                Hibbeler Mechanics + PYQs
+              </h3>
+<p class="text-xs text-text-muted mt-2 line-clamp-2 leading-relaxed">
+                14th SI edition + printed solved 7-year university end-term papers for First Year IPU B.Tech.
+              </p>
+</div>
+<div class="flex items-center gap-1.5 text-xs text-text-muted">
+<span class="material-symbols-outlined text-[16px] text-mint">location_on</span>
+<span class="truncate">Pickup: Library Lawn / Block E</span>
+</div>
+<div class="pt-2 flex items-center gap-2">
+<a class="flex-1 py-2.5 rounded-2xl bg-mint hover:bg-mint-dark text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm shadow-mint/20 transition-all" href="#">
+<span class="material-symbols-outlined text-[16px]">chat</span>
+<span>WhatsApp</span>
+</a>
+<button class="px-4 py-2.5 rounded-2xl bg-surface-muted hover:bg-lavender-light text-text-muted hover:text-lavender-dark text-xs font-semibold transition-all">
+                Details
+              </button>
+</div>
+</div>
+</div>
+<!-- Product Card 3: Drafter Bundle -->
+<div class="group flex flex-col rounded-3xl bg-white border border-outline-soft hover:border-mint/60 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-mint/5 transition-all duration-300 hover:-translate-y-1.5">
+<div class="relative aspect-[4/3] w-full overflow-hidden bg-surface-muted">
+<div class="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform duration-500" data-alt="Engineering drawing set including drafter and sheet holder." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBSZKbmO2jrYGvWr0d7EeWpyeaueSbX-IwbuaoVcIRbHuMPWF_-1H-__OE03FBKEX7Sfbb93Tp-hLzEGuiCeTm_nEqdiaTqc8V2N-CnMmcN2Hpx5hfgMGexBcXPibTp7gFRm6Oco_l5JI7oSZNzUeTM49ugEa3-r1Vdw7MPoIvEdP2TkKm4bqu1xtZoEya11ReDtsZz-KLEVc_4fJxhkonGvB5AeqdaSjHeF5CeznI')"></div>
+<span class="absolute top-3.5 left-3.5 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md text-mint font-display font-bold text-base shadow-sm border border-outline-soft">
+              ₹550
+            </span>
+<span class="absolute top-3.5 right-3.5 px-2.5 py-1 rounded-full bg-lavender text-lavender-dark text-[11px] font-bold">
+              Excellent
+            </span>
+<div class="absolute bottom-3 left-3.5 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-text-main text-[11px] font-semibold border border-outline-soft/60">
+<span class="material-symbols-outlined text-[14px] text-mint">school</span>
+<span>USAR Surajmal</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-1 justify-between gap-4">
+<div>
+<h3 class="font-display font-bold text-base text-text-main group-hover:text-mint transition-colors">
+                Drafter + Container Bundle
+              </h3>
+<p class="text-xs text-text-muted mt-2 line-clamp-2 leading-relaxed">
+                Omega mini-drafter with zero scale error, sheet cylinder tube &amp; clips. Used only sem 1.
+              </p>
+</div>
+<div class="flex items-center gap-1.5 text-xs text-text-muted">
+<span class="material-symbols-outlined text-[16px] text-mint">location_on</span>
+<span class="truncate">Pickup: East Campus Metro Gate</span>
+</div>
+<div class="pt-2 flex items-center gap-2">
+<a class="flex-1 py-2.5 rounded-2xl bg-mint hover:bg-mint-dark text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm shadow-mint/20 transition-all" href="#">
+<span class="material-symbols-outlined text-[16px]">chat</span>
+<span>WhatsApp</span>
+</a>
+<button class="px-4 py-2.5 rounded-2xl bg-surface-muted hover:bg-lavender-light text-text-muted hover:text-lavender-dark text-xs font-semibold transition-all">
+                Details
+              </button>
+</div>
+</div>
+</div>
+<!-- Product Card 4: Electric Kettle -->
+<div class="group flex flex-col rounded-3xl bg-white border border-outline-soft hover:border-mint/60 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-mint/5 transition-all duration-300 hover:-translate-y-1.5">
+<div class="relative aspect-[4/3] w-full overflow-hidden bg-surface-muted">
+<div class="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform duration-500" data-alt="Electric kettle sitting on hostel study desk." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAC3wdsP0zXkv-leMlVLh4-pSBzBhblPNCKGrjtBFJRlmkJ9sjEYSMHFTCmYUzbGfjexu0Vxg7sUdOUY0LiSLz3dtAL0ueeIwTqij9tNfRuQOxxMrbM9QvqsMWJFmhluVDrM-nigyu4usp-gLixZOt_NlWBQmLi9_s4jDb2S4GV-c66hzzjvLnEa_ETYjmfWWxMTbhGgcROZf-X1sSWFUQS4MqtUdi_NEgrXj6_qGo')"></div>
+<span class="absolute top-3.5 left-3.5 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md text-mint font-display font-bold text-base shadow-sm border border-outline-soft">
+              ₹499
+            </span>
+<span class="absolute top-3.5 right-3.5 px-2.5 py-1 rounded-full bg-mint-light text-mint-dark text-[11px] font-bold">
+              Mint Condition
+            </span>
+<div class="absolute bottom-3 left-3.5 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-text-main text-[11px] font-semibold border border-outline-soft/60">
+<span class="material-symbols-outlined text-[14px] text-mint">school</span>
+<span>GTB4CEC Hostel</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-1 justify-between gap-4">
+<div>
+<h3 class="font-display font-bold text-base text-text-main group-hover:text-mint transition-colors">
+                Philips Electric Kettle 1.5L
+              </h3>
+<p class="text-xs text-text-muted mt-2 line-clamp-2 leading-relaxed">
+                Food-grade stainless body, auto cut-off protection. Lifesaver for late night Maggi &amp; tea.
+              </p>
+</div>
+<div class="flex items-center gap-1.5 text-xs text-text-muted">
+<span class="material-symbols-outlined text-[16px] text-mint">location_on</span>
+<span class="truncate">Pickup: Boys Hostel Gate #2</span>
+</div>
+<div class="pt-2 flex items-center gap-2">
+<a class="flex-1 py-2.5 rounded-2xl bg-mint hover:bg-mint-dark text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm shadow-mint/20 transition-all" href="#">
+<span class="material-symbols-outlined text-[16px]">chat</span>
+<span>WhatsApp</span>
+</a>
+<button class="px-4 py-2.5 rounded-2xl bg-surface-muted hover:bg-lavender-light text-text-muted hover:text-lavender-dark text-xs font-semibold transition-all">
+                Details
+              </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 3: EXPLORE CAMPUSES (AIRY, UN-CROWDED, METRO INFO) -->
+<section class="w-full max-w-[1320px] mx-auto px-6 sm:px-8 py-20 border-t border-outline-soft/80" id="campuses">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
+<div>
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-lavender-light text-lavender-dark text-xs font-bold mb-2">
+<span class="material-symbols-outlined text-[15px] text-mint">account_balance</span>
+<span>Campus Network Directory</span>
+</div>
+<h2 class="font-display text-3xl sm:text-4xl font-bold text-text-main">Explore Your Campus</h2>
+<p class="text-text-muted text-sm sm:text-base mt-2">
+            Swipe or select to inspect student handover hubs, metro connectivity, verified listings &amp; branch stats.
+          </p>
+</div>
+<div class="flex items-center gap-3 self-start md:self-auto">
+<button aria-label="Previous Campuses" class="w-10 h-10 rounded-full border border-outline-soft bg-white hover:bg-surface-muted text-text-main flex items-center justify-center transition-all shadow-sm" id="campusPrevBtn">
+<span class="material-symbols-outlined text-[20px]">chevron_left</span>
+</button>
+<button aria-label="Next Campuses" class="w-10 h-10 rounded-full border border-outline-soft bg-white hover:bg-surface-muted text-text-main flex items-center justify-center transition-all shadow-sm" id="campusNextBtn">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+<a class="text-sm font-bold text-mint hover:text-mint-dark flex items-center gap-1 ml-2 group" data-path="campuses" href="#">
+<span>All 11 Campuses</span>
+<span class="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- Campus Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 overflow-x-auto pb-4" id="campusScrollContainer">
+<!-- Campus 1: MAIT -->
+<div class="group flex flex-col rounded-3xl bg-white border border-outline-soft hover:border-mint/60 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-mint/5 transition-all duration-300 hover:-translate-y-1.5">
+<div class="relative h-48 w-full overflow-hidden bg-surface-muted">
+<div class="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform duration-500" data-alt="Maharaja Agrasen Institute of Technology MAIT Rohini campus building." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD7wigMQGJxmoJN1gvw7hXCbQMiJbLS2Kaz78GvowlFI7oEQDoXKcfUreqPV4-rxohWujKTF7Ybcv8Ad4iEY51r_dXNHKlHQ983Yn5NNRUq52N82MGNoC5KZvEBv565b90ekbFTCv38Z36jg1SqUyCAak0t64h2RH-WRr6_qVFy-w6Y-TEM870fdCbIyD0xNjkvHsWsS_43oqXVD5EaCKUbU9BkZfTIGsUjSUOnYSw')"></div>
+<span class="absolute top-3.5 left-3.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md text-text-main text-xs font-bold shadow-sm border border-outline-soft">
+              MAIT Rohini
+            </span>
+<span class="absolute top-3.5 right-3.5 px-2.5 py-0.5 rounded-full bg-lavender text-lavender-dark text-[11px] font-bold">
+              Engineering
+            </span>
+<div class="absolute bottom-3 left-3.5 flex items-center gap-1.5 text-white text-[11px] font-medium bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full">
+<span class="material-symbols-outlined text-[14px] text-mint">location_on</span>
+<span>PSP Area, Sector 22, Rohini</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-1 justify-between gap-5">
+<div>
+<h3 class="font-display font-bold text-base text-text-main group-hover:text-mint transition-colors">
+                Maharaja Agrasen Inst. of Tech.
+              </h3>
+<p class="text-xs text-text-muted mt-2 line-clamp-2 leading-relaxed">
+                Premier IPU affiliated hub specializing in Computer Science, IT, and core engineering streams.
+              </p>
+</div>
+<div class="flex flex-col gap-2.5 pt-2 border-t border-outline-soft/60">
+<div class="flex items-center justify-between text-xs bg-surface-muted px-3 py-2 rounded-xl">
+<span class="text-text-muted font-medium">Avg CTC</span>
+<span class="text-mint font-bold">₹10.5 LPA (Max ₹51L)</span>
+</div>
+<div class="flex items-center gap-1.5 text-xs text-text-muted font-medium">
+<span class="material-symbols-outlined text-lavender-dark text-[16px]">subway</span>
+<span class="truncate">Rithala Metro (Red Line direct)</span>
+</div>
+</div>
+<div class="pt-2 flex items-center justify-between">
+<span class="text-xs font-semibold text-text-muted">148 Active Listings</span>
+<a class="px-4 py-2 rounded-full bg-mint text-white hover:bg-mint-dark text-xs font-bold flex items-center gap-1 shadow-sm transition-all" data-path="marketplace" href="#">
+<span>Explore</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+<!-- Campus 2: GTB4CEC -->
+<div class="group flex flex-col rounded-3xl bg-white border border-outline-soft hover:border-mint/60 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-mint/5 transition-all duration-300 hover:-translate-y-1.5">
+<div class="relative h-48 w-full overflow-hidden bg-surface-muted">
+<div class="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform duration-500" data-alt="Guru Tegh Bahadur 4th Centenary Engineering College brick architecture." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDzO5u97zkFyTkyJE61MFXAVnpVvWK-itBufL-KYHhd9Xi-NzJU0wnK5IK-k1e_gAT9OuXyoIVcGU8N_l6LyVdMGk4H4A8gKEqu-GGObAjyx4eDmMc37wp-PYef2TwIonhyHmOyfgjnloCy2hKlZ8rpsCUavfMSYnpmIpuiDqPXE7_Atbq5gfaUjOChqOwVFoPG2-VYFmmcTBTiZoX0xGmQl7GMpnp-Ja1U9KKxUPE')"></div>
+<span class="absolute top-3.5 left-3.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md text-text-main text-xs font-bold shadow-sm border border-outline-soft">
+              GTB4CEC
+            </span>
+<span class="absolute top-3.5 right-3.5 px-2.5 py-0.5 rounded-full bg-lavender text-lavender-dark text-[11px] font-bold">
+              Engineering
+            </span>
+<div class="absolute bottom-3 left-3.5 flex items-center gap-1.5 text-white text-[11px] font-medium bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full">
+<span class="material-symbols-outlined text-[14px] text-mint">location_on</span>
+<span>Rajouri Garden, West Delhi</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-1 justify-between gap-5">
+<div>
+<h3 class="font-display font-bold text-base text-text-main group-hover:text-mint transition-colors">
+                Guru Tegh Bahadur 4th Cent.
+              </h3>
+<p class="text-xs text-text-muted mt-2 line-clamp-2 leading-relaxed">
+                Active tech community focused on mechanical prototypes, computer science labs, and research.
+              </p>
+</div>
+<div class="flex flex-col gap-2.5 pt-2 border-t border-outline-soft/60">
+<div class="flex items-center justify-between text-xs bg-surface-muted px-3 py-2 rounded-xl">
+<span class="text-text-muted font-medium">Avg CTC</span>
+<span class="text-mint font-bold">₹6.8 LPA (Max ₹32L)</span>
+</div>
+<div class="flex items-center gap-1.5 text-xs text-text-muted font-medium">
+<span class="material-symbols-outlined text-lavender-dark text-[16px]">subway</span>
+<span class="truncate">Subhash Nagar (Blue Line)</span>
+</div>
+</div>
+<div class="pt-2 flex items-center justify-between">
+<span class="text-xs font-semibold text-text-muted">92 Active Listings</span>
+<a class="px-4 py-2 rounded-full bg-mint text-white hover:bg-mint-dark text-xs font-bold flex items-center gap-1 shadow-sm transition-all" data-path="marketplace" href="#">
+<span>Explore</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+<!-- Campus 3: USAR East Campus -->
+<div class="group flex flex-col rounded-3xl bg-white border border-outline-soft hover:border-mint/60 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-mint/5 transition-all duration-300 hover:-translate-y-1.5">
+<div class="relative h-48 w-full overflow-hidden bg-surface-muted">
+<div class="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform duration-500" data-alt="University School of Automation and Robotics USAR East Campus modern building." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCkA24kabwP0j3h7Amj0hYqSOx1MzFGLBDc7KcXTkFIXsUtQyGQoj6db0HSLbtq1Lpc57M9NZNO3eO1hl2LKjgT_tnnRqGD1Umx60cTB1mZP3N6p5_WZ8KEUWKGJhsz8VeF1KXEFLlOxRxL6ug8OOgq-zn83A3-uihmtJh2UNuPHr2y84dTgd7rOjG8GZGxNkvcVhtJoii2YWskM1vKb5RSM2ZMi_IsdAQGQ9J5a84')"></div>
+<span class="absolute top-3.5 left-3.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md text-text-main text-xs font-bold shadow-sm border border-outline-soft">
+              USAR East
+            </span>
+<span class="absolute top-3.5 right-3.5 px-2.5 py-0.5 rounded-full bg-mint-light text-mint-dark text-[11px] font-bold">
+              Robotics &amp; AI
+            </span>
+<div class="absolute bottom-3 left-3.5 flex items-center gap-1.5 text-white text-[11px] font-medium bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full">
+<span class="material-symbols-outlined text-[14px] text-mint">location_on</span>
+<span>Surajmal Vihar, East Delhi</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-1 justify-between gap-5">
+<div>
+<h3 class="font-display font-bold text-base text-text-main group-hover:text-mint transition-colors">
+                Univ. School of Automation &amp; AI
+              </h3>
+<p class="text-xs text-text-muted mt-2 line-clamp-2 leading-relaxed">
+                Brand-new flagship GGSIPU East Delhi campus focusing on Artificial Intelligence, Automation &amp; IIOT.
+              </p>
+</div>
+<div class="flex flex-col gap-2.5 pt-2 border-t border-outline-soft/60">
+<div class="flex items-center justify-between text-xs bg-surface-muted px-3 py-2 rounded-xl">
+<span class="text-text-muted font-medium">Avg CTC</span>
+<span class="text-mint font-bold">₹10.2 LPA (Max ₹45L)</span>
+</div>
+<div class="flex items-center gap-1.5 text-xs text-text-muted font-medium">
+<span class="material-symbols-outlined text-lavender-dark text-[16px]">subway</span>
+<span class="truncate">Karkardooma / Anand Vihar</span>
+</div>
+</div>
+<div class="pt-2 flex items-center justify-between">
+<span class="text-xs font-semibold text-text-muted">114 Active Listings</span>
+<a class="px-4 py-2 rounded-full bg-mint text-white hover:bg-mint-dark text-xs font-bold flex items-center gap-1 shadow-sm transition-all" data-path="marketplace" href="#">
+<span>Explore</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+<!-- Campus 4: USICT Main Dwarka -->
+<div class="group flex flex-col rounded-3xl bg-white border border-outline-soft hover:border-mint/60 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-mint/5 transition-all duration-300 hover:-translate-y-1.5">
+<div class="relative h-48 w-full overflow-hidden bg-surface-muted">
+<div class="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform duration-500" data-alt="USICT Main Dwarka campus sandstone block." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuARjmfO_caZ2N8BiFlwQVBixNqVo8Yuxlr10SjsafxpY-QXDXie184Q9BNHuzmPySUX5P0l553E0t8GXtt8C8ZJzBckAO3Oa4IDLvPIL336HoNMUZQ0Ck7KWHLxGACmfVluO6sv_bBJ2n6GFi9e353jhUrE71pSZ55PblxgexmdtcOdqFYQAeJTlmca5rsVb7bJVDqOuI495JEzSlgxGLXO8mNvsmUfFsRA2VYbod4')"></div>
+<span class="absolute top-3.5 left-3.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md text-text-main text-xs font-bold shadow-sm border border-outline-soft">
+              USICT Main
+            </span>
+<span class="absolute top-3.5 right-3.5 px-2.5 py-0.5 rounded-full bg-lavender text-lavender-dark text-[11px] font-bold">
+              Apex Campus
+            </span>
+<div class="absolute bottom-3 left-3.5 flex items-center gap-1.5 text-white text-[11px] font-medium bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full">
+<span class="material-symbols-outlined text-[14px] text-mint">location_on</span>
+<span>Sector 16C, Dwarka, New Delhi</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-1 justify-between gap-5">
+<div>
+<h3 class="font-display font-bold text-base text-text-main group-hover:text-mint transition-colors">
+                Univ. School of Info &amp; Comm Tech
+              </h3>
+<p class="text-xs text-text-muted mt-2 line-clamp-2 leading-relaxed">
+                Main headquarters with 14 residential hostels, massive hardware and software developer culture.
+              </p>
+</div>
+<div class="flex flex-col gap-2.5 pt-2 border-t border-outline-soft/60">
+<div class="flex items-center justify-between text-xs bg-surface-muted px-3 py-2 rounded-xl">
+<span class="text-text-muted font-medium">Avg CTC</span>
+<span class="text-mint font-bold">₹11.5 LPA (Max ₹52L)</span>
+</div>
+<div class="flex items-center gap-1.5 text-xs text-text-muted font-medium">
+<span class="material-symbols-outlined text-lavender-dark text-[16px]">subway</span>
+<span class="truncate">Dwarka Sector 14 (2 min walk)</span>
+</div>
+</div>
+<div class="pt-2 flex items-center justify-between">
+<span class="text-xs font-semibold text-text-muted">210 Active Listings</span>
+<a class="px-4 py-2 rounded-full bg-mint text-white hover:bg-mint-dark text-xs font-bold flex items-center gap-1 shadow-sm transition-all" data-path="marketplace" href="#">
+<span>Explore</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- IMPACT METRICS & TRUST STATS STRIP -->
+<section class="w-full max-w-[1320px] mx-auto px-6 sm:px-8 py-10">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-8 p-10 rounded-3xl bg-white border border-outline-soft shadow-sm">
+<div class="flex flex-col items-center md:items-start text-center md:text-left">
+<span class="font-display text-3xl sm:text-4xl font-bold text-mint">₹18.4L+</span>
+<span class="text-xs sm:text-sm font-bold text-text-main mt-1.5">Student Savings</span>
+<span class="text-xs text-text-muted mt-0.5">Compared to retail stores</span>
+</div>
+<div class="flex flex-col items-center md:items-start text-center md:text-left">
+<span class="font-display text-3xl sm:text-4xl font-bold text-lavender-dark">3,420+</span>
+<span class="text-xs sm:text-sm font-bold text-text-main mt-1.5">Verified Peers</span>
+<span class="text-xs text-text-muted mt-0.5">Active student accounts</span>
+</div>
+<div class="flex flex-col items-center md:items-start text-center md:text-left">
+<span class="font-display text-3xl sm:text-4xl font-bold text-mint">&lt; 15 Mins</span>
+<span class="text-xs sm:text-sm font-bold text-text-main mt-1.5">Handover Time</span>
+<span class="text-xs text-text-muted mt-0.5">Between campus blocks</span>
+</div>
+<div class="flex flex-col items-center md:items-start text-center md:text-left">
+<span class="font-display text-3xl sm:text-4xl font-bold text-text-main">0%</span>
+<span class="text-xs sm:text-sm font-bold text-text-main mt-1.5">Platform Tax</span>
+<span class="text-xs text-text-muted mt-0.5">Direct student-to-student</span>
+</div>
+</div>
+</section>
+<!-- HIGH-CONVERSION SELLER CTA BANNER -->
+<section class="w-full max-w-[1320px] mx-auto px-6 sm:px-8 py-16">
+<div class="relative rounded-3xl overflow-hidden bg-gradient-to-br from-mint-light via-white to-lavender-light border border-outline-soft p-10 sm:p-16 shadow-lg flex flex-col items-center text-center">
+<!-- Subtle ambient orbs inside banner -->
+<div class="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-mint/20 blur-3xl pointer-events-none"></div>
+<div class="absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-lavender blur-3xl pointer-events-none"></div>
+<span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white text-mint-dark font-bold text-xs mb-5 shadow-sm border border-mint/20">
+<span class="material-symbols-outlined text-[16px] text-mint">recycling</span>
+<span>Zero Waste Campus Initiative</span>
+</span>
+<h2 class="font-display text-2xl sm:text-4xl font-bold text-text-main max-w-2xl leading-tight">
+          Something on your shelf someone on this campus needs?
+        </h2>
+<p class="text-text-muted text-sm sm:text-base max-w-xl mt-4 mb-8 leading-relaxed">
+          List it in under two minutes and let it pass on. Textbooks, calculators, cycles, lab gear — if it helped you clear your sem, pass it on to a junior.
+        </p>
+<div class="flex flex-wrap items-center justify-center gap-4">
+<a class="px-8 py-3.5 rounded-full bg-mint text-white font-display font-bold text-sm shadow-xl shadow-mint/30 hover:bg-mint-dark hover:scale-105 transition-all flex items-center gap-2" data-path="sell-an-item" href="#">
+<span class="material-symbols-outlined text-[20px]">add_photo_alternate</span>
+<span>Pass On an Item</span>
+</a>
+<a class="px-6 py-3.5 rounded-full bg-white hover:bg-surface-muted text-text-main font-semibold text-xs border border-outline-soft flex items-center gap-2 shadow-sm transition-all" data-path="marketplace" href="#">
+<span>Browse Marketplace</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</a>
+</div>
+</div>
+</section>
+</main>
+<!-- REFINED, CLEAN FOOTER -->
+<footer class="w-full bg-white border-t border-outline-soft mt-10">
+<div class="max-w-[1320px] mx-auto px-6 sm:px-8 pt-16 pb-12">
+<div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-10 pb-16 border-b border-outline-soft">
+<div class="lg:col-span-2 flex flex-col gap-4">
+<div class="flex items-center gap-2.5">
+<div class="w-9 h-9 rounded-2xl bg-mint flex items-center justify-center text-white shadow-sm">
+<span class="material-symbols-outlined text-[20px]">school</span>
+</div>
+<span class="font-display font-bold text-xl text-text-main">
+              Pass<span class="text-mint">On</span>
+</span>
+</div>
+<p class="text-xs sm:text-sm text-text-muted max-w-sm leading-relaxed">
+            The student-first peer marketplace for verified college campuses. Buy, sell, and exchange textbooks, electronics, and dorm essentials with zero platform tax.
+          </p>
+<div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-mint-light w-fit text-mint-dark text-xs font-bold border border-mint/20">
+<span class="material-symbols-outlined text-[16px] text-mint">verified_user</span>
+<span>100% Verified Campus Peers</span>
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<span class="text-xs font-bold uppercase tracking-wider text-text-main">Marketplace</span>
+<ul class="flex flex-col gap-2.5 text-xs font-medium text-text-muted">
+<li><a class="hover:text-mint transition-colors" data-path="categories" href="#">Textbooks &amp; Notes</a></li>
+<li><a class="hover:text-mint transition-colors" data-path="categories" href="#">Electronics &amp; Gadgets</a></li>
+<li><a class="hover:text-mint transition-colors" data-path="categories" href="#">Dorm Essentials</a></li>
+<li><a class="hover:text-mint transition-colors" data-path="categories" href="#">Cycles &amp; Mobility</a></li>
+<li><a class="hover:text-mint transition-colors" data-path="categories" href="#">Lab Gear &amp; Uniforms</a></li>
+</ul>
+</div>
+<div class="flex flex-col gap-3">
+<span class="text-xs font-bold uppercase tracking-wider text-text-main">Campuses</span>
+<ul class="flex flex-col gap-2.5 text-xs font-medium text-text-muted">
+<li><a class="hover:text-mint transition-colors" data-path="campuses" href="#">MAIT Delhi</a></li>
+<li><a class="hover:text-mint transition-colors" data-path="campuses" href="#">DTU Delhi</a></li>
+<li><a class="hover:text-mint transition-colors" data-path="campuses" href="#">NSUT Dwarka</a></li>
+<li><a class="hover:text-mint transition-colors" data-path="campuses" href="#">IIT Delhi</a></li>
+<li><a class="hover:text-mint transition-colors" data-path="campuses" href="#">Browse All 40+ Hubs</a></li>
+</ul>
+</div>
+<div class="flex flex-col gap-3">
+<span class="text-xs font-bold uppercase tracking-wider text-text-main">Trust &amp; Safety</span>
+<ul class="flex flex-col gap-2.5 text-xs font-medium text-text-muted">
+<li><a class="hover:text-mint transition-colors" data-path="trust-and-safety" href="#">Student Verification</a></li>
+<li><a class="hover:text-mint transition-colors" data-path="trust-and-safety" href="#">Safe Handover Spots</a></li>
+<li><a class="hover:text-mint transition-colors" data-path="trust-and-safety" href="#">Zero-Tax Policy</a></li>
+<li><a class="hover:text-mint transition-colors" data-path="community" href="#">Campus Guidelines</a></li>
+<li><a class="hover:text-mint transition-colors" data-path="help-support" href="#">Contact Campus Leads</a></li>
+</ul>
+</div>
+</div>
+<div class="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-medium text-text-muted">
+<span>© 2025 PassOn Technologies. Built for Students.</span>
+<div class="flex items-center gap-6">
+<a class="hover:text-text-main transition-colors" data-path="privacy-policy" href="#">Privacy</a>
+<a class="hover:text-text-main transition-colors" data-path="terms-of-service" href="#">Terms</a>
+<a class="hover:text-text-main transition-colors" data-path="community" href="#">Honor Code</a>
+</div>
+</div>
+</div>
+</footer>
+<script>
+    (function initCampusScroller() {
+      const container = document.getElementById('campusScrollContainer');
+      const prevBtn = document.getElementById('campusPrevBtn');
+      const nextBtn = document.getElementById('campusNextBtn');
+
+      if (container && prevBtn && nextBtn) {
+        prevBtn.addEventListener('click', () => {
+          container.scrollBy({ left: -340, behavior: 'smooth' });
+        });
+        nextBtn.addEventListener('click', () => {
+          container.scrollBy({ left: 340, behavior: 'smooth' });
+        });
+      }
+    })();
+  </script>
+</body></html>

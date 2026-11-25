@@ -10,11 +10,11 @@ import { VerificationStatusBanner } from '@/components/verification/Verification
 
 export const metadata: Metadata = {
   title: {
-    default: 'Pass ON — Verified College Marketplace & Student Store',
-    template: '%s | Pass ON',
+    default: 'PassOn — Verified College Marketplace & Student Store',
+    template: '%s | PassOn',
   },
   description:
-    'Pass ON connects verified college seniors and juniors to buy, sell, borrow, donate and exchange textbooks, calculators, lab coats and essentials across Delhi engineering colleges — plus the official Pass ON store for student favourites.',
+    'PassOn connects verified college seniors and juniors to buy, sell, borrow, donate and exchange textbooks, calculators, lab coats and essentials across Delhi engineering colleges.',
   icons: {
     icon: '/logo-icon.png',
     apple: '/logo-icon.png',
@@ -27,8 +27,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className="flex min-h-screen flex-col bg-[#f7f7f8] dark:bg-[#020617] text-ink-950 dark:text-slate-100 selection:bg-brand-600 selection:text-white transition-colors duration-300">
+    <html lang="en" className="light">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="flex min-h-screen flex-col bg-surface-bg dark:bg-[#020617] text-text-main dark:text-slate-100 antialiased selection:bg-mint selection:text-white transition-colors duration-300">
         <AppProvider>
           <CartProvider>
             <Navbar />
