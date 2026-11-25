@@ -201,15 +201,15 @@ export default function SellPage() {
 
       // If user selected a local file, upload directly to Cloudinary to get a permanent URL
       if (imageFile) {
-        showToast('Saving item photo to Cloudinary...');
+        showToast('Uploading photo to Cloudinary...');
         try {
-          const permanentUrl = await uploadToCloudinary(imageFile, 'pass-on/listings');
+          const permanentUrl = await uploadToCloudinary(imageFile, 'passiton/products');
           if (permanentUrl) {
             finalImage = permanentUrl;
           }
         } catch (uploadErr) {
           console.warn('Cloudinary upload warning:', uploadErr);
-          // Graceful fallback so product publishing is never blocked by image CDN permission errors!
+          showToast(uploadErr instanceof Error ? uploadErr.message : 'Photo upload warning, using fallback');
           if (!finalImage && imageUrl.trim()) {
             finalImage = imageUrl.trim();
           }
@@ -254,7 +254,7 @@ export default function SellPage() {
       });
 
       if (newListing) {
-        showToast('Listing published permanently to Supabase!');
+        showToast('Listing published & photo saved to Cloudinary!');
         router.push(`/item/${newListing.id}`);
       }
     } catch (err) {
@@ -680,7 +680,7 @@ export default function SellPage() {
               className="w-full sm:w-auto"
             >
               <PlusCircle className="h-4 w-4" />
-              {isSubmitting ? 'Publishing to Supabase...' : 'Publish Campus Listing'}
+              {isSubmitting ? 'Uploading to Cloudinary & Publishing...' : 'Publish Campus Listing'}
             </Button>
           </div>
         </form>
