@@ -672,16 +672,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem(STORAGE_KEY_LISTINGS, JSON.stringify(updated));
     } catch {}
 
-    // Sync listing to central server database and wait for confirmation so it is never lost
+    // Sync listing to central MongoDB server database and verify confirmation
     try {
-      await fetch('/api/listings', {
+      const res = await fetch('/api/listings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newListing),
       });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData?.error || 'Failed to save listing to database');
+      }
       await syncFromServer();
     } catch (err) {
       console.error('Error adding listing to server:', err);
+      showToast(err instanceof Error ? err.message : 'Warning: Could not sync listing to server database.');
     }
 
     showToast(`Listing "${newListing.title}" published successfully!`);

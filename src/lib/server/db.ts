@@ -186,6 +186,11 @@ export async function saveListing(listing: Listing): Promise<Listing> {
     );
   } catch (err) {
     console.error('MongoDB saveListing failed:', err);
+    throw new Error(
+      err instanceof Error
+        ? `Database save failed: ${err.message}`
+        : 'Failed to persist listing in MongoDB'
+    );
   }
 
   return listing;
