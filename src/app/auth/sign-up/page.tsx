@@ -188,10 +188,12 @@ export default function SignUpPage() {
         return;
       }
 
-      // Also register into AppContext
+      // Update client state without firing a duplicate POST /api/students call
       if (data.student) {
-        registerStudent(data.student);
         setCurrentUser(data.student);
+        try {
+          localStorage.setItem('passon_user_v3', JSON.stringify(data.student));
+        } catch {}
       }
 
       showToast('Account created! Awaiting campus verification.');

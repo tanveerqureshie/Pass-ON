@@ -84,29 +84,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 4. Duplicate email check in MongoDB & Memory
+    // 4. Duplicate email check in MongoDB (strictly permanent DB check)
+    const db = await getDb();
     try {
-      const db = await getDb();
-      try {
-        await db.collection('students').createIndex({ email: 1 }, { unique: true });
-      } catch {
-        // Index may already exist
-      }
-
-      const existingInDb = await db.collection('students').findOne({ email });
-      if (existingInDb && existingInDb.id !== body.id) {
-        return NextResponse.json(
-          { success: false, field: 'email', message: 'Email already in use' },
-          { status: 409, headers: NO_CACHE_HEADERS }
-        );
-      }
-    } catch (dbErr) {
-      console.warn('MongoDB duplicate check fallback:', dbErr);
+      await db.collection('students').createIndex({ email: 1 }, { unique: true });
+    } catch {
+      // Index already exists
     }
 
-    const allStudents = await getAllStudents();
-    const duplicate = allStudents.find((s) => s.email.toLowerCase() === email && s.id !== body.id);
-    if (duplicate) {
+    const existingInDb = await db.collection('students').findOne({ email });
+    if (existingInDb) {
       return NextResponse.json(
         { success: false, field: 'email', message: 'Email already in use' },
         { status: 409, headers: NO_CACHE_HEADERS }
@@ -117,7 +104,7 @@ export async function POST(req: NextRequest) {
     const hashedPassword = await hashPassword(password);
 
     const studentToSave: UserProfile = {
-      id: body.id || `student_${Date.now()}`,
+      id: body.id || `student_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
       email,
       fullName,
       phoneNumber: body.phoneNumber?.trim() || undefined,
@@ -136,7 +123,7 @@ export async function POST(req: NextRequest) {
       password: hashedPassword,
     };
 
-    const saved = await saveStudent(studentToSave);
+    const saved = await saveStudent(studentToSave, true);
     const safeStudent = sanitizeUser(saved);
 
     const res = NextResponse.json(
@@ -151,8 +138,39 @@ export async function POST(req: NextRequest) {
     return res;
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Failed to register student';
+    if (msg === 'Email already in use') {
+      return NextResponse.json(
+        { success: false, field: 'email', message: 'Email already in use' },
+        { status: 409, headers: NO_CACHE_HEADERS }
+      );
+    }
     return NextResponse.json(
       { success: false, message: msg },
+      { status: 500, headers: NO_CACHE_HEADERS }
+    );
+  }
+}
+
+// PUT: Updates an existing student's profile details without overwriting other accounts
+export async function PUT(req: NextRequest) {
+  try {
+    const body = (await req.json()) as UserProfile;
+    if (!body || !body.id || !body.email) {
+      return NextResponse.json(
+        { success: false, error: 'Student ID and email are required' },
+        { status: 400, headers: NO_CACHE_HEADERS }
+      );
+    }
+
+    const saved = await saveStudent(body, false);
+    return NextResponse.json(
+      { success: true, student: sanitizeUser(saved) },
+      { headers: NO_CACHE_HEADERS }
+    );
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Failed to update profile';
+    return NextResponse.json(
+      { success: false, error: msg },
       { status: 500, headers: NO_CACHE_HEADERS }
     );
   }

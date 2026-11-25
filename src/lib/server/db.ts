@@ -295,33 +295,48 @@ export async function getAllStudents(): Promise<UserProfile[]> {
   return memoryDb.students;
 }
 
-export async function saveStudent(student: UserProfile): Promise<UserProfile> {
+export async function saveStudent(student: UserProfile, isNewRegistration = false): Promise<UserProfile> {
   const cleanEmail = student.email.trim().toLowerCase();
-  const existingIdx = memoryDb.students.findIndex(
-    (s) => s.id === student.id || s.email.toLowerCase() === cleanEmail
-  );
-  if (existingIdx >= 0) {
-    memoryDb.students[existingIdx] = { ...memoryDb.students[existingIdx], ...student, email: cleanEmail };
-  } else {
-    memoryDb.students.unshift({ ...student, email: cleanEmail });
-  }
-  syncLocalBackup({ students: memoryDb.students });
+  const normalizedStudent: UserProfile = { ...student, email: cleanEmail };
 
   try {
     const db = await getDb();
-    const row = toDbProfile(student);
+    const row = toDbProfile(normalizedStudent);
     row.email = cleanEmail;
 
-    await db.collection('students').updateOne(
-      { $or: [{ id: student.id }, { email: cleanEmail }] },
-      { $set: row },
-      { upsert: true }
-    );
-  } catch (err) {
+    if (isNewRegistration) {
+      // Strictly insert a new student document so existing students can never be overwritten
+      await db.collection('students').insertOne(row);
+    } else {
+      await db.collection('students').updateOne(
+        { id: normalizedStudent.id },
+        { $set: row },
+        { upsert: true }
+      );
+    }
+  } catch (err: any) {
     console.error('MongoDB saveStudent failed:', err);
+    if (err?.code === 11000) {
+      throw new Error('Email already in use');
+    }
+    throw new Error(
+      err instanceof Error
+        ? `Database error: ${err.message}`
+        : 'Failed to save student permanently in MongoDB'
+    );
   }
 
-  return student;
+  const existingIdx = memoryDb.students.findIndex(
+    (s) => s.id === normalizedStudent.id || s.email.toLowerCase() === cleanEmail
+  );
+  if (existingIdx >= 0) {
+    memoryDb.students[existingIdx] = { ...memoryDb.students[existingIdx], ...normalizedStudent };
+  } else {
+    memoryDb.students.unshift(normalizedStudent);
+  }
+  syncLocalBackup({ students: memoryDb.students });
+
+  return normalizedStudent;
 }
 
 export async function updateStudentStatus(
